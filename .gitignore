@@ -1,0 +1,25 @@
+## Visual Studio / .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+.idea/
+.vscode/
+
+## Test Results
+TestResults/
+*.trx
+
+## OS generated
+[Tt]humbs.db
+[Ee]hthumbs.db
+[Dd]esktop.ini
+.DS_Store
+
+## EF Core
+*.db
+*.db-shm
+*.db-wal

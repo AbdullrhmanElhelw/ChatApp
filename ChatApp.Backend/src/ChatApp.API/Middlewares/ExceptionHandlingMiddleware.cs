@@ -101,7 +101,7 @@ public class ExceptionHandlingMiddleware
 
         problemDetails.Extensions["traceId"] = traceId;
 
-        var json = JsonSerializer.Serialize(problemDetails, new JsonSerializerOptions
+        var json = JsonSerializer.Serialize((object)problemDetails, problemDetails.GetType(), new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = false

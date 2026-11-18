@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Brand Identity Palette -->
+    <Color x:Key="BrandPrimary">#0D9488</Color>
+    <Color x:Key="BrandPrimaryLight">#14B8A6</Color>
+    <Color x:Key="BrandPrimaryDark">#0F766E</Color>
+    <Color x:Key="BrandSecondary">#0284C7</Color>
+    <Color x:Key="BrandAccent">#F59E0B</Color>
+
+    <!-- Semantic Status Colors -->
+    <Color x:Key="StatusOnline">#10B981</Color>
+    <Color x:Key="StatusOffline">#94A3B8</Color>
+    <Color x:Key="StatusSuccess">#22C55E</Color>
+    <Color x:Key="StatusWarning">#F59E0B</Color>
+    <Color x:Key="StatusError">#EF4444</Color>
+    <Color x:Key="StatusInfo">#38BDF8</Color>
+
+    <!-- Neutral Scale -->
+    <Color x:Key="White">#FFFFFF</Color>
+    <Color x:Key="Black">#000000</Color>
+    <Color x:Key="Gray50">#F8FAFC</Color>
+    <Color x:Key="Gray100">#F1F5F9</Color>
+    <Color x:Key="Gray200">#E2E8F0</Color>
+    <Color x:Key="Gray300">#CBD5E1</Color>
+    <Color x:Key="Gray400">#94A3B8</Color>
+    <Color x:Key="Gray500">#64748B</Color>
+    <Color x:Key="Gray600">#475569</Color>
+    <Color x:Key="Gray700">#334155</Color>
+    <Color x:Key="Gray800">#1E293B</Color>
+    <Color x:Key="Gray900">#0F172A</Color>
+    <Color x:Key="Gray950">#0B0F19</Color>
+
+    <!-- Message Bubble Specific -->
+    <Color x:Key="BubbleOutgoingLight">#0D9488</Color>
+    <Color x:Key="BubbleOutgoingDark">#0F766E</Color>
+    <Color x:Key="BubbleIncomingLight">#F1F5F9</Color>
+    <Color x:Key="BubbleIncomingDark">#1E293B</Color>
+
+    <!-- Common Brushes -->
+    <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource BrandPrimary}" />
+    <SolidColorBrush x:Key="BrandSecondaryBrush" Color="{StaticResource BrandSecondary}" />
+    <SolidColorBrush x:Key="StatusOnlineBrush" Color="{StaticResource StatusOnline}" />
+    <SolidColorBrush x:Key="StatusErrorBrush" Color="{StaticResource StatusError}" />
+    <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource White}" />
+    <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource Black}" />
+
+    <!-- Gradient Brushes -->
+    <LinearGradientBrush x:Key="BrandGradientBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0D9488" Offset="0.0" />
+        <GradientStop Color="#0284C7" Offset="1.0" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="BrandGradientDarkBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0F766E" Offset="0.0" />
+        <GradientStop Color="#0369A1" Offset="1.0" />
+    </LinearGradientBrush>
+</ResourceDictionary>

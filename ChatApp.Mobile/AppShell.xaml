@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="ChatApp.Mobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:common="clr-namespace:ChatApp.Mobile.Features.Common"
+    Title="ChatApp">
+
+    <ShellContent
+        Title="Design System"
+        ContentTemplate="{DataTemplate common:DesignSystemPage}"
+        Route="DesignSystemPage" />
+
+</Shell>

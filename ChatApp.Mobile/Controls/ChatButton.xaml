@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:ChatApp.Mobile.Converters"
+             x:Class="ChatApp.Mobile.Controls.ChatButton"
+             x:Name="ThisButton">
+
+    <ContentView.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </ContentView.Resources>
+
+    <Border StrokeThickness="0"
+            HeightRequest="50"
+            BackgroundColor="{Binding ButtonBackground, Source={x:Reference ThisButton}}"
+            Padding="16,0">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="14" />
+        </Border.StrokeShape>
+
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding TapCommand, Source={x:Reference ThisButton}}" />
+        </Border.GestureRecognizers>
+
+        <Grid HorizontalOptions="Center" VerticalOptions="Center">
+            <!-- Normal Button Text -->
+            <Label Text="{Binding Text, Source={x:Reference ThisButton}}"
+                   TextColor="{Binding TextColor, Source={x:Reference ThisButton}}"
+                   FontFamily="CairoBold"
+                   FontSize="15"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding IsLoading, Source={x:Reference ThisButton}, Converter={StaticResource InverseBoolConverter}}" />
+
+            <!-- Loading Spinner -->
+            <ActivityIndicator IsRunning="{Binding IsLoading, Source={x:Reference ThisButton}}"
+                               IsVisible="{Binding IsLoading, Source={x:Reference ThisButton}}"
+                               Color="{Binding TextColor, Source={x:Reference ThisButton}}"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+        </Grid>
+    </Border>
+</ContentView>

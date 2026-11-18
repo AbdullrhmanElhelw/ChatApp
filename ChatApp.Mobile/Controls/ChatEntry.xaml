@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChatApp.Mobile.Controls.ChatEntry"
+             x:Name="ThisEntry">
+
+    <VerticalStackLayout Spacing="6">
+        <!-- Field Header Label -->
+        <Label Text="{Binding LabelText, Source={x:Reference ThisEntry}}"
+               TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}"
+               FontFamily="CairoBold"
+               FontSize="13"
+               FontAttributes="Bold"
+               IsVisible="{Binding HasLabel, Source={x:Reference ThisEntry}}" />
+
+        <!-- Input Box Border -->
+        <Border StrokeShape="RoundRectangle 12"
+                StrokeThickness="1"
+                Stroke="{Binding BorderStroke, Source={x:Reference ThisEntry}}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                Padding="14,0"
+                HeightRequest="50">
+
+            <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                <Entry Grid.Column="0"
+                       Text="{Binding Text, Source={x:Reference ThisEntry}, Mode=TwoWay}"
+                       Placeholder="{Binding Placeholder, Source={x:Reference ThisEntry}}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
+                       FontFamily="CairoRegular"
+                       FontSize="15"
+                       IsPassword="{Binding IsPassword, Source={x:Reference ThisEntry}}"
+                       Keyboard="{Binding Keyboard, Source={x:Reference ThisEntry}}"
+                       VerticalOptions="Center" />
+
+                <!-- Password Toggle / Clear button (optional) -->
+                <ImageButton Grid.Column="1"
+                             IsVisible="{Binding IsPassword, Source={x:Reference ThisEntry}}"
+                             Command="{Binding TogglePasswordCommand, Source={x:Reference ThisEntry}}"
+                             WidthRequest="24"
+                             HeightRequest="24"
+                             VerticalOptions="Center"
+                             BackgroundColor="Transparent" />
+            </Grid>
+        </Border>
+
+        <!-- Error Message Feedback -->
+        <Label Text="{Binding ErrorMessage, Source={x:Reference ThisEntry}}"
+               TextColor="{StaticResource StatusError}"
+               FontFamily="CairoRegular"
+               FontSize="12"
+               Margin="4,0,0,0"
+               IsVisible="{Binding HasError, Source={x:Reference ThisEntry}}" />
+    </VerticalStackLayout>
+</ContentView>

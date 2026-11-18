@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChatApp.Mobile.Controls.StateContainer"
+             x:Name="ThisStateContainer">
+
+    <Grid>
+        <!-- Content Layer -->
+        <ContentView Content="{Binding NormalContent, Source={x:Reference ThisStateContainer}}"
+                     IsVisible="{Binding IsContentVisible, Source={x:Reference ThisStateContainer}}" />
+
+        <!-- Loading State -->
+        <VerticalStackLayout Spacing="16"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             IsVisible="{Binding IsLoadingVisible, Source={x:Reference ThisStateContainer}}">
+            <ActivityIndicator IsRunning="True"
+                               Color="{StaticResource BrandPrimary}"
+                               WidthRequest="40"
+                               HeightRequest="40" />
+            <Label Text="{Binding LoadingText, Source={x:Reference ThisStateContainer}}"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                   FontFamily="CairoRegular"
+                   FontSize="14"
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <!-- Empty State -->
+        <VerticalStackLayout Spacing="12"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Padding="32"
+                             IsVisible="{Binding IsEmptyVisible, Source={x:Reference ThisStateContainer}}">
+            <Label Text="💬"
+                   FontSize="48"
+                   HorizontalOptions="Center" />
+            <Label Text="{Binding EmptyTitle, Source={x:Reference ThisStateContainer}}"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                   FontFamily="CairoBold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+            <Label Text="{Binding EmptyMessage, Source={x:Reference ThisStateContainer}}"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                   FontFamily="CairoRegular"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <!-- Error State -->
+        <VerticalStackLayout Spacing="12"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Padding="32"
+                             IsVisible="{Binding IsErrorVisible, Source={x:Reference ThisStateContainer}}">
+            <Label Text="⚠️"
+                   FontSize="44"
+                   HorizontalOptions="Center" />
+            <Label Text="{Binding ErrorMessage, Source={x:Reference ThisStateContainer}}"
+                   TextColor="{StaticResource StatusError}"
+                   FontFamily="CairoRegular"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   HorizontalOptions="Center" />
+            <Button Text="إعادة المحاولة"
+                    Command="{Binding RetryCommand, Source={x:Reference ThisStateContainer}}"
+                    Style="{StaticResource ChatPrimaryButton}"
+                    HeightRequest="44"
+                    Padding="20,0"
+                    HorizontalOptions="Center"
+                    IsVisible="{Binding HasRetryCommand, Source={x:Reference ThisStateContainer}}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentView>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:common="clr-namespace:ChatApp.Mobile.Features.Common"
+             xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
+             x:Class="ChatApp.Mobile.Features.Common.DesignSystemPage"
+             x:DataType="common:DesignSystemViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="24" Padding="20">
+
+            <!-- Header Card with Theme Switcher -->
+            <Border Style="{StaticResource ChatCardBorder}">
+                <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <Label Text="ChatApp Design Tokens"
+                               Style="{StaticResource TypographyH2}"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}" />
+                        <Label Text="{Binding CurrentThemeName}"
+                               Style="{StaticResource TypographyCaption}"
+                               TextColor="{StaticResource BrandPrimary}" />
+                    </VerticalStackLayout>
+
+                    <Button Grid.Column="1"
+                            Text="تبديل الثيم 🌓"
+                            Command="{Binding ToggleThemeCommand}"
+                            Style="{StaticResource ChatGhostButton}" />
+                </Grid>
+            </Border>
+
+            <!-- 1. Typography System -->
+            <Border Style="{StaticResource ChatCardBorder}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="1. Typography &amp; Cairo Font (الخطوط والعناوين)"
+                           Style="{StaticResource TypographyH3}"
+                           TextColor="{StaticResource BrandPrimary}" />
+
+                    <Label Text="عنوان رئيسي كبير H1 — ChatApp"
+                           Style="{StaticResource TypographyH1}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}" />
+
+                    <Label Text="عنوان فرعي H2 — تجربة مراسلة عصرية وفورية"
+                           Style="{StaticResource TypographyH2}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}" />
+
+                    <Label Text="عنوان أقسام H3 — المحادثات والمجموعات"
+                           Style="{StaticResource TypographyH3}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}" />
+
+                    <Label Text="نص المحادثة الأساسي Body: تطبيق مراسلة يجمع سرعة واتساب وإبداع تليجرام مع صانع استيكرز احترافي."
+                           Style="{StaticResource TypographyBody}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}" />
+
+                    <Label Text="نص معلومات إضافية Caption • 10:45 ص • تم التسليم"
+                           Style="{StaticResource TypographyCaption}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 2. Avatar Variations & Presence Badges -->
+            <Border Style="{StaticResource ChatCardBorder}">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="2. Reusable Avatars (الأفاتار وحالة الاتصال)"
+                           Style="{StaticResource TypographyH3}"
+                           TextColor="{StaticResource BrandPrimary}" />
+
+                    <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                        <!-- User 1: Online -->
+                        <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                            <controls:AvatarView FullName="عبدالله أحمد"
+                                                 Size="56"
+                                                 IsOnline="True" />
+                            <Label Text="متصل 🟢"
+                                   Style="{StaticResource TypographyTiny}"
+                                   TextColor="{StaticResource StatusOnline}"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+
+                        <!-- User 2: Offline -->
+                        <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                            <controls:AvatarView FullName="Sarah Connor"
+                                                 Size="56"
+                                                 IsOnline="False" />
+                            <Label Text="غير متصل"
+                                   Style="{StaticResource TypographyTiny}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+
+                        <!-- User 3: Mini Avatar in List -->
+                        <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                            <controls:AvatarView FullName="Mohamed Ali"
+                                                 Size="40"
+                                                 IsOnline="True" />
+                            <Label Text="حجم 40dp"
+                                   Style="{StaticResource TypographyTiny}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 3. Unread Badges -->
+            <Border Style="{StaticResource ChatCardBorder}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="3. Badge Indicators (شارات الرسائل غير المقروءة)"
+                           Style="{StaticResource TypographyH3}"
+                           TextColor="{StaticResource BrandPrimary}" />
+
+                    <HorizontalStackLayout Spacing="24" HorizontalOptions="Center">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <controls:BadgeIndicator Count="3" />
+                            <Label Text="3 رسائل" Style="{StaticResource TypographyTiny}" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <controls:BadgeIndicator Count="{Binding SampleUnreadCount}" />
+                            <Label Text="ديناميكي" Style="{StaticResource TypographyTiny}" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <controls:BadgeIndicator Count="145" />
+                            <Label Text="أكثر من 99" Style="{StaticResource TypographyTiny}" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 4. Interactive Reusable Buttons -->
+            <Border Style="{StaticResource ChatCardBorder}">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="4. Modern Buttons (الأزرار وحالات التحميل)"
+                           Style="{StaticResource TypographyH3}"
+                           TextColor="{StaticResource BrandPrimary}" />
+
+                    <!-- Primary Button with Spinner Simulation -->
+                    <controls:ChatButton Text="زر أساسي تفاعلي (اضغط للتجربة)"
+                                         ButtonType="Primary"
+                                         IsLoading="{Binding IsActionLoading}"
+                                         Command="{Binding SimulateLoadingActionCommand}" />
+
+                    <!-- Secondary Button -->
+                    <controls:ChatButton Text="زر ثانوي (Secondary Button)"
+                                         ButtonType="Secondary" />
+
+                    <!-- Danger Button -->
+                    <controls:ChatButton Text="زر تحذيري / حذف (Danger Button)"
+                                         ButtonType="Danger" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 5. Reusable Text Inputs -->
+            <Border Style="{StaticResource ChatCardBorder}">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="5. Inputs &amp; Validation (حقول الإدخال والتحقق)"
+                           Style="{StaticResource TypographyH3}"
+                           TextColor="{StaticResource BrandPrimary}" />
+
+                    <!-- Normal Text Input -->
+                    <controls:ChatEntry LabelText="اسم المستخدم"
+                                        Placeholder="أدخل اسم المستخدم"
+                                        Text="{Binding DemoInputText}" />
+
+                    <!-- Password Input with Toggle -->
+                    <controls:ChatEntry LabelText="كلمة المرور"
+                                        Placeholder="أدخل كلمة المرور السرية"
+                                        Text="{Binding DemoPassword}"
+                                        IsPassword="True" />
+
+                    <!-- Input with Error Feedback -->
+                    <controls:ChatEntry LabelText="البريد الإلكتروني (مثال على خطأ)"
+                                        Placeholder="example@domain.com"
+                                        Text="invalid_email"
+                                        ErrorMessage="صيغة البريد الإلكتروني المدخل غير صالحة" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 6. Message Bubble Preview (WhatsApp + Telegram Hybrid) -->
+            <Border Style="{StaticResource ChatCardBorder}">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="6. Chat Bubble Architecture (فقاعات الرسائل)"
+                           Style="{StaticResource TypographyH3}"
+                           TextColor="{StaticResource BrandPrimary}" />
+
+                    <!-- Incoming Message Bubble (Left/Right adaptive) -->
+                    <Border Style="{StaticResource ChatBubbleIncoming}"
+                            HorizontalOptions="Start"
+                            MaximumWidthRequest="300">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="أهلاً بك يا هندسة! الباك إند أصبح جاهزاً بالكامل مع .NET 10. هل نبدأ الآن في شاشات الدخول؟"
+                                   Style="{StaticResource TypographyBody}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}" />
+                            <Label Text="10:42 م"
+                                   Style="{StaticResource TypographyTiny}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                   HorizontalOptions="End" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Outgoing Message Bubble (Right/Left adaptive) -->
+                    <Border Style="{StaticResource ChatBubbleOutgoing}"
+                            HorizontalOptions="End"
+                            MaximumWidthRequest="300">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="تمام يا كبير، الـ Design System ده فاخر جداً ومدروس بدقة! 🔥"
+                                   Style="{StaticResource TypographyBody}"
+                                   TextColor="{StaticResource White}" />
+                            <HorizontalStackLayout Spacing="4" HorizontalOptions="End">
+                                <Label Text="10:43 م"
+                                       Style="{StaticResource TypographyTiny}"
+                                       TextColor="#CCFBF1" />
+                                <Label Text="✓✓"
+                                       FontSize="11"
+                                       TextColor="#CCFBF1" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

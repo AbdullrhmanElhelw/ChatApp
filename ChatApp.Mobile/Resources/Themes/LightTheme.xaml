@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Light Theme Dynamic Tokens -->
+    <Color x:Key="ThemeBackground">#F8FAFC</Color>
+    <Color x:Key="ThemeSurfaceCard">#FFFFFF</Color>
+    <Color x:Key="ThemeSurfaceElevated">#FFFFFF</Color>
+    <Color x:Key="ThemeBorder">#E2E8F0</Color>
+    <Color x:Key="ThemeDivider">#E2E8F0</Color>
+    <Color x:Key="ThemeSearchBarBackground">#F1F5F9</Color>
+
+    <!-- Text Colors -->
+    <Color x:Key="ThemeTextPrimary">#0F172A</Color>
+    <Color x:Key="ThemeTextSecondary">#64748B</Color>
+    <Color x:Key="ThemeTextMuted">#94A3B8</Color>
+    <Color x:Key="ThemeTextPlaceholder">#94A3B8</Color>
+
+    <!-- Message Bubbles -->
+    <Color x:Key="ThemeBubbleOutgoing">#0D9488</Color>
+    <Color x:Key="ThemeBubbleIncoming">#F1F5F9</Color>
+    <Color x:Key="ThemeTextOutgoing">#FFFFFF</Color>
+    <Color x:Key="ThemeTextIncoming">#0F172A</Color>
+    <Color x:Key="ThemeTimeOutgoing">#CCFBF1</Color>
+    <Color x:Key="ThemeTimeIncoming">#64748B</Color>
+
+    <!-- Brushes -->
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{StaticResource ThemeBackground}" />
+    <SolidColorBrush x:Key="ThemeSurfaceCardBrush" Color="{StaticResource ThemeSurfaceCard}" />
+    <SolidColorBrush x:Key="ThemeBorderBrush" Color="{StaticResource ThemeBorder}" />
+    <SolidColorBrush x:Key="ThemeTextPrimaryBrush" Color="{StaticResource ThemeTextPrimary}" />
+</ResourceDictionary>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:ChatApp.Mobile.Converters"
+             x:Class="ChatApp.Mobile.Controls.AvatarView"
+             x:Name="ThisControl">
+
+    <ContentView.Resources>
+        <converters:InitialsConverter x:Key="InitialsConverter" />
+        <converters:AvatarColorConverter x:Key="AvatarColorConverter" />
+    </ContentView.Resources>
+
+    <Grid WidthRequest="{Binding Size, Source={x:Reference ThisControl}}"
+          HeightRequest="{Binding Size, Source={x:Reference ThisControl}}">
+
+        <!-- Avatar Background Circle -->
+        <Border WidthRequest="{Binding Size, Source={x:Reference ThisControl}}"
+                HeightRequest="{Binding Size, Source={x:Reference ThisControl}}"
+                StrokeThickness="0"
+                BackgroundColor="{Binding FullName, Source={x:Reference ThisControl}, Converter={StaticResource AvatarColorConverter}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="{Binding Radius, Source={x:Reference ThisControl}}" />
+            </Border.StrokeShape>
+
+            <!-- Initials Fallback Text -->
+            <Label Text="{Binding FullName, Source={x:Reference ThisControl}, Converter={StaticResource InitialsConverter}}"
+                   TextColor="White"
+                   FontFamily="CairoBold"
+                   FontSize="{Binding FontSize, Source={x:Reference ThisControl}}"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Border>
+
+        <!-- Remote Image Layer -->
+        <Border WidthRequest="{Binding Size, Source={x:Reference ThisControl}}"
+                HeightRequest="{Binding Size, Source={x:Reference ThisControl}}"
+                StrokeThickness="0"
+                IsVisible="{Binding HasAvatarUrl, Source={x:Reference ThisControl}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="{Binding Radius, Source={x:Reference ThisControl}}" />
+            </Border.StrokeShape>
+            <Image Source="{Binding AvatarUrl, Source={x:Reference ThisControl}}"
+                   Aspect="AspectFill"
+                   WidthRequest="{Binding Size, Source={x:Reference ThisControl}}"
+                   HeightRequest="{Binding Size, Source={x:Reference ThisControl}}" />
+        </Border>
+
+        <!-- Online Status Dot -->
+        <Border WidthRequest="{Binding BadgeSize, Source={x:Reference ThisControl}}"
+                HeightRequest="{Binding BadgeSize, Source={x:Reference ThisControl}}"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,-1,-1"
+                Stroke="White"
+                StrokeThickness="2"
+                BackgroundColor="{StaticResource StatusOnline}"
+                IsVisible="{Binding IsOnline, Source={x:Reference ThisControl}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="999" />
+            </Border.StrokeShape>
+        </Border>
+    </Grid>
+</ContentView>

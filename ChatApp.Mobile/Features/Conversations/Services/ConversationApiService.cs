@@ -11,15 +11,20 @@ public class ConversationApiService : IConversationApiService
 {
     private readonly HttpClient _httpClient;
     private readonly ISecureStorageService _storageService;
+    private readonly IAuthApiService? _authService;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public ConversationApiService(HttpClient httpClient, ISecureStorageService storageService)
+    public ConversationApiService(
+        HttpClient httpClient,
+        ISecureStorageService storageService,
+        IAuthApiService? authService = null)
     {
         _httpClient = httpClient;
         _storageService = storageService;
+        _authService = authService;
 
         if (_httpClient.BaseAddress == null)
         {
@@ -34,6 +39,31 @@ public class ConversationApiService : IConversationApiService
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
+    }
+
+    private async Task<HttpResponseMessage> SendWithAuthRefreshAsync(Func<HttpRequestMessage> buildRequest)
+    {
+        using var req = buildRequest();
+        await AttachAuthHeaderAsync(req);
+        var response = await _httpClient.SendAsync(req);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && _authService != null)
+        {
+            var refreshToken = await _storageService.GetRefreshTokenAsync();
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                var refreshResult = await _authService.RefreshTokenAsync(refreshToken);
+                if (refreshResult.IsSuccess)
+                {
+                    response.Dispose();
+                    using var retryReq = buildRequest();
+                    await AttachAuthHeaderAsync(retryReq);
+                    return await _httpClient.SendAsync(retryReq);
+                }
+            }
+        }
+
+        return response;
     }
 
     public async Task<ApiResult<List<ConversationSummaryDto>>> GetConversationsAsync()
@@ -106,10 +136,7 @@ public class ConversationApiService : IConversationApiService
                 url += $"&query={Uri.EscapeDataString(query.Trim())}";
             }
 
-            using var req = new HttpRequestMessage(HttpMethod.Get, url);
-            await AttachAuthHeaderAsync(req);
-
-            var response = await _httpClient.SendAsync(req);
+            using var response = await SendWithAuthRefreshAsync(() => new HttpRequestMessage(HttpMethod.Get, url));
             var content = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
@@ -121,7 +148,12 @@ public class ConversationApiService : IConversationApiService
                 }
             }
 
-            return ApiResult<List<UserProfileDto>>.Failure("فشل البحث عن المستخدمين.", (int)response.StatusCode);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return ApiResult<List<UserProfileDto>>.Failure("انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى.", 401);
+            }
+
+            return ApiResult<List<UserProfileDto>>.Failure($"فشل البحث عن المستخدمين ({(int)response.StatusCode}).", (int)response.StatusCode);
         }
         catch (HttpRequestException)
         {

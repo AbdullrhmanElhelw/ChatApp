@@ -35,25 +35,15 @@
                           VerticalOptions="Center" />
                 </Border>
                 <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
-                    <Border WidthRequest="32"
-                            HeightRequest="32"
-                            StrokeThickness="0"
-                            BackgroundColor="{StaticResource BrandPrimary}">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="11" />
-                        </Border.StrokeShape>
-                        <Path Data="{StaticResource IconChat}"
-                              Fill="{StaticResource White}"
-                              WidthRequest="16"
-                              HeightRequest="16"
-                              Aspect="Uniform"
-                              HorizontalOptions="Center"
-                              VerticalOptions="Center" />
-                    </Border>
-                    <Label Text="ChatApp"
+                    <Image Source="betweenus_logo.png"
+                           WidthRequest="34"
+                           HeightRequest="34"
+                           Aspect="AspectFit"
+                           VerticalOptions="Center" />
+                    <Label Text="BetweenUs"
                            FontFamily="CairoBold"
                            FontSize="17"
-                           TextColor="{StaticResource BrandPrimary}"
+                           TextColor="#EC4899"
                            VerticalOptions="Center" />
                 </HorizontalStackLayout>
             </Grid>

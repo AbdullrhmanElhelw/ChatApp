@@ -15,27 +15,16 @@
         <!-- 1. Header with Theme Switcher -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,10,0,10">
             <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-                <Border WidthRequest="36"
-                        HeightRequest="36"
-                        StrokeThickness="0"
-                        BackgroundColor="{StaticResource BrandPrimary}"
-                        VerticalOptions="Center">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12" />
-                    </Border.StrokeShape>
-                    <Path Data="{StaticResource IconChat}"
-                          Fill="{StaticResource White}"
-                          WidthRequest="18"
-                          HeightRequest="18"
-                          Aspect="Uniform"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center" />
-                </Border>
-                <Label Text="ChatApp"
+                <Image Source="betweenus_logo.png"
+                       WidthRequest="38"
+                       HeightRequest="38"
+                       Aspect="AspectFit"
+                       VerticalOptions="Center" />
+                <Label Text="BetweenUs"
                        FontFamily="CairoBold"
-                       FontSize="20"
+                       FontSize="21"
                        FontAttributes="Bold"
-                       TextColor="{StaticResource BrandPrimary}"
+                       TextColor="#EC4899"
                        VerticalOptions="Center" />
             </HorizontalStackLayout>
 
@@ -53,35 +42,11 @@
             <VerticalStackLayout Spacing="24" VerticalOptions="Center" Margin="0,16">
 
                 <!-- Hero Graphic Container -->
-                <Border WidthRequest="120"
-                        HeightRequest="120"
-                        StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                        HorizontalOptions="Center">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="36" />
-                    </Border.StrokeShape>
-
-                    <Grid VerticalOptions="Center" HorizontalOptions="Center">
-                        <Border WidthRequest="72"
-                                HeightRequest="72"
-                                StrokeThickness="0"
-                                BackgroundColor="{StaticResource BrandPrimary}"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="24" />
-                            </Border.StrokeShape>
-                            <Path Data="{StaticResource IconChat}"
-                                  Fill="{StaticResource White}"
-                                  WidthRequest="36"
-                                  HeightRequest="36"
-                                  Aspect="Uniform"
-                                  HorizontalOptions="Center"
-                                  VerticalOptions="Center" />
-                        </Border>
-                    </Grid>
-                </Border>
+                <Image Source="betweenus_logo.png"
+                       WidthRequest="136"
+                       HeightRequest="136"
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center" />
 
                 <!-- Titles -->
                 <VerticalStackLayout Spacing="8" HorizontalOptions="Center">

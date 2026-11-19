@@ -21,11 +21,16 @@
                                      AvatarUrl="{Binding CurrentUser.AvatarUrl}"
                                      Size="42"
                                      IsOnline="True" />
-                <Label Text="ChatApp"
+                <Image Source="betweenus_logo.png"
+                       WidthRequest="28"
+                       HeightRequest="28"
+                       Aspect="AspectFit"
+                       VerticalOptions="Center" />
+                <Label Text="BetweenUs"
                        FontFamily="CairoBold"
-                       FontSize="24"
+                       FontSize="22"
                        FontAttributes="Bold"
-                       TextColor="{StaticResource BrandPrimary}"
+                       TextColor="#EC4899"
                        VerticalOptions="Center" />
             </HorizontalStackLayout>
 

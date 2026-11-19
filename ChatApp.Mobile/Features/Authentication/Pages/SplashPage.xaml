@@ -7,80 +7,83 @@
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
              FlowDirection="RightToLeft"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+             BackgroundColor="#15042C">
 
     <Grid VerticalOptions="Fill" HorizontalOptions="Fill">
-        <!-- Subtle Ambient Background Glow -->
-        <BoxView BackgroundColor="{StaticResource BrandPrimary}"
-                 Opacity="0.08"
-                 CornerRadius="180"
-                 WidthRequest="320"
-                 HeightRequest="320"
+
+        <!-- Full-Bleed BetweenUs Splash Artwork with Cinematic Ken Burns Zoom -->
+        <Image x:Name="SplashArtwork"
+               Source="betweenus_splash.png"
+               Aspect="AspectFill"
+               Opacity="0"
+               Scale="1.12"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <!-- Subtle Ambient Breathing Glow Over Centerpiece -->
+        <BoxView x:Name="LogoAura"
+                 BackgroundColor="#EC4899"
+                 Opacity="0.16"
+                 CornerRadius="140"
+                 WidthRequest="260"
+                 HeightRequest="260"
                  HorizontalOptions="Center"
-                 VerticalOptions="Center" />
+                 VerticalOptions="Center"
+                 TranslationY="-70" />
 
-        <VerticalStackLayout Spacing="24"
-                             VerticalOptions="Center"
-                             HorizontalOptions="Center"
-                             Padding="30">
+        <!-- Bottom Gradient Scrim for Crisp Text Readability -->
+        <BoxView VerticalOptions="End"
+                 HeightRequest="180"
+                 InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#0015042C" Offset="0.0" />
+                    <GradientStop Color="#AA15042C" Offset="0.55" />
+                    <GradientStop Color="#EE100222" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
 
-            <!-- App Logo with Shadow and Gradient Border -->
-            <Border WidthRequest="110"
-                    HeightRequest="110"
-                    StrokeThickness="0"
-                    BackgroundColor="{StaticResource BrandPrimary}"
-                    HorizontalOptions="Center">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="32" />
-                </Border.StrokeShape>
-
-                <Path Data="{StaticResource IconChat}"
-                      Fill="{StaticResource White}"
-                      WidthRequest="52"
-                      HeightRequest="52"
-                      Aspect="Uniform"
-                      HorizontalOptions="Center"
-                      VerticalOptions="Center" />
-            </Border>
-
-            <!-- Brand Name & Tagline -->
-            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
-                <Label Text="ChatApp"
-                       FontFamily="CairoBold"
-                       FontSize="36"
-                       FontAttributes="Bold"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                       HorizontalOptions="Center" />
-
-                <Label Text="محادثاتك • أصدقاؤك • ملصقاتك"
-                       Style="{StaticResource TypographyCaption}"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
-                       HorizontalOptions="Center" />
-            </VerticalStackLayout>
-
-            <!-- Spinner & Status Text -->
-            <VerticalStackLayout Spacing="12" Margin="0,30,0,0" HorizontalOptions="Center">
+        <!-- Floating Glassmorphic Status Capsule -->
+        <Border x:Name="StatusContainer"
+                VerticalOptions="End"
+                HorizontalOptions="Center"
+                Margin="24,0,24,48"
+                Padding="18,10"
+                StrokeThickness="1"
+                Stroke="#40F472B6"
+                BackgroundColor="#951B0738"
+                Opacity="0"
+                TranslationY="24">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="22" />
+            </Border.StrokeShape>
+            <HorizontalStackLayout Spacing="10" VerticalOptions="Center" HorizontalOptions="Center">
                 <ActivityIndicator IsRunning="{Binding IsBusy}"
                                    IsVisible="{Binding IsBusy}"
-                                   Color="{StaticResource BrandPrimary}"
-                                   WidthRequest="36"
-                                   HeightRequest="36" />
+                                   Color="#F472B6"
+                                   WidthRequest="20"
+                                   HeightRequest="20"
+                                   VerticalOptions="Center" />
 
                 <Label Text="{Binding StatusMessage}"
-                       Style="{StaticResource TypographyTiny}"
-                       TextColor="{StaticResource BrandPrimary}"
-                       HorizontalOptions="Center" />
-            </VerticalStackLayout>
-
-        </VerticalStackLayout>
+                       FontFamily="CairoBold"
+                       FontSize="13"
+                       TextColor="#F8FAFC"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
 
         <!-- Version Footer -->
-        <Label Text="ChatApp v1.0 • .NET 10"
-               Style="{StaticResource TypographyTiny}"
-               TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray600}}"
+        <Label x:Name="VersionFooter"
+               Text="BetweenUs v1.0 • A little world, just for two"
+               FontFamily="CairoRegular"
+               FontSize="11"
+               TextColor="#C4B5FD"
+               Opacity="0"
                HorizontalOptions="Center"
                VerticalOptions="End"
-               Margin="0,0,0,24" />
+               Margin="0,0,0,18" />
     </Grid>
 
 </ContentPage>

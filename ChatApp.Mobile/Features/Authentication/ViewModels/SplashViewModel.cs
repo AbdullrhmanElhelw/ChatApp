@@ -26,7 +26,7 @@ public partial class SplashViewModel : BaseViewModel
         _storageService = storageService;
         _authStateService = authStateService;
         _navigationService = navigationService;
-        Title = "ChatApp";
+        Title = "BetweenUs";
     }
 
     [RelayCommand]
@@ -37,8 +37,8 @@ public partial class SplashViewModel : BaseViewModel
 
         try
         {
-            // Allow splash branding display
-            await Task.Delay(1000);
+            // Allow cinematic BetweenUs splash animation display
+            await Task.Delay(1800);
 
             var accessToken = await _storageService.GetAccessTokenAsync();
             var refreshToken = await _storageService.GetRefreshTokenAsync();

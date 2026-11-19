@@ -13,6 +13,6 @@ public partial class AppShell : Shell
 
     private void RegisterRoutes()
     {
-        Routing.RegisterRoute(AppRoutes.DesignSystem, typeof(DesignSystemPage));
+        // Detail routes will be registered here (e.g. Chat, Profile)
     }
 }

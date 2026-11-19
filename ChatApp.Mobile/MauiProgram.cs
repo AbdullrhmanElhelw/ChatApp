@@ -1,4 +1,7 @@
 ﻿using CommunityToolkit.Maui;
+using ChatApp.Mobile.Features.Authentication.Pages;
+using ChatApp.Mobile.Features.Authentication.Services;
+using ChatApp.Mobile.Features.Authentication.ViewModels;
 using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Navigation;
 using Microsoft.Extensions.Logging;
@@ -22,11 +25,33 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "CairoBold");
             });
 
-        // 1. Navigation & System Services
+        // 1. Navigation & Core Infrastructure Services
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddSingleton<ISecureStorageService, SecureStorageService>();
+        builder.Services.AddSingleton<IAuthenticationStateService, AuthenticationStateService>();
 
-        // 2. ViewModels & Pages
+        // 2. HTTP & API Services
+        builder.Services.AddSingleton(new HttpClient
+        {
+            BaseAddress = new Uri(ApiConfig.BaseUrl),
+            Timeout = TimeSpan.FromSeconds(15)
+        });
+        builder.Services.AddSingleton<IAuthApiService, AuthApiService>();
+
+        // 3. ViewModels
+        builder.Services.AddTransient<SplashViewModel>();
+        builder.Services.AddTransient<WelcomeViewModel>();
+        builder.Services.AddTransient<LoginViewModel>();
+        builder.Services.AddTransient<RegisterViewModel>();
+        builder.Services.AddTransient<ProfileSetupViewModel>();
         builder.Services.AddTransient<DesignSystemViewModel>();
+
+        // 4. Pages
+        builder.Services.AddTransient<SplashPage>();
+        builder.Services.AddTransient<WelcomePage>();
+        builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<RegisterPage>();
+        builder.Services.AddTransient<ProfileSetupPage>();
         builder.Services.AddTransient<DesignSystemPage>();
 
 #if DEBUG

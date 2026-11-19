@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Authentication.ViewModels"
+             x:Class="ChatApp.Mobile.Features.Authentication.Pages.SplashPage"
+             x:DataType="vm:SplashViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+
+    <Grid VerticalOptions="Fill" HorizontalOptions="Fill">
+        <!-- Subtle Ambient Background Glow -->
+        <BoxView BackgroundColor="{StaticResource BrandPrimary}"
+                 Opacity="0.08"
+                 CornerRadius="180"
+                 WidthRequest="320"
+                 HeightRequest="320"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center" />
+
+        <VerticalStackLayout Spacing="24"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Padding="30">
+
+            <!-- App Logo with Shadow and Gradient Border -->
+            <Border WidthRequest="110"
+                    HeightRequest="110"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource BrandPrimary}"
+                    HorizontalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="32" />
+                </Border.StrokeShape>
+
+                <Grid VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label Text="💬"
+                           FontSize="48"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <!-- Brand Name & Tagline -->
+            <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                <Label Text="ChatApp"
+                       FontFamily="CairoBold"
+                       FontSize="36"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                       HorizontalOptions="Center" />
+
+                <Label Text="محادثات فورية • خصوصية فائقة • ستيكرز مخصص"
+                       Style="{StaticResource TypographyCaption}"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Spinner & Status Text -->
+            <VerticalStackLayout Spacing="12" Margin="0,30,0,0" HorizontalOptions="Center">
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="{StaticResource BrandPrimary}"
+                                   WidthRequest="36"
+                                   HeightRequest="36" />
+
+                <Label Text="{Binding StatusMessage}"
+                       Style="{StaticResource TypographyTiny}"
+                       TextColor="{StaticResource BrandPrimary}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- Version Footer -->
+        <Label Text="ChatApp v1.0 • .NET 10"
+               Style="{StaticResource TypographyTiny}"
+               TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray600}}"
+               HorizontalOptions="Center"
+               VerticalOptions="End"
+               Margin="0,0,0,24" />
+    </Grid>
+
+</ContentPage>

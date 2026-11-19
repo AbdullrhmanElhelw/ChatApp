@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Authentication.ViewModels"
+             xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
+             x:Class="ChatApp.Mobile.Features.Authentication.Pages.WelcomePage"
+             x:DataType="vm:WelcomeViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="24">
+
+        <!-- 1. Header with Theme Switcher -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,10,0,10">
+            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                <Label Text="💬" FontSize="24" VerticalOptions="Center" />
+                <Label Text="ChatApp"
+                       FontFamily="CairoBold"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource BrandPrimary}"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Button Grid.Column="1"
+                    Text="{Binding CurrentThemeName}"
+                    Command="{Binding ToggleThemeCommand}"
+                    Style="{StaticResource ChatGhostButton}"
+                    FontSize="12"
+                    HeightRequest="36"
+                    Padding="10,0" />
+        </Grid>
+
+        <!-- 2. Hero Body & Feature Highlights -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Spacing="24" VerticalOptions="Center" Margin="0,16">
+
+                <!-- Hero Graphic Container -->
+                <Border WidthRequest="120"
+                        HeightRequest="120"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                        HorizontalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="36" />
+                    </Border.StrokeShape>
+
+                    <Grid VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="🚀"
+                               FontSize="56"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Titles -->
+                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <Label Text="تجربة مراسلة عصرية وفورية"
+                           Style="{StaticResource TypographyH1}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+
+                    <Label Text="تواصل مع أصدقائك في أي مكان وبأعلى درجات الخصوصية، مع صانع استيكرز مبتكر من صورك الخاصة."
+                           Style="{StaticResource TypographyBody}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           MaximumWidthRequest="360" />
+                </VerticalStackLayout>
+
+                <!-- Feature Badges List -->
+                <VerticalStackLayout Spacing="12" Margin="0,10,0,0">
+                    <Border Style="{StaticResource ChatCardBorder}" Padding="14,10">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                            <Label Text="⚡" FontSize="20" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="رسائل فورية في الوقت الفعلي مع SignalR"
+                                   Style="{StaticResource TypographyBody}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource ChatCardBorder}" Padding="14,10">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                            <Label Text="🔒" FontSize="20" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="حماية وأمان مع Identity و JWT Token Rotation"
+                                   Style="{StaticResource TypographyBody}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource ChatCardBorder}" Padding="14,10">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                            <Label Text="🎨" FontSize="20" VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="صانع ستيكرز مخصص وحزم ملصقات قابلة للمشاركة"
+                                   Style="{StaticResource TypographyBody}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- 3. Bottom Action Buttons -->
+        <VerticalStackLayout Grid.Row="2" Spacing="12" Margin="0,16,0,0">
+            <controls:ChatButton Text="تسجيل الدخول"
+                                 ButtonType="Primary"
+                                 Command="{Binding NavigateToLoginCommand}" />
+
+            <controls:ChatButton Text="إنشاء حساب جديد"
+                                 ButtonType="Secondary"
+                                 Command="{Binding NavigateToRegisterCommand}" />
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

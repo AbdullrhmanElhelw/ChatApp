@@ -10,12 +10,12 @@
              Shell.NavBarIsVisible="False"
              BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="16,12,16,0">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12,16,0">
 
         <!-- 1. Top Bar with Back Button & Title -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,4,0,12" VerticalOptions="Center">
             <Button Grid.Column="0"
-                    Text="→ رجوع"
+                    Text="← رجوع"
                     Command="{Binding NavigateBackCommand}"
                     Style="{StaticResource ChatGhostButton}"
                     FontSize="14"
@@ -23,20 +23,20 @@
                     Padding="6,0" />
 
             <Label Grid.Column="1"
-                   Text="البحث وبدء محادثة جديدة"
-                   FontFamily="CairoBold"
-                   FontSize="18"
-                   FontAttributes="Bold"
-                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                   VerticalOptions="Center"
-                   Margin="12,0,0,0" />
+                    Text="البحث وبدء محادثة جديدة"
+                    FontFamily="CairoBold"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                    VerticalOptions="Center"
+                    Margin="12,0,0,0" />
         </Grid>
 
         <!-- 2. Search Input Box & Submit Button -->
         <Border Grid.Row="1"
                 Style="{StaticResource ChatCardBorder}"
                 Padding="12,4"
-                Margin="0,0,0,16">
+                Margin="0,0,0,10">
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                 <Entry Grid.Column="0"
                        Text="{Binding SearchQuery, Mode=TwoWay}"
@@ -59,11 +59,40 @@
             </Grid>
         </Border>
 
+        <!-- Error / Info Banner -->
+        <Border Grid.Row="2"
+                StrokeShape="RoundRectangle 12"
+                StrokeThickness="1"
+                Stroke="{StaticResource StatusWarning}"
+                BackgroundColor="{AppThemeBinding Light=#FEF3C7, Dark=#78350F}"
+                Padding="12,8"
+                Margin="0,0,0,12"
+                IsVisible="{Binding HasError}">
+            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                <Label Text="⚠️" FontSize="16" VerticalOptions="Center" />
+                <Label Text="{Binding ErrorMessage}"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light=#92400E, Dark=#FDE68A}"
+                       VerticalOptions="Center"
+                       LineBreakMode="WordWrap" />
+            </HorizontalStackLayout>
+        </Border>
+
         <!-- 3. Results Container -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3" RowDefinitions="Auto,*">
+
+            <!-- Section Title -->
+            <Label Grid.Row="0"
+                   Text="{Binding SectionTitle}"
+                   FontFamily="CairoBold"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                   Margin="4,0,0,8" />
 
             <!-- Loading Indicator -->
-            <VerticalStackLayout Spacing="12"
+            <VerticalStackLayout Grid.Row="1"
+                                 Spacing="12"
                                  VerticalOptions="Center"
                                  HorizontalOptions="Center"
                                  IsVisible="{Binding IsSearching}">
@@ -78,9 +107,10 @@
             </VerticalStackLayout>
 
             <!-- Results List -->
-            <CollectionView ItemsSource="{Binding SearchResults}"
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding SearchResults}"
                             SelectionMode="None"
-                            IsVisible="{Binding IsNotBusy}">
+                            IsVisible="{Binding IsSearching, Converter={StaticResource InverseBoolConverter}}">
 
                 <!-- Empty Results State -->
                 <CollectionView.EmptyView>
@@ -94,7 +124,7 @@
                                Style="{StaticResource TypographyH3}"
                                TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
                                HorizontalOptions="Center" />
-                        <Label Text="تأكد من كتابة اسم المستخدم أو البريد بدقة."
+                        <Label Text="تأكد من كتابة اسم المستخدم بدقة، أو اختر من المستخدمين المقترحين."
                                Style="{StaticResource TypographyCaption}"
                                TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
                                HorizontalOptions="Center" />
@@ -144,14 +174,6 @@
                                            TextColor="{StaticResource BrandPrimary}"
                                            LineBreakMode="TailTruncation"
                                            MaxLines="1" />
-
-                                    <Label Text="{Binding Bio}"
-                                           FontFamily="CairoRegular"
-                                           FontSize="12"
-                                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
-                                           LineBreakMode="TailTruncation"
-                                           MaxLines="1"
-                                           IsVisible="{Binding Bio, Converter={StaticResource InverseBoolConverter}}" />
                                 </VerticalStackLayout>
 
                                 <!-- Message Button Action -->

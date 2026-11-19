@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChatApp.Mobile.Features.Authentication.DTOs;
+using ChatApp.Mobile.Features.Authentication.Services;
 using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Features.Conversations.Services;
 using ChatApp.Mobile.Navigation;
@@ -11,7 +12,9 @@ namespace ChatApp.Mobile.Features.Conversations.ViewModels;
 public partial class UserSearchViewModel : BaseViewModel
 {
     private readonly IConversationApiService _conversationService;
+    private readonly IAuthenticationStateService _authState;
     private readonly INavigationService _navigationService;
+    private CancellationTokenSource? _searchCts;
 
     [ObservableProperty]
     public partial string SearchQuery { get; set; } = string.Empty;
@@ -28,38 +31,113 @@ public partial class UserSearchViewModel : BaseViewModel
     [NotifyPropertyChangedFor(nameof(IsEmpty))]
     public partial bool HasSearched { get; set; }
 
+    [ObservableProperty]
+    public partial string SectionTitle { get; set; } = "المستخدمون المقترحون";
+
     public bool IsEmpty => HasSearched && !IsSearching && SearchResults.Count == 0;
 
     public UserSearchViewModel(
         IConversationApiService conversationService,
+        IAuthenticationStateService authState,
         INavigationService navigationService)
     {
         _conversationService = conversationService;
+        _authState = authState;
         _navigationService = navigationService;
         Title = "البحث عن مستخدمين";
     }
 
     partial void OnSearchQueryChanged(string value)
     {
+        _searchCts?.Cancel();
+
         if (string.IsNullOrWhiteSpace(value))
         {
+            _ = LoadInitialUsersAsync();
+            return;
+        }
+
+        _searchCts = new CancellationTokenSource();
+        var token = _searchCts.Token;
+
+        Task.Delay(350, token).ContinueWith(t =>
+        {
+            if (!t.IsCanceled)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await SearchAsync();
+                });
+            }
+        }, TaskScheduler.Default);
+    }
+
+    [RelayCommand]
+    public async Task LoadInitialUsersAsync()
+    {
+        ClearError();
+        IsSearching = true;
+        SectionTitle = "المستخدمون المسجلون";
+
+        try
+        {
+            var result = await _conversationService.SearchUsersAsync(null);
+            if (result.IsSuccess && result.Value != null)
+            {
+                SearchResults = new ObservableCollection<UserProfileDto>(result.Value);
+            }
+            else
+            {
+                SearchResults.Clear();
+            }
+        }
+        catch
+        {
             SearchResults.Clear();
+        }
+        finally
+        {
+            IsSearching = false;
             HasSearched = false;
+            OnPropertyChanged(nameof(IsEmpty));
         }
     }
 
     [RelayCommand]
     public async Task SearchAsync()
     {
-        if (string.IsNullOrWhiteSpace(SearchQuery)) return;
+        var rawQuery = SearchQuery?.Trim() ?? "";
+        if (string.IsNullOrWhiteSpace(rawQuery))
+        {
+            await LoadInitialUsersAsync();
+            return;
+        }
+
+        var query = rawQuery.TrimStart('@');
+        ClearError();
+
+        // Check if searching for self
+        var current = _authState.CurrentUser;
+        if (current != null && (
+            string.Equals(query, current.UserName, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(query, current.Email, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(query, current.FullName, StringComparison.OrdinalIgnoreCase)))
+        {
+            ErrorMessage = "أنت تبحث عن حسابك الحالي! لا يمكن بدء محادثة مع نفسك، ابحث عن مستخدم آخر (مثل: momo أو walid).";
+            SearchResults.Clear();
+            HasSearched = true;
+            IsSearching = false;
+            OnPropertyChanged(nameof(IsEmpty));
+            return;
+        }
 
         IsSearching = true;
         HasSearched = true;
-        ClearError();
+        SectionTitle = $"نتائج البحث عن \"{rawQuery}\"";
 
         try
         {
-            var result = await _conversationService.SearchUsersAsync(SearchQuery);
+            var result = await _conversationService.SearchUsersAsync(query);
 
             if (result.IsSuccess && result.Value != null)
             {

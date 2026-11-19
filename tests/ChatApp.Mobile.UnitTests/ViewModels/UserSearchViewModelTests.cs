@@ -14,31 +14,65 @@ namespace ChatApp.Mobile.UnitTests.ViewModels;
 public class UserSearchViewModelTests
 {
     private readonly Mock<IConversationApiService> _conversationServiceMock;
+    private readonly Mock<IAuthenticationStateService> _authStateMock;
     private readonly Mock<INavigationService> _navigationMock;
     private readonly UserSearchViewModel _sut;
 
     public UserSearchViewModelTests()
     {
         _conversationServiceMock = new Mock<IConversationApiService>();
+        _authStateMock = new Mock<IAuthenticationStateService>();
         _navigationMock = new Mock<INavigationService>();
+
+        _authStateMock.Setup(x => x.CurrentUser).Returns(new UserProfileDto(
+            Id: Guid.NewGuid(),
+            UserName: "logged_in_user",
+            Email: "logged@example.com",
+            FullName: "Logged In User",
+            Bio: null,
+            AvatarUrl: null,
+            IsOnline: true,
+            LastSeenAt: DateTime.UtcNow,
+            CreatedAt: DateTime.UtcNow
+        ));
 
         _sut = new UserSearchViewModel(
             _conversationServiceMock.Object,
+            _authStateMock.Object,
             _navigationMock.Object);
     }
 
     [Fact]
-    public async Task Search_WhenQueryIsEmpty_ShouldNotCallApi()
+    public async Task Search_WhenQueryIsEmpty_ShouldLoadInitialUsers()
     {
         // Arrange
+        _conversationServiceMock
+            .Setup(x => x.SearchUsersAsync(null, 1, 20))
+            .ReturnsAsync(ApiResult<List<UserProfileDto>>.Success(new List<UserProfileDto>()));
+
         _sut.SearchQuery = "   ";
+        _conversationServiceMock.Invocations.Clear();
 
         // Act
         await _sut.SearchCommand.ExecuteAsync(null);
 
         // Assert
-        _conversationServiceMock.Verify(x => x.SearchUsersAsync(It.IsAny<string>()), Times.Never);
-        _sut.SearchResults.Should().BeEmpty();
+        _conversationServiceMock.Verify(x => x.SearchUsersAsync(null, 1, 20), Times.Once);
+    }
+
+    [Fact]
+    public async Task Search_WhenSearchingForSelf_ShouldSetErrorMessageAndNotCallApi()
+    {
+        // Arrange
+        _sut.SearchQuery = "logged_in_user";
+
+        // Act
+        await _sut.SearchCommand.ExecuteAsync(null);
+
+        // Assert
+        _sut.HasError.Should().BeTrue();
+        _sut.ErrorMessage.Should().Contain("حسابك الحالي");
+        _conversationServiceMock.Verify(x => x.SearchUsersAsync("logged_in_user", It.IsAny<int>(), It.IsAny<int>()), Times.Never);
     }
 
     [Fact]

@@ -67,7 +67,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(query))
         {
-            var trimmed = query.Trim();
+            var trimmed = query.Trim().TrimStart('@');
             baseQuery = baseQuery.Where(u =>
                 (u.UserName != null && EF.Functions.Like(u.UserName, $"%{trimmed}%")) ||
                 EF.Functions.Like(u.FullName, $"%{trimmed}%") ||

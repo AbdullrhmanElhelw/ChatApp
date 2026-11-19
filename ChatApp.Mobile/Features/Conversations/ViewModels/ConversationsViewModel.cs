@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChatApp.Mobile.Features.Authentication.DTOs;
@@ -101,36 +102,107 @@ public partial class ConversationsViewModel : BaseViewModel
         SelectedFilter = filter;
     }
 
+    private static List<ConversationSummaryDto>? _memoryConversationsCache;
+    private static Guid _memoryCacheUserId;
+
+    private static string GetConversationsCachePath(Guid userId) =>
+        Path.Combine(FileSystem.AppDataDirectory, $"conversations_cache_{userId:N}.json");
+
+    private static List<ConversationSummaryDto>? TryGetCachedConversations(Guid userId)
+    {
+        if (userId == Guid.Empty) return null;
+        if (_memoryCacheUserId == userId && _memoryConversationsCache != null && _memoryConversationsCache.Count > 0)
+            return _memoryConversationsCache;
+
+        try
+        {
+            var path = GetConversationsCachePath(userId);
+            if (!File.Exists(path)) return null;
+            var list = JsonSerializer.Deserialize<List<ConversationSummaryDto>>(File.ReadAllText(path));
+            if (list != null && list.Count > 0)
+            {
+                _memoryCacheUserId = userId;
+                _memoryConversationsCache = list;
+                return list;
+            }
+        }
+        catch { }
+        return null;
+    }
+
+    private static void SaveConversationsCache(Guid userId, List<ConversationSummaryDto> items)
+    {
+        if (userId == Guid.Empty) return;
+        try
+        {
+            _memoryCacheUserId = userId;
+            _memoryConversationsCache = items;
+            var path = GetConversationsCachePath(userId);
+            _ = Task.Run(() =>
+            {
+                try { File.WriteAllText(path, JsonSerializer.Serialize(items)); }
+                catch { }
+            });
+        }
+        catch { }
+    }
+
+    private bool _isSyncingConversations;
+
     [RelayCommand]
     public async Task LoadConversationsAsync()
     {
-        if (IsBusy) return;
-
-        IsBusy = true;
+        if (_isSyncingConversations) return;
+        _isSyncingConversations = true;
         ClearError();
 
         try
         {
             CurrentUser = _authStateService.CurrentUser;
+            var userId = CurrentUser?.Id ?? Guid.Empty;
+
+            if (Conversations.Count == 0)
+            {
+                var cached = TryGetCachedConversations(userId);
+                if (cached != null && cached.Count > 0)
+                {
+                    Conversations = new ObservableCollection<ConversationSummaryDto>(cached);
+                    FilterConversations();
+                    OnPropertyChanged(nameof(IsEmpty));
+                }
+            }
+
+            var showLoader = Conversations.Count == 0 && !IsRefreshing;
+            if (showLoader)
+            {
+                IsBusy = true;
+            }
+
             var result = await _conversationService.GetConversationsAsync();
 
             if (result.IsSuccess && result.Value != null)
             {
-                Conversations = new ObservableCollection<ConversationSummaryDto>(result.Value);
+                var fresh = result.Value.ToList();
+                SaveConversationsCache(userId, fresh);
+                Conversations = new ObservableCollection<ConversationSummaryDto>(fresh);
                 FilterConversations();
                 _ = EnsureHubConnectedAsync();
             }
-            else
+            else if (Conversations.Count == 0)
             {
                 ErrorMessage = result.ErrorMessage;
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"تعذر جلب المحادثات: {ex.Message}";
+            if (Conversations.Count == 0)
+            {
+                ErrorMessage = $"تعذر جلب المحادثات: {ex.Message}";
+            }
         }
         finally
         {
+            _isSyncingConversations = false;
             IsBusy = false;
             IsRefreshing = false;
             OnPropertyChanged(nameof(IsEmpty));

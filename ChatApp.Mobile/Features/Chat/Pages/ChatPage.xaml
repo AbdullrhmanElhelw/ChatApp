@@ -6,6 +6,7 @@
              xmlns:dto="clr-namespace:ChatApp.Mobile.Features.Chat.DTOs"
              xmlns:converters="clr-namespace:ChatApp.Mobile.Converters"
              xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
+             xmlns:pages="clr-namespace:ChatApp.Mobile.Features.Chat.Pages"
              x:Class="ChatApp.Mobile.Features.Chat.Pages.ChatPage"
              x:Name="ChatPageRoot"
              x:DataType="vm:ChatViewModel"
@@ -16,6 +17,67 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+            <!-- Ultra-lightweight Outgoing Text Bubble (6 views instead of 80!) -->
+            <DataTemplate x:Key="OutgoingTextTemplate" x:DataType="dto:ChatMessageItem">
+                <Grid Padding="16,2">
+                    <Border HorizontalOptions="Start"
+                            MaximumWidthRequest="340"
+                            StrokeThickness="0"
+                            BackgroundColor="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OutgoingBubbleStartColor}"
+                            Padding="16,10">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="20,20,4,20" /></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
+                                                      PointerReleased="OnMessageBubblePointerReleased"
+                                                      PointerExited="OnMessageBubblePointerExited" />
+                            <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                  Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OpenReactionPickerCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding Content}"
+                                   FontFamily="CairoRegular" FontSize="15" TextColor="#FFFFFF"
+                                   LineBreakMode="WordWrap" HorizontalTextAlignment="Start" />
+                            <HorizontalStackLayout HorizontalOptions="End" Spacing="5" VerticalOptions="Center">
+                                <Label Text="معدّلة" FontFamily="CairoRegular" FontSize="10" TextColor="#FFD6F2" IsVisible="{Binding IsEdited}" VerticalOptions="Center" />
+                                <Label Text="{Binding FormattedTime}" FontFamily="CairoRegular" FontSize="10" TextColor="#FFB5DC" VerticalOptions="Center" />
+                                <Label Text="{Binding StatusIcon}" FontSize="11" TextColor="#FFB5DC" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </DataTemplate>
+
+            <!-- Ultra-lightweight Incoming Text Bubble -->
+            <DataTemplate x:Key="IncomingTextTemplate" x:DataType="dto:ChatMessageItem">
+                <Grid Padding="16,2">
+                    <Border HorizontalOptions="End"
+                            MaximumWidthRequest="340"
+                            StrokeThickness="0"
+                            BackgroundColor="#252131"
+                            Padding="16,10">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="20,20,20,4" /></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
+                                                      PointerReleased="OnMessageBubblePointerReleased"
+                                                      PointerExited="OnMessageBubblePointerExited" />
+                            <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                  Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OpenReactionPickerCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding Content}"
+                                   FontFamily="CairoRegular" FontSize="15" TextColor="#FFFFFF"
+                                   LineBreakMode="WordWrap" HorizontalTextAlignment="Start" />
+                            <HorizontalStackLayout HorizontalOptions="End" Spacing="5" VerticalOptions="Center">
+                                <Label Text="معدّلة" FontFamily="CairoRegular" FontSize="10" TextColor="#9B86B8" IsVisible="{Binding IsEdited}" VerticalOptions="Center" />
+                                <Label Text="{Binding FormattedTime}" FontFamily="CairoRegular" FontSize="10" TextColor="#9B86B8" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -256,7 +318,10 @@
             </CollectionView.Header>
 
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="dto:ChatMessageItem">
+                <pages:ChatMessageTemplateSelector OutgoingTextTemplate="{StaticResource OutgoingTextTemplate}"
+                                                   IncomingTextTemplate="{StaticResource IncomingTextTemplate}">
+                    <pages:ChatMessageTemplateSelector.RichMessageTemplate>
+                        <DataTemplate x:DataType="dto:ChatMessageItem">
                     <Grid Padding="16,2">
                         <!-- Outgoing Bubble (Mine) - Signal Royal Cobalt Style (RTL: Start = Right) -->
                         <VerticalStackLayout HorizontalOptions="Start"
@@ -274,20 +339,11 @@
                                     <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
                                                               PointerReleased="OnMessageBubblePointerReleased"
                                                               PointerExited="OnMessageBubblePointerExited" />
-                                    <PanGestureRecognizer PanUpdated="OnMessageBubblePanUpdated" />
-                                    <SwipeGestureRecognizer Direction="Left"
-                                                            Threshold="35"
-                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                            CommandParameter="{Binding .}" />
-                                    <SwipeGestureRecognizer Direction="Right"
-                                                            Threshold="35"
-                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                            CommandParameter="{Binding .}" />
                                     <TapGestureRecognizer NumberOfTapsRequired="2"
-                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OpenReactionPickerCommand}"
                                                           CommandParameter="{Binding .}" />
                                     <TapGestureRecognizer Buttons="Secondary"
-                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OpenReactionPickerCommand}"
                                                           CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <VerticalStackLayout Spacing="5">
@@ -559,20 +615,11 @@
                                     <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
                                                               PointerReleased="OnMessageBubblePointerReleased"
                                                               PointerExited="OnMessageBubblePointerExited" />
-                                    <PanGestureRecognizer PanUpdated="OnMessageBubblePanUpdated" />
-                                    <SwipeGestureRecognizer Direction="Left"
-                                                            Threshold="35"
-                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                            CommandParameter="{Binding .}" />
-                                    <SwipeGestureRecognizer Direction="Right"
-                                                            Threshold="35"
-                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                            CommandParameter="{Binding .}" />
                                     <TapGestureRecognizer NumberOfTapsRequired="2"
-                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OpenReactionPickerCommand}"
                                                           CommandParameter="{Binding .}" />
                                     <TapGestureRecognizer Buttons="Secondary"
-                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OpenReactionPickerCommand}"
                                                           CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
                                 <VerticalStackLayout Spacing="5">
@@ -821,6 +868,8 @@
                         </VerticalStackLayout>
                     </Grid>
                 </DataTemplate>
+                    </pages:ChatMessageTemplateSelector.RichMessageTemplate>
+                </pages:ChatMessageTemplateSelector>
             </CollectionView.ItemTemplate>
         </CollectionView>
         </Grid>

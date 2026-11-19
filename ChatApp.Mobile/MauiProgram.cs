@@ -9,6 +9,8 @@ using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Features.Conversations.Pages;
 using ChatApp.Mobile.Features.Conversations.Services;
 using ChatApp.Mobile.Features.Conversations.ViewModels;
+using ChatApp.Mobile.Features.Stickers.Pages;
+using ChatApp.Mobile.Features.Stickers.ViewModels;
 using ChatApp.Mobile.Navigation;
 using Microsoft.Extensions.Logging;
 
@@ -46,6 +48,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IConversationApiService, ConversationApiService>();
         builder.Services.AddSingleton<IChatHubService, ChatHubService>();
         builder.Services.AddSingleton<IMessageApiService, MessageApiService>();
+        builder.Services.AddSingleton<IStickerApiService, StickerApiService>();
 
         // 3. ViewModels
         builder.Services.AddTransient<SplashViewModel>();
@@ -56,6 +59,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ConversationsViewModel>();
         builder.Services.AddTransient<UserSearchViewModel>();
         builder.Services.AddTransient<ChatViewModel>();
+        builder.Services.AddTransient<StickerStudioViewModel>();
         builder.Services.AddTransient<DesignSystemViewModel>();
 
         // 4. Pages
@@ -67,6 +71,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ConversationsPage>();
         builder.Services.AddTransient<UserSearchPage>();
         builder.Services.AddTransient<ChatPage>();
+        builder.Services.AddTransient<StickerStudioPage>();
         builder.Services.AddTransient<DesignSystemPage>();
 
 #if DEBUG

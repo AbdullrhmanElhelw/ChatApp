@@ -16,7 +16,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto">
+    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
 
         <!-- 1. Header / Top Bar -->
         <Border Grid.Row="0"
@@ -133,10 +133,31 @@
                                 <Shadow Brush="#15000000" Offset="0,1" Radius="3" Opacity="0.5" />
                             </Border.Shadow>
                             <VerticalStackLayout Spacing="4">
+                                <!-- Text Message Content -->
                                 <Label Text="{Binding Content}"
                                        FontSize="15"
                                        TextColor="{StaticResource White}"
-                                       LineBreakMode="WordWrap" />
+                                       LineBreakMode="WordWrap"
+                                       IsVisible="{Binding IsTextMessage}" />
+
+                                <!-- Image Attachment Preview -->
+                                <Border StrokeThickness="0"
+                                        MaximumWidthRequest="240"
+                                        MaximumHeightRequest="240"
+                                        IsVisible="{Binding IsImage}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12" />
+                                    </Border.StrokeShape>
+                                    <Image Source="{Binding DisplayImageUrl}"
+                                           Aspect="AspectFill" />
+                                </Border>
+
+                                <!-- Sticker Content -->
+                                <Image Source="{Binding StickerUrl}"
+                                       WidthRequest="130"
+                                       HeightRequest="130"
+                                       Aspect="AspectFit"
+                                       IsVisible="{Binding IsSticker}" />
 
                                 <HorizontalStackLayout HorizontalOptions="End" Spacing="4">
                                     <Label Text="{Binding FormattedTime}"
@@ -164,10 +185,31 @@
                                 <Shadow Brush="#10000000" Offset="0,1" Radius="3" Opacity="0.5" />
                             </Border.Shadow>
                             <VerticalStackLayout Spacing="4">
+                                <!-- Text Message Content -->
                                 <Label Text="{Binding Content}"
                                        FontSize="15"
                                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
-                                       LineBreakMode="WordWrap" />
+                                       LineBreakMode="WordWrap"
+                                       IsVisible="{Binding IsTextMessage}" />
+
+                                <!-- Image Attachment Preview -->
+                                <Border StrokeThickness="0"
+                                        MaximumWidthRequest="240"
+                                        MaximumHeightRequest="240"
+                                        IsVisible="{Binding IsImage}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12" />
+                                    </Border.StrokeShape>
+                                    <Image Source="{Binding DisplayImageUrl}"
+                                           Aspect="AspectFill" />
+                                </Border>
+
+                                <!-- Sticker Content -->
+                                <Image Source="{Binding StickerUrl}"
+                                       WidthRequest="130"
+                                       HeightRequest="130"
+                                       Aspect="AspectFit"
+                                       IsVisible="{Binding IsSticker}" />
 
                                 <Label Text="{Binding FormattedTime}"
                                        FontSize="10"
@@ -218,7 +260,8 @@
                         CornerRadius="21"
                         Padding="0"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                        TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                        TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                        Command="{Binding ToggleAttachmentPanelCommand}" />
 
                 <!-- Text Input Box -->
                 <Border Grid.Column="1"
@@ -251,6 +294,72 @@
                         TextColor="{StaticResource White}"
                         Command="{Binding SendMessageCommand}" />
             </Grid>
+        </Border>
+
+        <!-- 5. Interactive Stickers & Media Bottom Sheet -->
+        <Border Grid.Row="4"
+                StrokeThickness="1"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                Padding="16,12"
+                IsVisible="{Binding IsAttachmentPanelVisible}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20,20,0,0" />
+            </Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="12">
+                <!-- Top Actions Bar: Photo, Sticker Studio -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Grid.Column="0"
+                            Text="📷 إرسال صورة"
+                            Command="{Binding PickAndSendImageCommand}"
+                            Style="{StaticResource ChatSecondaryButton}"
+                            HeightRequest="40"
+                            FontSize="12" />
+
+                    <Button Grid.Column="1"
+                            Text="🎨 صانع الاستيكرات (Studio)"
+                            Command="{Binding OpenStickerStudioCommand}"
+                            Style="{StaticResource ChatPrimaryButton}"
+                            HeightRequest="40"
+                            FontSize="12" />
+                </Grid>
+
+                <Label Text="اختر ملصقاً لإرساله فورياً:"
+                       FontFamily="CairoBold"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}" />
+
+                <!-- Stickers Grid / Horizontal Collection -->
+                <CollectionView ItemsSource="{Binding ActiveStickers}"
+                                HeightRequest="130"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Horizontal" Span="2" HorizontalItemSpacing="12" VerticalItemSpacing="8" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dto:StickerClientDto">
+                            <Border WidthRequest="56"
+                                    HeightRequest="56"
+                                    Padding="4"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=SendStickerCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Image Source="{Binding ImageUrl}"
+                                       Aspect="AspectFit"
+                                       WidthRequest="48"
+                                       HeightRequest="48" />
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
         </Border>
 
     </Grid>

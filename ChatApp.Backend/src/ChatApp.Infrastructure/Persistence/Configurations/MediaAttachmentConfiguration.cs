@@ -24,6 +24,7 @@ public class MediaAttachmentConfiguration : IEntityTypeConfiguration<MediaAttach
         builder.HasOne(ma => ma.Message)
             .WithMany(m => m.MediaAttachments)
             .HasForeignKey(ma => ma.MessageId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

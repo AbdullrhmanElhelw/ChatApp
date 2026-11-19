@@ -16,7 +16,9 @@ public record SendMessageRequestClientDto(
     [property: JsonPropertyName("content")] string? Content,
     [property: JsonPropertyName("messageType")] MessageType MessageType = MessageType.Text,
     [property: JsonPropertyName("clientMessageId")] Guid ClientMessageId = default,
-    [property: JsonPropertyName("replyToMessageId")] Guid? ReplyToMessageId = null
+    [property: JsonPropertyName("replyToMessageId")] Guid? ReplyToMessageId = null,
+    [property: JsonPropertyName("mediaAttachmentId")] Guid? MediaAttachmentId = null,
+    [property: JsonPropertyName("stickerId")] Guid? StickerId = null
 );
 
 public record MessageClientDto(
@@ -36,7 +38,10 @@ public record MessageClientDto(
     [property: JsonPropertyName("deliveryStatus")] MessageDeliveryStatus DeliveryStatus,
     [property: JsonPropertyName("deliveredAt")] DateTime? DeliveredAt,
     [property: JsonPropertyName("readAt")] DateTime? ReadAt,
-    [property: JsonPropertyName("isMine")] bool IsMine
+    [property: JsonPropertyName("isMine")] bool IsMine,
+    [property: JsonPropertyName("mediaUrl")] string? MediaUrl = null,
+    [property: JsonPropertyName("thumbnailUrl")] string? ThumbnailUrl = null,
+    [property: JsonPropertyName("mediaSizeBytes")] long? MediaSizeBytes = null
 );
 
 public record MessageStatusUpdateClientDto(
@@ -69,6 +74,9 @@ public partial class ChatMessageItem : ObservableObject
     public Guid? ReplyToMessageId { get; set; }
     public string? ReplyToContent { get; set; }
     public bool IsMine { get; set; }
+    public string? MediaUrl { get; set; }
+    public string? ThumbnailUrl { get; set; }
+    public long? MediaSizeBytes { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StatusIcon))]
@@ -84,6 +92,13 @@ public partial class ChatMessageItem : ObservableObject
     public Color StatusColor => IsRead ? Color.FromArgb("#38BDF8") : Color.FromArgb("#E0F2FE");
 
     public string FormattedTime => SentAt.ToLocalTime().ToString("hh:mm tt");
+
+    public bool HasMedia => !string.IsNullOrEmpty(MediaUrl);
+    public bool IsImage => MessageType == MessageType.Image && HasMedia;
+    public bool IsSticker => MessageType == MessageType.Sticker;
+    public string StickerUrl => MessageType == MessageType.Sticker ? (MediaUrl ?? Content ?? "") : "";
+    public string DisplayImageUrl => MessageType == MessageType.Sticker ? StickerUrl : (MediaUrl ?? "");
+    public bool IsTextMessage => MessageType == MessageType.Text || (!IsImage && !IsSticker);
 
     public string StatusIcon
     {
@@ -120,7 +135,10 @@ public partial class ChatMessageItem : ObservableObject
             ReplyToContent = dto.ReplyToContent,
             IsMine = dto.IsMine,
             Status = dto.DeliveryStatus,
-            IsSending = false
+            IsSending = false,
+            MediaUrl = dto.MediaUrl,
+            ThumbnailUrl = dto.ThumbnailUrl,
+            MediaSizeBytes = dto.MediaSizeBytes
         };
     }
 }

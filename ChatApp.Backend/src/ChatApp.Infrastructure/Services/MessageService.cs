@@ -38,6 +38,7 @@ public class MessageService : IMessageService
             .Include(m => m.Sender)
             .Include(m => m.ReplyToMessage)
             .Include(m => m.Deliveries)
+            .Include(m => m.MediaAttachments)
             .Where(m => m.ConversationId == conversationId && !m.IsDeleted);
 
         if (before.HasValue)
@@ -79,6 +80,7 @@ public class MessageService : IMessageService
                 .Include(m => m.Sender)
                 .Include(m => m.ReplyToMessage)
                 .Include(m => m.Deliveries)
+                .Include(m => m.MediaAttachments)
                 .FirstOrDefaultAsync(m => m.ClientMessageId == request.ClientMessageId, cancellationToken);
 
             if (existingMessage != null)
@@ -90,18 +92,51 @@ public class MessageService : IMessageService
         var clientMessageId = request.ClientMessageId != Guid.Empty ? request.ClientMessageId : Guid.NewGuid();
         var now = DateTime.UtcNow;
 
+        var msgType = request.MessageType;
+        var content = request.Content;
+
+        if (request.StickerId.HasValue)
+        {
+            var sticker = await _dbContext.Stickers.AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == request.StickerId.Value, cancellationToken);
+            if (sticker != null)
+            {
+                msgType = MessageType.Sticker;
+                content = sticker.ImageUrl;
+            }
+        }
+
         var message = new Message
         {
             Id = Guid.NewGuid(),
             ConversationId = request.ConversationId,
             SenderId = currentUserId,
-            Content = request.Content,
-            MessageType = request.MessageType,
+            Content = content,
+            MessageType = msgType,
             ClientMessageId = clientMessageId,
             SentAt = now,
             ReplyToMessageId = request.ReplyToMessageId,
             IsDeleted = false
         };
+
+        if (request.MediaAttachmentId.HasValue)
+        {
+            var attachment = await _dbContext.MediaAttachments
+                .FirstOrDefaultAsync(ma => ma.Id == request.MediaAttachmentId.Value, cancellationToken);
+            if (attachment != null)
+            {
+                attachment.MessageId = message.Id;
+                message.MediaAttachments.Add(attachment);
+                if (msgType == MessageType.Text)
+                {
+                    msgType = attachment.ContentType.StartsWith("image/") ? MessageType.Image
+                        : attachment.ContentType.StartsWith("video/") ? MessageType.Video
+                        : attachment.ContentType.StartsWith("audio/") ? MessageType.Audio
+                        : MessageType.Image;
+                    message.MessageType = msgType;
+                }
+            }
+        }
 
         // Create message deliveries for all other conversation participants
         foreach (var p in participants.Where(cp => cp.UserId != currentUserId))
@@ -292,6 +327,8 @@ public class MessageService : IMessageService
             readAt = myDelivery?.ReadAt;
         }
 
+        var media = message.MediaAttachments?.FirstOrDefault();
+
         return new MessageDto(
             message.Id,
             message.ConversationId,
@@ -309,7 +346,10 @@ public class MessageService : IMessageService
             status,
             deliveredAt,
             readAt,
-            isMine
+            isMine,
+            media?.FileUrl,
+            media?.ThumbnailUrl,
+            media?.FileSizeBytes
         );
     }
 }

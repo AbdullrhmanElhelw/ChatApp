@@ -7,7 +7,7 @@ public partial class ChatPage : ContentPage
 {
     private readonly ChatViewModel? _viewModel;
 
-    public ChatPage() : this(IPlatformApplication.Current?.Services?.GetService<ChatViewModel>() ?? new ChatViewModel(null!, null!, null!, null!))
+    public ChatPage() : this(IPlatformApplication.Current?.Services?.GetService<ChatViewModel>() ?? new ChatViewModel(null!, null!, null!, null!, null!))
     {
     }
 

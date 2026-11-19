@@ -81,6 +81,20 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Seed initial data
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await AppDbContextSeed.SeedAsync(context);
+    }
+    catch (Exception ex)
+    {
+        Log.Warning(ex, "Failed to seed database on startup.");
+    }
+}
+
 // Configure the HTTP request pipeline
 app.UseSerilogRequestLogging();
 
@@ -97,6 +111,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseCors(corsPolicy);
 

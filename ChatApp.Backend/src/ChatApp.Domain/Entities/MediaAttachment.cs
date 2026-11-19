@@ -4,7 +4,7 @@ namespace ChatApp.Domain.Entities;
 
 public class MediaAttachment : BaseEntity
 {
-    public Guid MessageId { get; set; }
+    public Guid? MessageId { get; set; }
     public string FileUrl { get; set; } = string.Empty;
     public string? ThumbnailUrl { get; set; }
     public string ContentType { get; set; } = string.Empty;

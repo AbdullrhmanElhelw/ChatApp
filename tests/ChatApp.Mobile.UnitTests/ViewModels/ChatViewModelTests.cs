@@ -16,6 +16,7 @@ public class ChatViewModelTests
 {
     private readonly Mock<IChatHubService> _chatHubMock;
     private readonly Mock<IMessageApiService> _messageApiMock;
+    private readonly Mock<IStickerApiService> _stickerApiMock;
     private readonly Mock<IAuthenticationStateService> _authStateMock;
     private readonly Mock<INavigationService> _navigationMock;
     private readonly ChatViewModel _sut;
@@ -25,6 +26,7 @@ public class ChatViewModelTests
     {
         _chatHubMock = new Mock<IChatHubService>();
         _messageApiMock = new Mock<IMessageApiService>();
+        _stickerApiMock = new Mock<IStickerApiService>();
         _authStateMock = new Mock<IAuthenticationStateService>();
         _navigationMock = new Mock<INavigationService>();
 
@@ -44,6 +46,7 @@ public class ChatViewModelTests
         _sut = new ChatViewModel(
             _chatHubMock.Object,
             _messageApiMock.Object,
+            _stickerApiMock.Object,
             _authStateMock.Object,
             _navigationMock.Object);
     }
@@ -174,5 +177,59 @@ public class ChatViewModelTests
         _sut.ConversationId.Should().Be(convId);
         _sut.ChatTitle.Should().Be("Walid");
         _sut.AvatarUrl.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SendSticker_WhenStickerProvided_ShouldAddOptimisticItemAndCallHubWithStickerId()
+    {
+        // Arrange
+        var convId = Guid.NewGuid();
+        _sut.ConversationId = convId;
+        var sticker = new StickerClientDto(Guid.NewGuid(), Guid.NewGuid(), "https://example.com/stk.webp", 512, 512, 0);
+
+        // Act
+        await _sut.SendStickerCommand.ExecuteAsync(sticker);
+
+        // Assert
+        _sut.Messages.Should().HaveCount(1);
+        var msg = _sut.Messages[0];
+        msg.MessageType.Should().Be(MessageType.Sticker);
+        msg.IsSticker.Should().BeTrue();
+        msg.StickerUrl.Should().Be("https://example.com/stk.webp");
+
+        _chatHubMock.Verify(x => x.SendMessageAsync(It.Is<SendMessageRequestClientDto>(r =>
+            r.ConversationId == convId &&
+            r.MessageType == MessageType.Sticker &&
+            r.StickerId == sticker.Id)), Times.Once);
+    }
+
+    [Fact]
+    public void ToggleAttachmentPanel_ShouldFlipVisibility()
+    {
+        // Arrange
+        _sut.IsAttachmentPanelVisible = false;
+
+        // Act
+        _sut.ToggleAttachmentPanelCommand.Execute(null);
+
+        // Assert
+        _sut.IsAttachmentPanelVisible.Should().BeTrue();
+
+        // Act 2
+        _sut.ToggleAttachmentPanelCommand.Execute(null);
+
+        // Assert 2
+        _sut.IsAttachmentPanelVisible.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task OpenStickerStudio_ShouldNavigateToStickerStudio()
+    {
+        // Act
+        await _sut.OpenStickerStudioCommand.ExecuteAsync(null);
+
+        // Assert
+        _sut.IsAttachmentPanelVisible.Should().BeFalse();
+        _navigationMock.Verify(x => x.NavigateToAsync(AppRoutes.StickerStudio, null), Times.Once);
     }
 }

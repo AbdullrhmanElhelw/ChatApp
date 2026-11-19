@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Stickers.ViewModels"
+             x:Class="ChatApp.Mobile.Features.Stickers.Pages.StickerStudioPage"
+             x:DataType="vm:StickerStudioViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16,12,16,16">
+
+        <!-- 1. Top Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,12" VerticalOptions="Center">
+            <Button Grid.Column="0"
+                    Text="← رجوع"
+                    Command="{Binding NavigateBackCommand}"
+                    Style="{StaticResource ChatGhostButton}"
+                    FontSize="14"
+                    HeightRequest="38"
+                    Padding="6,0" />
+
+            <Label Grid.Column="1"
+                   Text="صانع الاستيكرات 🎨"
+                   FontFamily="CairoBold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                   VerticalOptions="Center"
+                   Margin="12,0,0,0" />
+
+            <Button Grid.Column="2"
+                    Text="حفظ الاستيكر 💾"
+                    Command="{Binding SaveStickerCommand}"
+                    Style="{StaticResource ChatPrimaryButton}"
+                    HeightRequest="38"
+                    Padding="12,0"
+                    FontSize="13" />
+        </Grid>
+
+        <!-- 2. Main Studio Canvas / Preview -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="16" HorizontalOptions="Center" MaximumWidthRequest="500">
+
+                <!-- Preview Box -->
+                <Border StrokeThickness="2"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                        WidthRequest="320"
+                        HeightRequest="320"
+                        HorizontalOptions="Center"
+                        Padding="8">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="24" />
+                    </Border.StrokeShape>
+
+                    <Grid>
+                        <!-- Empty Canvas State -->
+                        <VerticalStackLayout VerticalOptions="Center"
+                                             HorizontalOptions="Center"
+                                             Spacing="12"
+                                             IsVisible="{Binding HasImage, Converter={StaticResource InverseBoolConverter}}">
+                            <Label Text="🖼️" FontSize="64" HorizontalOptions="Center" />
+                            <Label Text="اختر صورة للبدء في صنع استيكرك الخاص"
+                                   FontFamily="CairoBold"
+                                   FontSize="14"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center" />
+
+                            <Button Text="اختيار صورة من المعرض 📂"
+                                    Command="{Binding PickImageCommand}"
+                                    Style="{StaticResource ChatSecondaryButton}"
+                                    HeightRequest="42"
+                                    Padding="16,0"
+                                    FontSize="13"
+                                    HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+
+                        <!-- Selected Image Canvas -->
+                        <Image Source="{Binding SelectedImagePath}"
+                               Aspect="AspectFit"
+                               HorizontalOptions="Fill"
+                               VerticalOptions="Fill"
+                               IsVisible="{Binding HasImage}" />
+
+                        <!-- Text Overlay Preview -->
+                        <Border VerticalOptions="End"
+                                HorizontalOptions="Center"
+                                Margin="0,0,0,16"
+                                BackgroundColor="#90000000"
+                                Padding="12,4"
+                                IsVisible="{Binding CaptionText, Converter={StaticResource InverseBoolConverter}, ConverterParameter=invert}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <Label Text="{Binding CaptionText}"
+                                   TextColor="{Binding SelectedColor}"
+                                   FontFamily="CairoBold"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Feedback Banner -->
+                <Border StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light=#D1FAE5, Dark=#064E3B}"
+                        Padding="12,8"
+                        IsVisible="{Binding StatusMessage, Converter={StaticResource InverseBoolConverter}, ConverterParameter=invert}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <Label Text="{Binding StatusMessage}"
+                           TextColor="{AppThemeBinding Light=#065F46, Dark=#A7F3D0}"
+                           FontSize="12"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+
+                <!-- Error Banner -->
+                <Border StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#7F1D1D}"
+                        Padding="12,8"
+                        IsVisible="{Binding HasError}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="{AppThemeBinding Light=#991B1B, Dark=#FECACA}"
+                           FontSize="12"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+
+                <!-- 3. Editing Tools -->
+                <Border Padding="16"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                        StrokeThickness="1">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="إضافة تعليق نصي على الاستيكر"
+                               FontFamily="CairoBold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}" />
+
+                        <Entry Text="{Binding CaptionText, Mode=TwoWay}"
+                               Placeholder="اكتب كلمة أو جملة مضحكة..."
+                               FontFamily="CairoRegular"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                               PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray800}}"
+                               HeightRequest="44" />
+
+                        <!-- Quick Emojis -->
+                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                            <Button Text="🔥" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🔥" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                            <Button Text="😂" Command="{Binding AddQuickEmojiCommand}" CommandParameter="😂" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                            <Button Text="❤️" Command="{Binding AddQuickEmojiCommand}" CommandParameter="❤️" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                            <Button Text="🚀" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🚀" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                            <Button Text="😎" Command="{Binding AddQuickEmojiCommand}" CommandParameter="😎" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                            <Button Text="💡" Command="{Binding AddQuickEmojiCommand}" CommandParameter="💡" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                        </HorizontalStackLayout>
+
+                        <!-- Change Image Button -->
+                        <Button Text="تغيير الصورة 🔄"
+                                Command="{Binding PickImageCommand}"
+                                Style="{StaticResource ChatGhostButton}"
+                                HeightRequest="38"
+                                FontSize="13"
+                                IsVisible="{Binding HasImage}"
+                                HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="0" Grid.RowSpan="3"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="{StaticResource BrandPrimary}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           WidthRequest="48"
+                           HeightRequest="48" />
+
+    </Grid>
+
+</ContentPage>

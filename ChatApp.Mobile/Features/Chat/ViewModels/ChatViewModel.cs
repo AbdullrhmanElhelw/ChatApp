@@ -14,6 +14,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 {
     private readonly IChatHubService _chatHub;
     private readonly IMessageApiService _messageApi;
+    private readonly IStickerApiService _stickerApi;
     private readonly IAuthenticationStateService _authState;
     private readonly INavigationService _navigationService;
 
@@ -53,6 +54,15 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     [NotifyPropertyChangedFor(nameof(ConnectionStatusText))]
     public partial bool IsConnected { get; set; }
 
+    [ObservableProperty]
+    public partial bool IsAttachmentPanelVisible { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableCollection<StickerPackClientDto> AvailableStickerPacks { get; set; } = new();
+
+    [ObservableProperty]
+    public partial ObservableCollection<StickerClientDto> ActiveStickers { get; set; } = new();
+
     public string ConnectionStatusText => IsConnected ? "متصل" : "جارٍ الاتصال...";
 
     public bool CanSend => !string.IsNullOrWhiteSpace(MessageText) && !IsBusy;
@@ -60,11 +70,13 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public ChatViewModel(
         IChatHubService chatHub,
         IMessageApiService messageApi,
+        IStickerApiService stickerApi,
         IAuthenticationStateService authState,
         INavigationService navigationService)
     {
         _chatHub = chatHub;
         _messageApi = messageApi;
+        _stickerApi = stickerApi;
         _authState = authState;
         _navigationService = navigationService;
 
@@ -141,10 +153,173 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             {
                 ErrorMessage = historyResult.ErrorMessage;
             }
+
+            // 5. Preload available sticker packs in background
+            _ = LoadStickerPacksAsync();
         }
         catch (Exception ex)
         {
             ErrorMessage = $"تعذر تحميل المحادثة: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    public async Task LoadStickerPacksAsync()
+    {
+        try
+        {
+            var packsResult = await _stickerApi.GetPublicPacksAsync();
+            if (packsResult.IsSuccess && packsResult.Value != null)
+            {
+                AvailableStickerPacks = new ObservableCollection<StickerPackClientDto>(packsResult.Value);
+                var allStickers = packsResult.Value.SelectMany(p => p.Stickers).ToList();
+                ActiveStickers = new ObservableCollection<StickerClientDto>(allStickers);
+            }
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    public void ToggleAttachmentPanel()
+    {
+        IsAttachmentPanelVisible = !IsAttachmentPanelVisible;
+        if (IsAttachmentPanelVisible && AvailableStickerPacks.Count == 0)
+        {
+            _ = LoadStickerPacksAsync();
+        }
+    }
+
+    [RelayCommand]
+    public async Task OpenStickerStudioAsync()
+    {
+        IsAttachmentPanelVisible = false;
+        await _navigationService.NavigateToAsync(AppRoutes.StickerStudio);
+    }
+
+    [RelayCommand]
+    public async Task SendStickerAsync(StickerClientDto? sticker)
+    {
+        if (sticker == null || ConversationId == Guid.Empty) return;
+
+        IsAttachmentPanelVisible = false;
+
+        var clientMessageId = Guid.NewGuid();
+        var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+
+        var optimisticItem = new ChatMessageItem
+        {
+            Id = Guid.Empty,
+            ConversationId = ConversationId,
+            SenderId = currentUserId,
+            SenderUserName = _authState.CurrentUser?.UserName ?? "",
+            SenderFullName = _authState.CurrentUser?.FullName ?? "",
+            SenderAvatarUrl = _authState.CurrentUser?.AvatarUrl,
+            Content = sticker.ImageUrl,
+            MediaUrl = sticker.ImageUrl,
+            MessageType = MessageType.Sticker,
+            ClientMessageId = clientMessageId,
+            SentAt = DateTime.UtcNow,
+            IsMine = true,
+            Status = MessageDeliveryStatus.Sent,
+            IsSending = true
+        };
+
+        Messages.Add(optimisticItem);
+
+        try
+        {
+            var request = new SendMessageRequestClientDto(
+                ConversationId,
+                sticker.ImageUrl,
+                MessageType.Sticker,
+                clientMessageId,
+                StickerId: sticker.Id
+            );
+
+            await _chatHub.SendMessageAsync(request);
+        }
+        catch (Exception ex)
+        {
+            optimisticItem.IsSending = false;
+            ErrorMessage = $"فشل إرسال الملصق: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    public async Task PickAndSendImageAsync()
+    {
+        IsAttachmentPanelVisible = false;
+
+        try
+        {
+            var file = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = "اختر صورة لإرسالها",
+                FileTypes = FilePickerFileType.Images
+            });
+
+            if (file == null) return;
+
+            IsBusy = true;
+            await using var stream = await file.OpenReadAsync();
+            var ext = Path.GetExtension(file.FullPath).ToLowerInvariant();
+            var contentType = ext switch
+            {
+                ".png" => "image/png",
+                ".webp" => "image/webp",
+                ".gif" => "image/gif",
+                _ => "image/jpeg"
+            };
+
+            var uploadResult = await _stickerApi.UploadMediaAsync(stream, file.FileName, contentType, MessageType.Image);
+            if (!uploadResult.IsSuccess || uploadResult.Value == null)
+            {
+                ErrorMessage = uploadResult.ErrorMessage ?? "فشل رفع الصورة.";
+                return;
+            }
+
+            var media = uploadResult.Value;
+            var clientMessageId = Guid.NewGuid();
+            var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+
+            var optimisticItem = new ChatMessageItem
+            {
+                Id = Guid.Empty,
+                ConversationId = ConversationId,
+                SenderId = currentUserId,
+                SenderUserName = _authState.CurrentUser?.UserName ?? "",
+                SenderFullName = _authState.CurrentUser?.FullName ?? "",
+                SenderAvatarUrl = _authState.CurrentUser?.AvatarUrl,
+                Content = null,
+                MediaUrl = media.FileUrl,
+                ThumbnailUrl = media.ThumbnailUrl,
+                MediaSizeBytes = media.FileSizeBytes,
+                MessageType = MessageType.Image,
+                ClientMessageId = clientMessageId,
+                SentAt = DateTime.UtcNow,
+                IsMine = true,
+                Status = MessageDeliveryStatus.Sent,
+                IsSending = true
+            };
+
+            Messages.Add(optimisticItem);
+
+            var request = new SendMessageRequestClientDto(
+                ConversationId,
+                Content: null,
+                MessageType: MessageType.Image,
+                ClientMessageId: clientMessageId,
+                MediaAttachmentId: media.MediaId
+            );
+
+            await _chatHub.SendMessageAsync(request);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر إرسال الصورة: {ex.Message}";
         }
         finally
         {

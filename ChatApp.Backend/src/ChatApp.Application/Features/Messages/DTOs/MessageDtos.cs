@@ -7,7 +7,9 @@ public record SendMessageRequestDto(
     string? Content,
     MessageType MessageType = MessageType.Text,
     Guid ClientMessageId = default,
-    Guid? ReplyToMessageId = null
+    Guid? ReplyToMessageId = null,
+    Guid? MediaAttachmentId = null,
+    Guid? StickerId = null
 );
 
 public record MessageDto(
@@ -27,7 +29,10 @@ public record MessageDto(
     DeliveryStatus DeliveryStatus,
     DateTime? DeliveredAt,
     DateTime? ReadAt,
-    bool IsMine
+    bool IsMine,
+    string? MediaUrl = null,
+    string? ThumbnailUrl = null,
+    long? MediaSizeBytes = null
 );
 
 public record MessageStatusUpdateDto(

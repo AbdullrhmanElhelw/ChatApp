@@ -2,6 +2,7 @@ using System.Text;
 using ChatApp.Application.Common.Interfaces;
 using ChatApp.Application.Features.Auth.Interfaces;
 using ChatApp.Application.Features.Conversations.Interfaces;
+using ChatApp.Application.Features.Messages.Interfaces;
 using ChatApp.Application.Features.Users.Interfaces;
 using ChatApp.Domain.Entities;
 using ChatApp.Infrastructure.Identity;
@@ -84,6 +85,21 @@ public static class DependencyInjection
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
+
+                // Allow SignalR WebSockets to pass JWT in query string ?access_token=...
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddTransient<IDateTimeService, DateTimeService>();
@@ -91,6 +107,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IConversationService, ConversationService>();
+        services.AddScoped<IMessageService, MessageService>();
 
         return services;
     }

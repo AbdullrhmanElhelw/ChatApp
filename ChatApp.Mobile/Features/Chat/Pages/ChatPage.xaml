@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Chat.ViewModels"
+             xmlns:dto="clr-namespace:ChatApp.Mobile.Features.Chat.DTOs"
+             xmlns:converters="clr-namespace:ChatApp.Mobile.Converters"
+             xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
+             x:Class="ChatApp.Mobile.Features.Chat.Pages.ChatPage"
+             x:DataType="vm:ChatViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+
+        <!-- 1. Header / Top Bar -->
+        <Border Grid.Row="0"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                Padding="16,10">
+            <Border.Shadow>
+                <Shadow Brush="{AppThemeBinding Light=#10000000, Dark=#30000000}"
+                        Offset="0,2"
+                        Radius="6"
+                        Opacity="0.8" />
+            </Border.Shadow>
+
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                <!-- Back Button -->
+                <Button Grid.Column="0"
+                        Text="←"
+                        FontSize="20"
+                        FontAttributes="Bold"
+                        WidthRequest="40"
+                        HeightRequest="40"
+                        CornerRadius="20"
+                        Padding="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
+                        Command="{Binding NavigateBackCommand}" />
+
+                <!-- Partner Avatar & Online Indicator -->
+                <controls:AvatarView Grid.Column="1"
+                                     FullName="{Binding ChatTitle}"
+                                     AvatarUrl="{Binding AvatarUrl}"
+                                     Size="42"
+                                     IsOnline="{Binding IsPartnerOnline}" />
+
+                <!-- Partner Info & Status -->
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="2">
+                    <Label Text="{Binding ChatTitle}"
+                           FontFamily="CairoBold"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
+                           LineBreakMode="TailTruncation" />
+
+                    <!-- Typing or Presence Status -->
+                    <Label Text="{Binding PartnerTypingText}"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource BrandPrimary}"
+                           IsVisible="{Binding IsPartnerTyping}" />
+
+                    <Label Text="{Binding PartnerPresenceText}"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                           IsVisible="{Binding IsPartnerTyping, Converter={StaticResource InverseBoolConverter}}" />
+                </VerticalStackLayout>
+
+                <!-- Connection Indicator (Top Right) -->
+                <Border Grid.Column="3"
+                        StrokeShape="RoundRectangle 12"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                        Padding="8,4"
+                        VerticalOptions="Center">
+                    <Label Text="{Binding ConnectionStatusText}"
+                           FontSize="11"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- 2. Message Feed -->
+        <CollectionView x:Name="MessagesList"
+                        Grid.Row="1"
+                        ItemsSource="{Binding Messages}"
+                        SelectionMode="None"
+                        ItemSizingStrategy="MeasureAllItems">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.Header>
+                <VerticalStackLayout Padding="16,12" Spacing="4" HorizontalOptions="Center">
+                    <Border StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                            Padding="12,6">
+                        <Label Text="🔒 الرسائل مشفرة ومؤمنة في ChatApp"
+                               FontSize="11"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                               HorizontalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+            </CollectionView.Header>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="dto:ChatMessageItem">
+                    <Grid Padding="12,2">
+                        <!-- Outgoing Bubble (Mine) -->
+                        <Border x:Name="OutgoingBubble"
+                                HorizontalOptions="End"
+                                MaximumWidthRequest="300"
+                                StrokeShape="RoundRectangle 18, 18, 4, 18"
+                                StrokeThickness="0"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource BubbleOutgoingLight}, Dark={StaticResource BubbleOutgoingDark}}"
+                                Padding="12,8"
+                                IsVisible="{Binding IsMine}">
+                            <Border.Shadow>
+                                <Shadow Brush="#15000000" Offset="0,1" Radius="3" Opacity="0.5" />
+                            </Border.Shadow>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding Content}"
+                                       FontSize="15"
+                                       TextColor="{StaticResource White}"
+                                       LineBreakMode="WordWrap" />
+
+                                <HorizontalStackLayout HorizontalOptions="End" Spacing="4">
+                                    <Label Text="{Binding FormattedTime}"
+                                           FontSize="10"
+                                           TextColor="#E0F2FE" />
+                                    <Label Text="{Binding StatusIcon}"
+                                           FontSize="11"
+                                           TextColor="{Binding StatusColor}" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Incoming Bubble (Partner) -->
+                        <Border x:Name="IncomingBubble"
+                                HorizontalOptions="Start"
+                                MaximumWidthRequest="300"
+                                StrokeShape="RoundRectangle 18, 18, 18, 4"
+                                StrokeThickness="0"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource BubbleIncomingLight}, Dark={StaticResource BubbleIncomingDark}}"
+                                Padding="12,8"
+                                IsVisible="{Binding IsMine, Converter={StaticResource InverseBoolConverter}}">
+                            <Border.Shadow>
+                                <Shadow Brush="#10000000" Offset="0,1" Radius="3" Opacity="0.5" />
+                            </Border.Shadow>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding Content}"
+                                       FontSize="15"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
+                                       LineBreakMode="WordWrap" />
+
+                                <Label Text="{Binding FormattedTime}"
+                                       FontSize="10"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                       HorizontalOptions="End" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- 3. Real-Time Typing Banner -->
+        <Border Grid.Row="2"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                Padding="16,6"
+                IsVisible="{Binding IsPartnerTyping}">
+            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                <Label Text="✍️" FontSize="14" VerticalOptions="Center" />
+                <Label Text="{Binding PartnerTypingText}"
+                       FontSize="13"
+                       TextColor="{StaticResource BrandPrimary}"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+
+        <!-- 4. Message Input Bar -->
+        <Border Grid.Row="3"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                Padding="12,8">
+            <Border.Shadow>
+                <Shadow Brush="{AppThemeBinding Light=#10000000, Dark=#30000000}"
+                        Offset="0,-2"
+                        Radius="6"
+                        Opacity="0.8" />
+            </Border.Shadow>
+
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                <!-- Attachment Button (Stickers & Media) -->
+                <Button Grid.Column="0"
+                        Text="📎"
+                        FontSize="18"
+                        WidthRequest="42"
+                        HeightRequest="42"
+                        CornerRadius="21"
+                        Padding="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+
+                <!-- Text Input Box -->
+                <Border Grid.Column="1"
+                        StrokeShape="RoundRectangle 22"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray800}}"
+                        Padding="14,2">
+                    <Entry Text="{Binding MessageText, Mode=TwoWay}"
+                           Placeholder="اكتب رسالة..."
+                           PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
+                           FontSize="15"
+                           VerticalOptions="Center"
+                           ReturnCommand="{Binding SendMessageCommand}" />
+                </Border>
+
+                <!-- Send Button -->
+                <Button Grid.Column="2"
+                        Text="➤"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        CornerRadius="22"
+                        Padding="0"
+                        BackgroundColor="{StaticResource BrandPrimary}"
+                        TextColor="{StaticResource White}"
+                        Command="{Binding SendMessageCommand}" />
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>

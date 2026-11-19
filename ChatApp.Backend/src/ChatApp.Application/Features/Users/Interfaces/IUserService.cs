@@ -15,4 +15,6 @@ public interface IUserService
         int pageIndex = 1,
         int pageSize = 20,
         CancellationToken cancellationToken = default);
+
+    Task UpdatePresenceAsync(Guid userId, bool isOnline, CancellationToken cancellationToken = default);
 }

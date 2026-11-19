@@ -95,4 +95,15 @@ public class UserService : IUserService
 
         return PagedResponse<UserProfileDto>.Create(users, pageIndex, pageSize, totalCount);
     }
+
+    public async Task UpdatePresenceAsync(Guid userId, bool isOnline, CancellationToken cancellationToken = default)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user != null)
+        {
+            user.IsOnline = isOnline;
+            user.LastSeenAt = DateTime.UtcNow;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
 }

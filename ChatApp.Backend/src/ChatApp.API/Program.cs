@@ -1,3 +1,4 @@
+using ChatApp.API.Hubs;
 using ChatApp.API.Middlewares;
 using ChatApp.API.Services;
 using ChatApp.Application;
@@ -29,8 +30,9 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("database", tags: new[] { "ready", "db" });
 
-// 5. Register Controllers
+// 5. Register Controllers & SignalR
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 // 6. Register CORS
 const string corsPolicy = "ChatAppCorsPolicy";
@@ -102,6 +104,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
 app.MapHealthChecks("/health");
 
 try

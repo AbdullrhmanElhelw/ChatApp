@@ -222,7 +222,7 @@ namespace ChatApp.Infrastructure.Persistence.Migrations
                     b.Property<int?>("Height")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("MessageId")
+                    b.Property<Guid?>("MessageId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ThumbnailUrl")
@@ -678,8 +678,7 @@ namespace ChatApp.Infrastructure.Persistence.Migrations
                     b.HasOne("ChatApp.Domain.Entities.Message", "Message")
                         .WithMany("MediaAttachments")
                         .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Message");
                 });

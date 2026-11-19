@@ -30,10 +30,15 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
         // Apply all entity configurations from current assembly
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-        // Global Query Filters for soft-deletable entities
+        // Global Query Filters for soft-deletable entities and their required dependents
         builder.Entity<Conversation>().HasQueryFilter(c => !c.IsDeleted);
+        builder.Entity<ConversationParticipant>().HasQueryFilter(cp => !cp.Conversation!.IsDeleted);
         builder.Entity<Message>().HasQueryFilter(m => !m.IsDeleted);
+        builder.Entity<MessageDelivery>().HasQueryFilter(md => !md.Message!.IsDeleted);
+        builder.Entity<MessageReaction>().HasQueryFilter(mr => !mr.Message!.IsDeleted);
         builder.Entity<StickerPack>().HasQueryFilter(sp => !sp.IsDeleted);
+        builder.Entity<Sticker>().HasQueryFilter(s => !s.StickerPack!.IsDeleted);
+        builder.Entity<UserStickerPack>().HasQueryFilter(usp => !usp.StickerPack!.IsDeleted);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

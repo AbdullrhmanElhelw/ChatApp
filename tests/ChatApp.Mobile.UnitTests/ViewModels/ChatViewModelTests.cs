@@ -292,4 +292,70 @@ public class ChatViewModelTests
         // Assert
         _chatHubMock.Verify(x => x.ReactToMessageAsync(msgId, "🔥"), Times.Once);
     }
+
+    [Fact]
+    public void SelectEmojiCategory_ShouldShowOnlyThatCategory()
+    {
+        // Act
+        _sut.SelectEmojiCategoryCommand.Execute("الرموز");
+
+        // Assert
+        _sut.SelectedEmojiCategory.Should().Be("الرموز");
+        _sut.FilteredEmojis.Should().Contain("❤️");
+        _sut.FilteredEmojis.Should().NotContain("😀");
+        _sut.EmojiCategoryTabs.Single(t => t.Key == "الرموز").IsSelected.Should().BeTrue();
+        _sut.EmojiCategoryTabs.Single(t => t.Key == "الوجوه").IsSelected.Should().BeFalse();
+    }
+
+    [Fact]
+    public void BackspaceMessageEmoji_ShouldRemoveLastGraphemeWithoutCorruptingSurrogatePairs()
+    {
+        // Arrange
+        _sut.MessageText = "أهلاً 😂❤️";
+
+        // Act
+        _sut.BackspaceMessageEmojiCommand.Execute(null);
+
+        // Assert
+        _sut.MessageText.Should().Be("أهلاً 😂");
+
+        // Act again
+        _sut.BackspaceMessageEmojiCommand.Execute(null);
+
+        // Assert
+        _sut.MessageText.Should().Be("أهلاً ");
+    }
+
+    [Fact]
+    public void InsertMessageEmoji_ShouldAppendEmojiToCurrentText()
+    {
+        // Arrange
+        _sut.MessageText = "Hi ";
+
+        // Act
+        _sut.InsertMessageEmojiCommand.Execute("👋");
+
+        // Assert
+        _sut.MessageText.Should().Be("Hi 👋");
+    }
+
+    [Fact]
+    public async Task ToggleReactionPill_WhenSameMessageIsAlreadyBeingUpdated_ShouldInvokeHubOnlyOnce()
+    {
+        // Arrange
+        var messageId = Guid.NewGuid();
+        var reaction = new ReactionCountClientDto("👍", 1, true, messageId);
+        var hubCall = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _chatHubMock.Setup(x => x.ReactToMessageAsync(messageId, "👍")).Returns(hubCall.Task);
+
+        // Act
+        var firstRequest = _sut.ToggleReactionPillCommand.ExecuteAsync(reaction);
+        await Task.Yield();
+        await _sut.ToggleReactionPillCommand.ExecuteAsync(reaction);
+
+        // Assert
+        _chatHubMock.Verify(x => x.ReactToMessageAsync(messageId, "👍"), Times.Once);
+        hubCall.SetResult(true);
+        await firstRequest;
+    }
 }

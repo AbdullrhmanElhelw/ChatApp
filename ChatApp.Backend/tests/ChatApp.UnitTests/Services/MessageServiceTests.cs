@@ -300,4 +300,60 @@ public class MessageServiceTests
         var updatedPart = await db.ConversationParticipants.FirstAsync(cp => cp.ConversationId == conversationId && cp.UserId == recipientId);
         updatedPart.LastReadAt.Should().NotBeNull();
     }
+
+    [Fact]
+    public async Task ToggleReactionAsync_WhenSingleUserReacts_ShouldReturnCountOfOneNotTwo()
+    {
+        // Arrange
+        using var db = CreateDbContext();
+        var sut = new MessageService(db);
+
+        var userId = Guid.NewGuid();
+        var conversationId = Guid.NewGuid();
+        var messageId = Guid.NewGuid();
+
+        var user = new AppUser { Id = userId, UserName = "ahmed", FullName = "Ahmed", Email = "a@test.com" };
+        var conv = new Conversation { Id = conversationId, CreatedById = userId };
+        conv.Participants.Add(new ConversationParticipant { ConversationId = conversationId, UserId = userId });
+
+        var msg = new Message
+        {
+            Id = messageId,
+            ConversationId = conversationId,
+            SenderId = userId,
+            Content = "Hello!",
+            ClientMessageId = Guid.NewGuid()
+        };
+
+        db.Users.Add(user);
+        db.Conversations.Add(conv);
+        db.Messages.Add(msg);
+        await db.SaveChangesAsync();
+
+        // Act 1: Add reaction
+        var result1 = await sut.ToggleReactionAsync(userId, messageId, "😂");
+
+        // Assert 1: Count must be exactly 1
+        result1.Added.Should().BeTrue();
+        result1.Reactions.Should().ContainSingle();
+        result1.Reactions[0].Emoji.Should().Be("😂");
+        result1.Reactions[0].Count.Should().Be(1);
+        result1.Reactions[0].HasReacted.Should().BeTrue();
+
+        // Act 2: Change reaction to ❤️
+        var result2 = await sut.ToggleReactionAsync(userId, messageId, "❤️");
+
+        // Assert 2: Count must still be 1 for ❤️
+        result2.Added.Should().BeTrue();
+        result2.Reactions.Should().ContainSingle();
+        result2.Reactions[0].Emoji.Should().Be("❤️");
+        result2.Reactions[0].Count.Should().Be(1);
+
+        // Act 3: Toggle off ❤️
+        var result3 = await sut.ToggleReactionAsync(userId, messageId, "❤️");
+
+        // Assert 3: Reactions should be empty
+        result3.Added.Should().BeFalse();
+        result3.Reactions.Should().BeEmpty();
+    }
 }

@@ -26,7 +26,7 @@ public class MediaController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> UploadMedia(
-        [FromForm] IFormFile file,
+        IFormFile file,
         [FromForm] int mediaType = (int)MessageType.Image,
         CancellationToken cancellationToken = default)
     {

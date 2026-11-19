@@ -14,7 +14,7 @@
 
             <!-- 1. Header Step Indicator -->
             <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,10,0,24">
-                <Label Text="الخطوة الأخيرة: إعداد الملف الشخصي 👤"
+                <Label Text="الخطوة الأخيرة: إعداد ملفك الشخصي"
                        Style="{StaticResource TypographyH2}"
                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
                        HorizontalOptions="Center"
@@ -55,10 +55,13 @@
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding PickAvatarCommand}" />
                             </Border.GestureRecognizers>
-                            <Label Text="📷"
-                                   FontSize="15"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
+                            <Path Data="{StaticResource IconCamera}"
+                                  Fill="{StaticResource White}"
+                                  WidthRequest="16"
+                                  HeightRequest="16"
+                                  Aspect="Uniform"
+                                  HorizontalOptions="Center"
+                                  VerticalOptions="Center" />
                         </Border>
                     </Grid>
 
@@ -98,7 +101,7 @@
 
             <!-- 3. Bottom Complete Button -->
             <VerticalStackLayout Grid.Row="2" Spacing="12" Margin="0,20,0,10">
-                <controls:ChatButton Text="إتمام والبدء في المراسلة 🚀"
+                <controls:ChatButton Text="إتمام والبدء في المراسلة"
                                      ButtonType="Primary"
                                      IsLoading="{Binding IsBusy}"
                                      Command="{Binding CompleteSetupCommand}" />

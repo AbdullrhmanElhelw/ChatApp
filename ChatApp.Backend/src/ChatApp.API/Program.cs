@@ -5,6 +5,7 @@ using ChatApp.Application;
 using ChatApp.Application.Common.Interfaces;
 using ChatApp.Infrastructure;
 using ChatApp.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Serilog;
 
@@ -81,12 +82,24 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Seed initial data
+// Apply pending database migrations before seeding or accepting requests.
 using (var scope = app.Services.CreateScope())
 {
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
     try
     {
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await context.Database.MigrateAsync();
+        Log.Information("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Failed to apply database migrations on startup.");
+        throw;
+    }
+
+    try
+    {
         await AppDbContextSeed.SeedAsync(context);
     }
     catch (Exception ex)

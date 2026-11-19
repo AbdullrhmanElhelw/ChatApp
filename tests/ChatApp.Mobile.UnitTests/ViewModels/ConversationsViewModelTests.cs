@@ -154,6 +154,46 @@ public class ConversationsViewModelTests
     }
 
     [Fact]
+    public void SelectFilter_ShouldShowUnreadAndGroupConversations()
+    {
+        var template = new ConversationSummaryDto(
+            Guid.NewGuid(),
+            ConversationType.Direct,
+            "",
+            null,
+            null,
+            null,
+            false,
+            null,
+            null,
+            0,
+            false,
+            false,
+            false,
+            DateTime.UtcNow);
+
+        var directUnread = template with { Title = "Unread direct", UnreadCount = 2 };
+        var groupUnread = template with { Title = "Unread group", ConversationType = ConversationType.Group, UnreadCount = 1 };
+        var groupRead = template with { Title = "Read group", ConversationType = ConversationType.Group };
+        _sut.Conversations = new System.Collections.ObjectModel.ObservableCollection<ConversationSummaryDto>
+        {
+            directUnread,
+            groupUnread,
+            groupRead
+        };
+
+        _sut.SelectFilterCommand.Execute(ConversationFilter.Unread);
+
+        _sut.FilteredConversations.Select(conversation => conversation.Title)
+            .Should().Equal("Unread direct", "Unread group");
+
+        _sut.SelectFilterCommand.Execute(ConversationFilter.Groups);
+
+        _sut.FilteredConversations.Select(conversation => conversation.Title)
+            .Should().Equal("Unread group", "Read group");
+    }
+
+    [Fact]
     public async Task SelectConversation_ShouldNavigateToChatWithParameters()
     {
         // Arrange

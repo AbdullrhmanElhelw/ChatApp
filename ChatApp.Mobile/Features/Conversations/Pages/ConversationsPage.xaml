@@ -124,18 +124,33 @@
             </Grid>
         </Border>
 
-        <!-- 3. Category Filter Tabs -->
+        <!-- 3. Conversation filters -->
         <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="0,0,0,12">
-            <Border BackgroundColor="{StaticResource BrandPrimary}"
+            <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
                     StrokeThickness="0"
                     Padding="14,6">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="16" />
                 </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
+                                          CommandParameter="{x:Static vm:ConversationFilter.All}" />
+                </Border.GestureRecognizers>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.All}">
+                        <Setter Property="BackgroundColor" Value="{StaticResource BrandPrimary}" />
+                    </DataTrigger>
+                </Border.Triggers>
                 <Label Text="الكل"
                        FontFamily="CairoBold"
                        FontSize="12"
-                       TextColor="{StaticResource White}" />
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.All}">
+                            <Setter Property="TextColor" Value="{StaticResource White}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
             </Border>
 
             <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
@@ -144,10 +159,25 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="16" />
                 </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
+                                          CommandParameter="{x:Static vm:ConversationFilter.Unread}" />
+                </Border.GestureRecognizers>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Unread}">
+                        <Setter Property="BackgroundColor" Value="{StaticResource BrandPrimary}" />
+                    </DataTrigger>
+                </Border.Triggers>
                 <Label Text="غير مقروءة"
                        FontFamily="CairoBold"
                        FontSize="12"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Unread}">
+                            <Setter Property="TextColor" Value="{StaticResource White}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
             </Border>
 
             <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
@@ -156,10 +186,25 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="16" />
                 </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
+                                          CommandParameter="{x:Static vm:ConversationFilter.Groups}" />
+                </Border.GestureRecognizers>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Groups}">
+                        <Setter Property="BackgroundColor" Value="{StaticResource BrandPrimary}" />
+                    </DataTrigger>
+                </Border.Triggers>
                 <Label Text="المجموعات"
                        FontFamily="CairoBold"
                        FontSize="12"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Groups}">
+                            <Setter Property="TextColor" Value="{StaticResource White}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
             </Border>
         </HorizontalStackLayout>
 
@@ -171,6 +216,9 @@
 
                 <CollectionView ItemsSource="{Binding FilteredConversations}"
                                 SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                    </CollectionView.ItemsLayout>
 
                     <!-- Empty State View -->
                     <CollectionView.EmptyView>
@@ -236,24 +284,16 @@
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
 
-                    <!-- Conversation Card Item Template -->
+                    <!-- Compact conversation rows with subtle separators -->
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="dtos:ConversationSummaryDto">
-                            <Border Margin="0,0,0,8"
-                                    Padding="14,10"
-                                    BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
-                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
-                                    StrokeThickness="1">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="16" />
-                                </Border.StrokeShape>
-                                <Border.GestureRecognizers>
+                            <Grid RowDefinitions="Auto,1" Padding="0,4">
+                                <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ConversationsViewModel}}, Path=SelectConversationCommand}"
                                                           CommandParameter="{Binding .}" />
-                                </Border.GestureRecognizers>
+                                </Grid.GestureRecognizers>
 
-                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-                                    <!-- Participant Avatar with Online Presence -->
+                                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="8,8">
                                     <controls:AvatarView Grid.Column="0"
                                                          FullName="{Binding Title}"
                                                          AvatarUrl="{Binding AvatarUrl}"
@@ -261,19 +301,22 @@
                                                          IsOnline="{Binding IsOtherParticipantOnline}"
                                                          VerticalOptions="Center" />
 
-                                    <!-- Middle Details: Title & Message Preview -->
                                     <VerticalStackLayout Grid.Column="1"
                                                          Spacing="4"
                                                          VerticalOptions="Center">
-                                        <HorizontalStackLayout Spacing="6">
-                                            <Label Text="{Binding Title}"
-                                                   FontFamily="CairoBold"
-                                                   FontSize="16"
-                                                   FontAttributes="Bold"
-                                                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                                                   LineBreakMode="TailTruncation"
-                                                   MaxLines="1" />
-                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding Title}"
+                                               FontFamily="CairoBold"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding UnreadCount}" Value="0">
+                                                    <Setter Property="FontAttributes" Value="None" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
 
                                         <Label Text="{Binding LastMessagePreview}"
                                                FontFamily="CairoRegular"
@@ -283,7 +326,6 @@
                                                MaxLines="1" />
                                     </VerticalStackLayout>
 
-                                    <!-- Right Meta: Timestamp & Unread Badge -->
                                     <VerticalStackLayout Grid.Column="2"
                                                          Spacing="6"
                                                          HorizontalOptions="End"
@@ -298,7 +340,12 @@
                                                                  HorizontalOptions="End" />
                                     </VerticalStackLayout>
                                 </Grid>
-                            </Border>
+
+                                <BoxView Grid.Row="1"
+                                         HeightRequest="1"
+                                         Margin="70,0,8,0"
+                                         Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}" />
+                            </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>

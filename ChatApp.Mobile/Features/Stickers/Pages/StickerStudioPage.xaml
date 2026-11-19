@@ -173,7 +173,7 @@
                             <Label Text="{Binding CaptionText}"
                                    TextColor="{Binding SelectedColor}"
                                    FontFamily="CairoBold"
-                                   FontSize="18"
+                                   FontSize="{Binding CaptionFontSize}"
                                    FontAttributes="Bold"
                                    HorizontalOptions="Center" />
                         </Border>
@@ -238,10 +238,27 @@
                     </Border.StrokeShape>
 
                     <VerticalStackLayout Spacing="14">
-                        <Label Text="إضافة تعليق نصي على الاستيكر"
-                               FontFamily="CairoBold"
-                               FontSize="14"
-                               TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}" />
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                            <Label Text="نص المعاينة على الملصق"
+                                   FontFamily="CairoBold"
+                                   FontSize="14"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                   VerticalOptions="Center" />
+                            <Button Grid.Column="1"
+                                    Text="−"
+                                    Command="{Binding DecreaseCaptionSizeCommand}"
+                                    Style="{StaticResource ChatGhostButton}"
+                                    WidthRequest="36"
+                                    HeightRequest="36"
+                                    Padding="0" />
+                            <Button Grid.Column="2"
+                                    Text="+"
+                                    Command="{Binding IncreaseCaptionSizeCommand}"
+                                    Style="{StaticResource ChatGhostButton}"
+                                    WidthRequest="36"
+                                    HeightRequest="36"
+                                    Padding="0" />
+                        </Grid>
 
                         <!-- Text Input Pill Container -->
                         <Border StrokeThickness="1"
@@ -262,15 +279,46 @@
                                    VerticalOptions="Center" />
                         </Border>
 
-                        <!-- Quick Emojis -->
-                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
-                            <Button Text="🔥" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🔥" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
-                            <Button Text="😂" Command="{Binding AddQuickEmojiCommand}" CommandParameter="😂" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
-                            <Button Text="❤️" Command="{Binding AddQuickEmojiCommand}" CommandParameter="❤️" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
-                            <Button Text="🚀" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🚀" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
-                            <Button Text="😎" Command="{Binding AddQuickEmojiCommand}" CommandParameter="😎" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
-                            <Button Text="💡" Command="{Binding AddQuickEmojiCommand}" CommandParameter="💡" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
-                        </HorizontalStackLayout>
+                        <Label Text="إيموجي سريعة"
+                               FontFamily="CairoBold"
+                               FontSize="12"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                        <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout Spacing="8">
+                                <Button Text="🔥" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🔥" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="😂" Command="{Binding AddQuickEmojiCommand}" CommandParameter="😂" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="❤️" Command="{Binding AddQuickEmojiCommand}" CommandParameter="❤️" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="🚀" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🚀" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="😎" Command="{Binding AddQuickEmojiCommand}" CommandParameter="😎" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="💡" Command="{Binding AddQuickEmojiCommand}" CommandParameter="💡" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="🥰" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🥰" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="👏" Command="{Binding AddQuickEmojiCommand}" CommandParameter="👏" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="🎉" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🎉" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                                <Button Text="💯" Command="{Binding AddQuickEmojiCommand}" CommandParameter="💯" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
+                            </HorizontalStackLayout>
+                        </ScrollView>
+
+                        <Label Text="لون النص"
+                               FontFamily="CairoBold"
+                               FontSize="12"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                        <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout Spacing="8">
+                                <Button Text="Aa" TextColor="#111827" BackgroundColor="#FFFFFF" BorderColor="#D1D5DB" Command="{Binding SelectColorCommand}" CommandParameter="#FFFFFF" WidthRequest="42" HeightRequest="36" Padding="0" />
+                                <Button Text="Aa" TextColor="#111827" BackgroundColor="#FDE047" BorderColor="#FACC15" Command="{Binding SelectColorCommand}" CommandParameter="#FDE047" WidthRequest="42" HeightRequest="36" Padding="0" />
+                                <Button Text="Aa" TextColor="#FFFFFF" BackgroundColor="#F87171" BorderColor="#EF4444" Command="{Binding SelectColorCommand}" CommandParameter="#F87171" WidthRequest="42" HeightRequest="36" Padding="0" />
+                                <Button Text="Aa" TextColor="#FFFFFF" BackgroundColor="#60A5FA" BorderColor="#3B82F6" Command="{Binding SelectColorCommand}" CommandParameter="#60A5FA" WidthRequest="42" HeightRequest="36" Padding="0" />
+                                <Button Text="Aa" TextColor="#FFFFFF" BackgroundColor="#34D399" BorderColor="#10B981" Command="{Binding SelectColorCommand}" CommandParameter="#34D399" WidthRequest="42" HeightRequest="36" Padding="0" />
+                                <Button Text="Aa" TextColor="#FFFFFF" BackgroundColor="#A78BFA" BorderColor="#8B5CF6" Command="{Binding SelectColorCommand}" CommandParameter="#A78BFA" WidthRequest="42" HeightRequest="36" Padding="0" />
+                                <Button Text="Aa" TextColor="#FFFFFF" BackgroundColor="#111827" BorderColor="#374151" Command="{Binding SelectColorCommand}" CommandParameter="#111827" WidthRequest="42" HeightRequest="36" Padding="0" />
+                            </HorizontalStackLayout>
+                        </ScrollView>
+
+                        <Label Text="ملاحظة: النص واللون للمعاينة فقط؛ سيتم حفظ الصورة الأصلية كملصق."
+                               FontFamily="CairoRegular"
+                               FontSize="11"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                               LineBreakMode="WordWrap" />
 
                         <!-- Change Image Button -->
                         <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"

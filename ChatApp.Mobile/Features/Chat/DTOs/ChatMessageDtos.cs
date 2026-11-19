@@ -43,6 +43,17 @@ public record ReactRequestClientDto(
     [property: JsonPropertyName("emoji")] string Emoji
 );
 
+public partial class EmojiCategoryTabItem : ObservableObject
+{
+    public string Key { get; init; } = string.Empty;
+    public string Icon { get; init; } = string.Empty;
+    public string Title { get; init; } = string.Empty;
+    public string DisplayLabel => $"{Icon} {Title}";
+
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
+}
+
 public record MessageClientDto(
     [property: JsonPropertyName("id")] Guid Id,
     [property: JsonPropertyName("conversationId")] Guid ConversationId,

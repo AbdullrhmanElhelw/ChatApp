@@ -6,6 +6,7 @@
              x:DataType="vm:SplashViewModel"
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
+             FlowDirection="RightToLeft"
              BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
 
     <Grid VerticalOptions="Fill" HorizontalOptions="Fill">
@@ -33,12 +34,13 @@
                     <RoundRectangle CornerRadius="32" />
                 </Border.StrokeShape>
 
-                <Grid VerticalOptions="Center" HorizontalOptions="Center">
-                    <Label Text="💬"
-                           FontSize="48"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center" />
-                </Grid>
+                <Path Data="{StaticResource IconChat}"
+                      Fill="{StaticResource White}"
+                      WidthRequest="52"
+                      HeightRequest="52"
+                      Aspect="Uniform"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center" />
             </Border>
 
             <!-- Brand Name & Tagline -->
@@ -50,7 +52,7 @@
                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
                        HorizontalOptions="Center" />
 
-                <Label Text="محادثات فورية • خصوصية فائقة • ستيكرز مخصص"
+                <Label Text="محادثاتك • أصدقاؤك • ملصقاتك"
                        Style="{StaticResource TypographyCaption}"
                        TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
                        HorizontalOptions="Center" />

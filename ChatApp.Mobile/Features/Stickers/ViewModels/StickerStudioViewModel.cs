@@ -28,6 +28,9 @@ public partial class StickerStudioViewModel : BaseViewModel
     public partial string SelectedColor { get; set; } = "#FFFFFF";
 
     [ObservableProperty]
+    public partial double CaptionFontSize { get; set; } = 18;
+
+    [ObservableProperty]
     public partial ObservableCollection<StickerPackClientDto> StickerPacks { get; set; } = new();
 
     [ObservableProperty]
@@ -89,7 +92,7 @@ public partial class StickerStudioViewModel : BaseViewModel
             {
                 SelectedImagePath = result.FullPath;
                 ClearError();
-                StatusMessage = "تم اختيار الصورة بنجاح! يمكنك الآن كتابة نص أو حفظ الاستيكر.";
+                StatusMessage = "تم اختيار الصورة. أضف نصًا وإيموجي للمعاينة قبل حفظ الصورة الأصلية كملصق.";
             }
         }
         catch (Exception ex)
@@ -111,6 +114,18 @@ public partial class StickerStudioViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    public void IncreaseCaptionSize()
+    {
+        CaptionFontSize = Math.Min(CaptionFontSize + 2, 34);
+    }
+
+    [RelayCommand]
+    public void DecreaseCaptionSize()
+    {
+        CaptionFontSize = Math.Max(CaptionFontSize - 2, 14);
+    }
+
+    [RelayCommand]
     public async Task SaveStickerAsync()
     {
         if (string.IsNullOrEmpty(SelectedImagePath) || !File.Exists(SelectedImagePath))
@@ -121,7 +136,7 @@ public partial class StickerStudioViewModel : BaseViewModel
 
         IsBusy = true;
         ClearError();
-        StatusMessage = "جارٍ حفظ وتحويل الاستيكر...";
+        StatusMessage = "جارٍ رفع الصورة وإضافتها إلى حزمة الملصقات...";
 
         try
         {

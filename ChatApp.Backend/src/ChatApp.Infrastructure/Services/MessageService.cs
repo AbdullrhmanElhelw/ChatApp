@@ -330,25 +330,34 @@ public class MessageService : IMessageService
         var user = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == currentUserId, cancellationToken);
         var userName = user?.FullName ?? user?.UserName ?? "مستخدم";
 
-        var existingReaction = message.Reactions.FirstOrDefault(r => r.UserId == currentUserId);
+        var existingUserReactions = message.Reactions.Where(r => r.UserId == currentUserId).ToList();
+        var existingReaction = existingUserReactions.FirstOrDefault();
         bool added;
 
         if (existingReaction != null && existingReaction.Emoji == emoji)
         {
             // Same emoji tapped again: remove reaction (toggle off)
-            _dbContext.MessageReactions.Remove(existingReaction);
-            message.Reactions.Remove(existingReaction);
+            foreach (var r in existingUserReactions)
+            {
+                _dbContext.MessageReactions.Remove(r);
+                message.Reactions.Remove(r);
+            }
             added = false;
         }
         else if (existingReaction != null)
         {
-            // Different emoji: update to new emoji
+            // Different emoji: update to new emoji (and clean up any historical duplicates)
             existingReaction.Emoji = emoji;
+            foreach (var duplicate in existingUserReactions.Skip(1))
+            {
+                _dbContext.MessageReactions.Remove(duplicate);
+                message.Reactions.Remove(duplicate);
+            }
             added = true;
         }
         else
         {
-            // New reaction
+            // New reaction (EF Core relationship fixup automatically populates message.Reactions)
             var newReaction = new MessageReaction
             {
                 Id = Guid.NewGuid(),
@@ -358,13 +367,17 @@ public class MessageService : IMessageService
                 CreatedAt = DateTime.UtcNow
             };
             _dbContext.MessageReactions.Add(newReaction);
-            message.Reactions.Add(newReaction);
+            if (!message.Reactions.Any(r => r.Id == newReaction.Id || r.UserId == currentUserId))
+            {
+                message.Reactions.Add(newReaction);
+            }
             added = true;
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         var reactionList = message.Reactions
+            .DistinctBy(r => r.UserId)
             .GroupBy(r => r.Emoji)
             .Select(g => new ReactionCountDto(
                 g.Key,
@@ -442,6 +455,7 @@ public class MessageService : IMessageService
         }
 
         var reactionList = message.Reactions?
+            .DistinctBy(r => r.UserId)
             .GroupBy(r => r.Emoji)
             .Select(g => new ReactionCountDto(
                 g.Key,

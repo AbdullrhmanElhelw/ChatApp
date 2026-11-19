@@ -14,7 +14,7 @@
         <Grid RowDefinitions="Auto,*,Auto" Padding="24" MinimumHeightRequest="700">
 
             <!-- 1. Top Bar with Back Button -->
-            <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,10,0,16">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,10,0,16">
                 <Border Grid.Column="0"
                         WidthRequest="38"
                         HeightRequest="38"
@@ -34,6 +34,28 @@
                           HorizontalOptions="Center"
                           VerticalOptions="Center" />
                 </Border>
+                <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
+                    <Border WidthRequest="32"
+                            HeightRequest="32"
+                            StrokeThickness="0"
+                            BackgroundColor="{StaticResource BrandPrimary}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="11" />
+                        </Border.StrokeShape>
+                        <Path Data="{StaticResource IconChat}"
+                              Fill="{StaticResource White}"
+                              WidthRequest="16"
+                              HeightRequest="16"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="ChatApp"
+                           FontFamily="CairoBold"
+                           FontSize="17"
+                           TextColor="{StaticResource BrandPrimary}"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
             </Grid>
 
             <!-- 2. Form Card Container -->
@@ -45,7 +67,7 @@
                            Style="{StaticResource TypographyH1}"
                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
 
-                    <Label Text="انضم إلى ChatApp واستمتع بمراسلة فورية وآمنة مع صانع ملصقاتك المفضل."
+                    <Label Text="أنشئ حسابك وابدأ محادثاتك وشارك ملصقاتك مع أصدقائك."
                            Style="{StaticResource TypographyBody}"
                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
                 </VerticalStackLayout>
@@ -104,7 +126,7 @@
                                         IsPassword="True"
                                         ErrorMessage="{Binding ConfirmPasswordError}" />
 
-                    <Label Text="💡 نصيحة: يجب أن تحتوي كلمة المرور على 6 خانات تشمل حرفاً كبيراً ورقم ورمزاً."
+                    <Label Text="اختر كلمة مرور قوية لا تستخدمها في مواقع أخرى."
                            Style="{StaticResource TypographyTiny}"
                            TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
                 </VerticalStackLayout>

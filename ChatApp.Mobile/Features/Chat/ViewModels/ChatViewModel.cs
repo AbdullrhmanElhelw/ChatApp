@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -18,6 +19,19 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     private readonly IAuthenticationStateService _authState;
     private readonly INavigationService _navigationService;
 
+    private static readonly IReadOnlyDictionary<string, string[]> EmojiCatalog = new Dictionary<string, string[]>
+    {
+        ["الوجوه"] = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😍", "🥰", "😘", "😋", "😎", "🥳", "🤩", "🤔", "🤨", "😐", "😶", "🙄", "😏", "😴", "🥱", "😷", "🤒", "🤕", "🤢", "🤮", "🥵", "🥶", "😭", "😢", "😤", "😡", "🤯", "🥺", "😱", "😨", "😰", "😳", "🤗", "🤫", "🤭", "🫡", "🫠"],
+        ["الأشخاص"] = ["👋", "🤚", "✋", "🖐️", "👌", "🤌", "🤏", "✌️", "🤞", "🫰", "🤟", "🤘", "🤙", "👈", "👉", "👆", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "💪", "🦾", "🧑", "👨", "👩", "🧒", "👶", "🧓", "👴", "👵", "🧔", "👮", "🧑‍🍳", "🧑‍🎓", "🧑‍💻", "🧑‍🎤", "🧑‍🚀", "🧑‍⚕️"],
+        ["الحيوانات"] = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵", "🙈", "🙉", "🙊", "🐔", "🐧", "🐦", "🦄", "🐝", "🦋", "🐢", "🐬", "🐳", "🦈", "🦖", "🐙", "🦀", "🐞", "🐠", "🦜", "🦚", "🐾", "🌸", "🌹", "🌻", "🌈", "🌙", "⭐", "⚡", "🔥", "🌊"],
+        ["الطعام"] = ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🥑", "🥦", "🥕", "🌽", "🌶️", "🍕", "🍔", "🍟", "🌭", "🍿", "🌮", "🌯", "🥙", "🍜", "🍣", "🍰", "🎂", "🍪", "🍩", "🍫", "🍦", "☕", "🧋", "🥤", "🍺", "🥂"],
+        ["السفر"] = ["🚗", "🚕", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚲", "🛵", "🚆", "✈️", "🚀", "🛸", "🚁", "⛵", "🚢", "🗺️", "🌍", "🏖️", "🏝️", "🏕️", "🏠", "🏢", "🏰", "🗼", "🌃", "🌉", "🎡", "🎢", "⛺", "⛰️", "🏔️", "🌋", "⛲", "🗽"],
+        ["الأنشطة"] = ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸", "🥊", "🥋", "⛳", "🎣", "🤿", "🎽", "🛹", "🎿", "🏂", "🏋️", "🤸", "⛹️", "🤾", "🏊", "🎮", "🕹️", "🎯", "🎲", "🎸", "🎹", "🎤", "🎧", "🎨", "🎬", "🏆", "🥇", "🎉", "🎊"],
+        ["الأشياء"] = ["⌚", "📱", "💻", "⌨️", "🖥️", "🖨️", "📷", "📹", "💡", "🔦", "📚", "📖", "✏️", "🖊️", "📝", "📌", "📎", "✂️", "🔒", "🔑", "🔨", "🛠️", "⚙️", "🎁", "🎈", "🪄", "💎", "🧸", "🛍️", "🎒", "🧢", "👓", "☂️", "🕯️"],
+        ["الرموز"] = ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "☮️", "✝️", "☪️", "🕉️", "♻️", "✅", "❌", "❓", "❗", "💯", "💢", "💬", "💤", "🔔", "🔕", "♨️", "🚫", "⭐", "✨", "💫", "🎵", "🎶"]
+    };
+
+    private readonly ConcurrentDictionary<Guid, byte> _reactionRequestsInFlight = new();
     private CancellationTokenSource? _typingCts;
     private bool _isCurrentlyTyping;
     private bool _isDisposed;
@@ -58,6 +72,40 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public partial bool IsAttachmentPanelVisible { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEmojiPickerVisible))]
+    public partial bool IsEmojiPickerOpen { get; set; }
+
+    public bool IsEmojiPickerVisible => IsEmojiPickerOpen;
+
+    [ObservableProperty]
+    public partial ObservableCollection<string> EmojiCategories { get; set; } = new(EmojiCatalog.Keys);
+
+    [ObservableProperty]
+    public partial ObservableCollection<EmojiCategoryTabItem> EmojiCategoryTabs { get; set; } = new()
+    {
+        new EmojiCategoryTabItem { Key = "الوجوه", Icon = "😊", Title = "الوجوه", IsSelected = true },
+        new EmojiCategoryTabItem { Key = "الأشخاص", Icon = "👋", Title = "الأشخاص", IsSelected = false },
+        new EmojiCategoryTabItem { Key = "الحيوانات", Icon = "🦊", Title = "الحيوانات", IsSelected = false },
+        new EmojiCategoryTabItem { Key = "الطعام", Icon = "🍕", Title = "الطعام", IsSelected = false },
+        new EmojiCategoryTabItem { Key = "السفر", Icon = "✈️", Title = "السفر", IsSelected = false },
+        new EmojiCategoryTabItem { Key = "الأنشطة", Icon = "⚽", Title = "الأنشطة", IsSelected = false },
+        new EmojiCategoryTabItem { Key = "الأشياء", Icon = "💡", Title = "الأشياء", IsSelected = false },
+        new EmojiCategoryTabItem { Key = "الرموز", Icon = "❤️", Title = "الرموز", IsSelected = false }
+    };
+
+    [ObservableProperty]
+    public partial ObservableCollection<string> QuickEmojis { get; set; } = new()
+    {
+        "😂", "❤️", "🔥", "😍", "🥰", "👍", "😭", "🙏", "🥳", "💯"
+    };
+
+    [ObservableProperty]
+    public partial ObservableCollection<string> FilteredEmojis { get; set; } = new(EmojiCatalog["الوجوه"]);
+
+    [ObservableProperty]
+    public partial string SelectedEmojiCategory { get; set; } = "الوجوه";
+
+    [ObservableProperty]
     public partial ObservableCollection<StickerPackClientDto> AvailableStickerPacks { get; set; } = new();
 
     [ObservableProperty]
@@ -74,6 +122,72 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public partial ChatMessageItem? ReactionTargetMessage { get; set; }
 
     public bool IsReactionPickerVisible => ReactionTargetMessage != null;
+
+    partial void OnSelectedEmojiCategoryChanged(string value)
+    {
+        if (EmojiCatalog.TryGetValue(value, out var emojis))
+        {
+            FilteredEmojis = new ObservableCollection<string>(emojis);
+        }
+
+        foreach (var tab in EmojiCategoryTabs)
+        {
+            tab.IsSelected = tab.Key == value;
+        }
+    }
+
+    [RelayCommand]
+    public void ToggleEmojiPicker()
+    {
+        IsEmojiPickerOpen = !IsEmojiPickerOpen;
+        if (IsEmojiPickerOpen)
+        {
+            IsAttachmentPanelVisible = false;
+        }
+    }
+
+    [RelayCommand]
+    public void CloseEmojiPicker()
+    {
+        IsEmojiPickerOpen = false;
+    }
+
+    [RelayCommand]
+    public void SelectEmojiCategory(string? category)
+    {
+        if (!string.IsNullOrWhiteSpace(category) && EmojiCatalog.ContainsKey(category))
+        {
+            SelectedEmojiCategory = category;
+        }
+    }
+
+    [RelayCommand]
+    public void InsertMessageEmoji(string? emoji)
+    {
+        if (!string.IsNullOrWhiteSpace(emoji))
+        {
+            MessageText += emoji;
+        }
+    }
+
+    [RelayCommand]
+    public void BackspaceMessageEmoji()
+    {
+        if (string.IsNullOrEmpty(MessageText)) return;
+
+        var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(MessageText);
+        var elements = new List<string>();
+        while (enumerator.MoveNext())
+        {
+            elements.Add(enumerator.GetTextElement());
+        }
+
+        if (elements.Count > 0)
+        {
+            elements.RemoveAt(elements.Count - 1);
+            MessageText = string.Concat(elements);
+        }
+    }
 
     [RelayCommand]
     public void StartReply(ChatMessageItem message)
@@ -112,6 +226,11 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         var messageId = ReactionTargetMessage.Id;
         CloseReactionPicker();
 
+        if (!_reactionRequestsInFlight.TryAdd(messageId, 0))
+        {
+            return;
+        }
+
         try
         {
             await _chatHub.ReactToMessageAsync(messageId, emoji.Trim());
@@ -119,6 +238,10 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         catch (Exception ex)
         {
             ErrorMessage = $"تعذر إرسال التفاعل: {ex.Message}";
+        }
+        finally
+        {
+            _reactionRequestsInFlight.TryRemove(messageId, out _);
         }
     }
 
@@ -128,6 +251,11 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         if (reaction == null || reaction.MessageId == Guid.Empty || string.IsNullOrWhiteSpace(reaction.Emoji))
             return;
 
+        if (!_reactionRequestsInFlight.TryAdd(reaction.MessageId, 0))
+        {
+            return;
+        }
+
         try
         {
             await _chatHub.ReactToMessageAsync(reaction.MessageId, reaction.Emoji.Trim());
@@ -135,6 +263,10 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         catch (Exception ex)
         {
             ErrorMessage = $"تعذر التفاعل: {ex.Message}";
+        }
+        finally
+        {
+            _reactionRequestsInFlight.TryRemove(reaction.MessageId, out _);
         }
     }
 
@@ -291,6 +423,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         IsAttachmentPanelVisible = !IsAttachmentPanelVisible;
         if (IsAttachmentPanelVisible)
         {
+            IsEmojiPickerOpen = false;
             _ = LoadStickerPacksAsync();
         }
     }
@@ -462,6 +595,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         var text = MessageText.Trim();
         MessageText = string.Empty;
         IsAttachmentPanelVisible = false;
+        IsEmojiPickerOpen = false;
         CancelTyping();
 
         var clientMessageId = Guid.NewGuid();

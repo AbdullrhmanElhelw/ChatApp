@@ -10,6 +10,13 @@ using ChatApp.Mobile.Navigation;
 
 namespace ChatApp.Mobile.Features.Conversations.ViewModels;
 
+public enum ConversationFilter
+{
+    All,
+    Unread,
+    Groups
+}
+
 public partial class ConversationsViewModel : BaseViewModel
 {
     private readonly IConversationApiService _conversationService;
@@ -25,6 +32,9 @@ public partial class ConversationsViewModel : BaseViewModel
 
     [ObservableProperty]
     public partial string SearchText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial ConversationFilter SelectedFilter { get; set; } = ConversationFilter.All;
 
     [ObservableProperty]
     public partial bool IsRefreshing { get; set; }
@@ -54,6 +64,17 @@ public partial class ConversationsViewModel : BaseViewModel
     partial void OnSearchTextChanged(string value)
     {
         FilterConversations();
+    }
+
+    partial void OnSelectedFilterChanged(ConversationFilter value)
+    {
+        FilterConversations();
+    }
+
+    [RelayCommand]
+    private void SelectFilter(ConversationFilter filter)
+    {
+        SelectedFilter = filter;
     }
 
     [RelayCommand]
@@ -136,19 +157,24 @@ public partial class ConversationsViewModel : BaseViewModel
 
     private void FilterConversations()
     {
-        if (string.IsNullOrWhiteSpace(SearchText))
-        {
-            FilteredConversations = new ObservableCollection<ConversationSummaryDto>(Conversations);
-        }
-        else
-        {
-            var query = SearchText.Trim().ToLower();
-            var matches = Conversations.Where(c =>
-                c.Title.ToLower().Contains(query) ||
-                (c.LastMessage?.Content?.ToLower().Contains(query) ?? false));
+        IEnumerable<ConversationSummaryDto> matches = Conversations;
 
-            FilteredConversations = new ObservableCollection<ConversationSummaryDto>(matches);
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            var query = SearchText.Trim();
+            matches = matches.Where(c =>
+                c.Title.Contains(query, StringComparison.CurrentCultureIgnoreCase) ||
+                (c.LastMessage?.Content?.Contains(query, StringComparison.CurrentCultureIgnoreCase) ?? false));
         }
+
+        matches = SelectedFilter switch
+        {
+            ConversationFilter.Unread => matches.Where(c => c.UnreadCount > 0),
+            ConversationFilter.Groups => matches.Where(c => c.ConversationType == ConversationType.Group),
+            _ => matches
+        };
+
+        FilteredConversations = new ObservableCollection<ConversationSummaryDto>(matches);
         OnPropertyChanged(nameof(IsEmpty));
     }
 

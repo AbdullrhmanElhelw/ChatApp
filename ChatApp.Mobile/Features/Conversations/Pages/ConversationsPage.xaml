@@ -21,16 +21,23 @@
                                      AvatarUrl="{Binding CurrentUser.AvatarUrl}"
                                      Size="42"
                                      IsOnline="True" />
-                <Image Source="betweenus_logo.png"
-                       WidthRequest="28"
-                       HeightRequest="28"
-                       Aspect="AspectFit"
-                       VerticalOptions="Center" />
+                <Border WidthRequest="30"
+                        HeightRequest="30"
+                        StrokeThickness="0"
+                        VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="9" />
+                    </Border.StrokeShape>
+                    <Image Source="betweenus_logo.png"
+                           WidthRequest="30"
+                           HeightRequest="30"
+                           Aspect="AspectFill" />
+                </Border>
                 <Label Text="BetweenUs"
                        FontFamily="CairoBold"
                        FontSize="22"
                        FontAttributes="Bold"
-                       TextColor="#EC4899"
+                       TextColor="#F044A5"
                        VerticalOptions="Center" />
             </HorizontalStackLayout>
 

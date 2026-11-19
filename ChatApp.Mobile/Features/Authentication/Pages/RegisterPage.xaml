@@ -35,15 +35,22 @@
                           VerticalOptions="Center" />
                 </Border>
                 <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
-                    <Image Source="betweenus_logo.png"
-                           WidthRequest="34"
-                           HeightRequest="34"
-                           Aspect="AspectFit"
-                           VerticalOptions="Center" />
+                    <Border WidthRequest="34"
+                            HeightRequest="34"
+                            StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Image Source="betweenus_logo.png"
+                               WidthRequest="34"
+                               HeightRequest="34"
+                               Aspect="AspectFill" />
+                    </Border>
                     <Label Text="BetweenUs"
                            FontFamily="CairoBold"
                            FontSize="17"
-                           TextColor="#EC4899"
+                           TextColor="#F044A5"
                            VerticalOptions="Center" />
                 </HorizontalStackLayout>
             </Grid>

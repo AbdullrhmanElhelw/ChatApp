@@ -33,6 +33,14 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "CairoBold");
             });
 
+#if ANDROID
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("BetweenUsBorderlessEntry", (handler, view) =>
+        {
+            handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+            handler.PlatformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+        });
+#endif
+
         // 1. Navigation & Core Infrastructure Services
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<ISecureStorageService, SecureStorageService>();

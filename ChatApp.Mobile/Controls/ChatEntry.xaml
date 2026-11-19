@@ -7,18 +7,18 @@
     <VerticalStackLayout Spacing="6">
         <!-- Field Header Label -->
         <Label Text="{Binding LabelText, Source={x:Reference ThisEntry}}"
-               TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}"
+               TextColor="{AppThemeBinding Light=#5A4478, Dark=#FFB5DC}"
                FontFamily="CairoBold"
                FontSize="13"
                FontAttributes="Bold"
                IsVisible="{Binding HasLabel, Source={x:Reference ThisEntry}}" />
 
-        <!-- Input Box Border -->
-        <Border StrokeThickness="1"
+        <!-- Input Box Border (54px Height, 14px Radius, Focus Border Violet #9B4DDB) -->
+        <Border StrokeThickness="1.5"
                 Stroke="{Binding BorderStroke, Source={x:Reference ThisEntry}}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1C1230}"
                 Padding="16,0"
-                HeightRequest="48">
+                HeightRequest="54">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="14" />
             </Border.StrokeShape>
@@ -27,23 +27,29 @@
                 <Entry Grid.Column="0"
                        Text="{Binding Text, Source={x:Reference ThisEntry}, Mode=TwoWay}"
                        Placeholder="{Binding Placeholder, Source={x:Reference ThisEntry}}"
-                       PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
+                       PlaceholderColor="{AppThemeBinding Light=#9B86B8, Dark=#755E96}"
+                       TextColor="{AppThemeBinding Light=#180B35, Dark=#FFF5FF}"
                        FontFamily="CairoRegular"
                        FontSize="14"
+                       HorizontalTextAlignment="Start"
+                       Focused="OnEntryFocused"
+                       Unfocused="OnEntryUnfocused"
                        IsPassword="{Binding IsPassword, Source={x:Reference ThisEntry}}"
                        Keyboard="{Binding Keyboard, Source={x:Reference ThisEntry}}"
                        BackgroundColor="Transparent"
                        VerticalOptions="Center" />
 
-                <!-- Password Toggle / Clear button (optional) -->
-                <ImageButton Grid.Column="1"
-                             IsVisible="{Binding IsPassword, Source={x:Reference ThisEntry}}"
-                             Command="{Binding TogglePasswordCommand, Source={x:Reference ThisEntry}}"
-                             WidthRequest="24"
-                             HeightRequest="24"
-                             VerticalOptions="Center"
-                             BackgroundColor="Transparent" />
+                <!-- Password Visibility Toggle -->
+                <Label Grid.Column="1"
+                       Text="{Binding PasswordToggleGlyph, Source={x:Reference ThisEntry}}"
+                       IsVisible="{Binding ShowPasswordToggle, Source={x:Reference ThisEntry}}"
+                       FontSize="16"
+                       Padding="8,4"
+                       VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding TogglePasswordCommand, Source={x:Reference ThisEntry}}" />
+                    </Label.GestureRecognizers>
+                </Label>
             </Grid>
         </Border>
 

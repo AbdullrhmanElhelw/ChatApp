@@ -6,13 +6,13 @@ public class AvatarColorConverter : IValueConverter
 {
     private static readonly Color[] Palette =
     {
-        Color.FromArgb("#0D9488"), // Teal
-        Color.FromArgb("#0284C7"), // Sky Blue
-        Color.FromArgb("#7C3AED"), // Violet
-        Color.FromArgb("#DB2777"), // Pink
-        Color.FromArgb("#EA580C"), // Orange
-        Color.FromArgb("#16A34A"), // Green
-        Color.FromArgb("#4F46E5"), // Indigo
+        Color.FromArgb("#7025B8"), // Primary Purple
+        Color.FromArgb("#9B4DDB"), // Violet
+        Color.FromArgb("#F044A5"), // Pink
+        Color.FromArgb("#6D28D9"), // Royal Violet
+        Color.FromArgb("#C026D3"), // Fuchsia
+        Color.FromArgb("#4E1688"), // Deep Violet
+        Color.FromArgb("#DB2777"), // Rose Pink
     };
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

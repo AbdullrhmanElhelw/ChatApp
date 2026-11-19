@@ -60,20 +60,54 @@ public partial class ChatButton : ContentView
 
     public ICommand TapCommand { get; }
 
-    public Color ButtonBackground => ButtonType switch
+    public Brush ButtonBrush
     {
-        ChatButtonType.Primary => Color.FromArgb("#0D9488"),
-        ChatButtonType.Secondary => Color.FromArgb("#F1F5F9"),
-        ChatButtonType.Danger => Color.FromArgb("#EF4444"),
-        _ => Colors.Transparent
-    };
+        get
+        {
+            var isDark = Application.Current?.RequestedTheme != AppTheme.Light;
+            return ButtonType switch
+            {
+                ChatButtonType.Primary => new LinearGradientBrush(
+                    new GradientStopCollection
+                    {
+                        new GradientStop(Color.FromArgb("#7025B8"), 0.0f),
+                        new GradientStop(Color.FromArgb("#F044A5"), 1.0f)
+                    },
+                    new Point(0, 0),
+                    new Point(1, 1)),
+                ChatButtonType.Secondary => new SolidColorBrush(isDark ? Color.FromArgb("#281A3E") : Color.FromArgb("#F7ECFA")),
+                ChatButtonType.Danger => new SolidColorBrush(Color.FromArgb("#EF4444")),
+                _ => new SolidColorBrush(Colors.Transparent)
+            };
+        }
+    }
 
-    public Color TextColor => ButtonType switch
+    public Color BorderColor
     {
-        ChatButtonType.Secondary => Color.FromArgb("#0F172A"),
-        ChatButtonType.Ghost => Color.FromArgb("#0D9488"),
-        _ => Colors.White
-    };
+        get
+        {
+            var isDark = Application.Current?.RequestedTheme != AppTheme.Light;
+            return ButtonType == ChatButtonType.Secondary
+                ? (isDark ? Color.FromArgb("#39274F") : Color.FromArgb("#E9D7F5"))
+                : Colors.Transparent;
+        }
+    }
+
+    public double BorderWidth => ButtonType == ChatButtonType.Secondary ? 1 : 0;
+
+    public Color TextColor
+    {
+        get
+        {
+            var isDark = Application.Current?.RequestedTheme != AppTheme.Light;
+            return ButtonType switch
+            {
+                ChatButtonType.Secondary => isDark ? Color.FromArgb("#FFF5FF") : Color.FromArgb("#180B35"),
+                ChatButtonType.Ghost => Color.FromArgb("#F044A5"),
+                _ => Color.FromArgb("#FFF5FF")
+            };
+        }
+    }
 
     public ChatButton()
     {
@@ -86,11 +120,18 @@ public partial class ChatButton : ContentView
         });
 
         InitializeComponent();
+
+        if (Application.Current != null)
+        {
+            Application.Current.RequestedThemeChanged += (_, _) => OnButtonTypeChanged();
+        }
     }
 
     private void OnButtonTypeChanged()
     {
-        OnPropertyChanged(nameof(ButtonBackground));
+        OnPropertyChanged(nameof(ButtonBrush));
+        OnPropertyChanged(nameof(BorderColor));
+        OnPropertyChanged(nameof(BorderWidth));
         OnPropertyChanged(nameof(TextColor));
     }
 }

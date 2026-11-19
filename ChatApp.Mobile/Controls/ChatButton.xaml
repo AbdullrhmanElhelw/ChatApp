@@ -9,10 +9,11 @@
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     </ContentView.Resources>
 
-    <Border StrokeThickness="0"
-            HeightRequest="50"
-            BackgroundColor="{Binding ButtonBackground, Source={x:Reference ThisButton}}"
-            Padding="16,0">
+    <Border StrokeThickness="{Binding BorderWidth, Source={x:Reference ThisButton}}"
+            Stroke="{Binding BorderColor, Source={x:Reference ThisButton}}"
+            HeightRequest="52"
+            Background="{Binding ButtonBrush, Source={x:Reference ThisButton}}"
+            Padding="20,0">
         <Border.StrokeShape>
             <RoundRectangle CornerRadius="14" />
         </Border.StrokeShape>

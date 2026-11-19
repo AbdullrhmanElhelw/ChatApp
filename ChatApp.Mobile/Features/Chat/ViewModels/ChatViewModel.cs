@@ -56,6 +56,33 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     [NotifyPropertyChangedFor(nameof(DisplayedMessages))]
     public partial string SearchQuery { get; set; } = string.Empty;
 
+    [ObservableProperty]
+    public partial bool IsCustomizeSheetVisible { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasCustomWallpaper))]
+    public partial string? CustomWallpaperPath { get; set; }
+
+    public bool HasCustomWallpaper => !string.IsNullOrWhiteSpace(CustomWallpaperPath);
+
+    [ObservableProperty]
+    public partial string SelectedWallpaperKey { get; set; } = "default";
+
+    [ObservableProperty]
+    public partial string SelectedBubbleKey { get; set; } = "violet";
+
+    [ObservableProperty]
+    public partial Color ChatBackgroundStartColor { get; set; } = Color.FromArgb("#13101A");
+
+    [ObservableProperty]
+    public partial Color ChatBackgroundEndColor { get; set; } = Color.FromArgb("#13101A");
+
+    [ObservableProperty]
+    public partial Color OutgoingBubbleStartColor { get; set; } = Color.FromArgb("#9B3BF9");
+
+    [ObservableProperty]
+    public partial Color OutgoingBubbleEndColor { get; set; } = Color.FromArgb("#7B2DF3");
+
     public ObservableCollection<ChatMessageItem> DisplayedMessages
     {
         get
@@ -423,8 +450,157 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         }
     }
 
+    [RelayCommand]
+    public void OpenCustomizeSheet()
+    {
+        IsAttachmentPanelVisible = false;
+        IsEmojiPickerOpen = false;
+        IsCustomizeSheetVisible = true;
+    }
+
+    [RelayCommand]
+    public void CloseCustomizeSheet()
+    {
+        IsCustomizeSheetVisible = false;
+    }
+
+    [RelayCommand]
+    public void SelectWallpaperPreset(string? preset)
+    {
+        if (string.IsNullOrWhiteSpace(preset)) return;
+        SelectedWallpaperKey = preset;
+        CustomWallpaperPath = null;
+        ApplyWallpaperPreset(preset);
+        SaveCustomizationPreferences();
+    }
+
+    [RelayCommand]
+    public void SelectBubblePreset(string? preset)
+    {
+        if (string.IsNullOrWhiteSpace(preset)) return;
+        SelectedBubbleKey = preset;
+        ApplyBubblePreset(preset);
+        SaveCustomizationPreferences();
+    }
+
+    [RelayCommand]
+    public async Task PickChatWallpaperAsync()
+    {
+        try
+        {
+            var file = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = "اختر خلفية للمحادثة",
+                FileTypes = FilePickerFileType.Images
+            });
+
+            if (file == null) return;
+
+            var ext = Path.GetExtension(file.FileName);
+            if (string.IsNullOrWhiteSpace(ext)) ext = ".jpg";
+            var destPath = Path.Combine(FileSystem.AppDataDirectory, $"wallpaper_{ConversationId}{ext}");
+
+            await using (var src = await file.OpenReadAsync())
+            await using (var dst = File.Create(destPath))
+            {
+                await src.CopyToAsync(dst);
+            }
+
+            CustomWallpaperPath = destPath;
+            SelectedWallpaperKey = "custom";
+            SaveCustomizationPreferences();
+            IsCustomizeSheetVisible = false;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر تعيين الخلفية: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    public void ResetChatCustomization()
+    {
+        CustomWallpaperPath = null;
+        SelectedWallpaperKey = "default";
+        SelectedBubbleKey = "violet";
+        ApplyWallpaperPreset("default");
+        ApplyBubblePreset("violet");
+        SaveCustomizationPreferences();
+    }
+
+    private void LoadChatCustomization(Guid conversationId)
+    {
+        if (conversationId == Guid.Empty) return;
+        try
+        {
+            var prefix = $"chat_custom_{conversationId}_";
+            var wallpaperKey = Preferences.Default.Get(prefix + "wallpaper", "default");
+            var bubbleKey = Preferences.Default.Get(prefix + "bubble", "violet");
+            var customPath = Preferences.Default.Get(prefix + "wallpaper_path", string.Empty);
+
+            SelectedWallpaperKey = wallpaperKey;
+            SelectedBubbleKey = bubbleKey;
+
+            if (wallpaperKey == "custom" && !string.IsNullOrWhiteSpace(customPath) && File.Exists(customPath))
+            {
+                CustomWallpaperPath = customPath;
+            }
+            else
+            {
+                CustomWallpaperPath = null;
+                ApplyWallpaperPreset(wallpaperKey);
+            }
+
+            ApplyBubblePreset(bubbleKey);
+        }
+        catch
+        {
+            // Safe fallback in unit test environment
+        }
+    }
+
+    private void SaveCustomizationPreferences()
+    {
+        if (ConversationId == Guid.Empty) return;
+        try
+        {
+            var prefix = $"chat_custom_{ConversationId}_";
+            Preferences.Default.Set(prefix + "wallpaper", SelectedWallpaperKey);
+            Preferences.Default.Set(prefix + "bubble", SelectedBubbleKey);
+            Preferences.Default.Set(prefix + "wallpaper_path", CustomWallpaperPath ?? string.Empty);
+        }
+        catch
+        {
+            // Safe fallback in unit test environment
+        }
+    }
+
+    private void ApplyWallpaperPreset(string preset)
+    {
+        (ChatBackgroundStartColor, ChatBackgroundEndColor) = preset switch
+        {
+            "cosmic" => (Color.FromArgb("#14042B"), Color.FromArgb("#2E0854")),
+            "rose" => (Color.FromArgb("#280624"), Color.FromArgb("#4A0E3E")),
+            "midnight" => (Color.FromArgb("#0A1128"), Color.FromArgb("#1B2845")),
+            _ => (Color.FromArgb("#13101A"), Color.FromArgb("#13101A"))
+        };
+    }
+
+    private void ApplyBubblePreset(string preset)
+    {
+        (OutgoingBubbleStartColor, OutgoingBubbleEndColor) = preset switch
+        {
+            "pink" => (Color.FromArgb("#FF4FB8"), Color.FromArgb("#D9268E")),
+            "ocean" => (Color.FromArgb("#3B82F6"), Color.FromArgb("#1D4ED8")),
+            "emerald" => (Color.FromArgb("#10B981"), Color.FromArgb("#059669")),
+            "gold" => (Color.FromArgb("#F59E0B"), Color.FromArgb("#D97706")),
+            _ => (Color.FromArgb("#9B3BF9"), Color.FromArgb("#7B2DF3"))
+        };
+    }
+
     public async Task InitializeConversationAsync(Guid conversationId)
     {
+        LoadChatCustomization(conversationId);
         IsBusy = true;
         ClearError();
 

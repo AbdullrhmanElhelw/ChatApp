@@ -20,12 +20,28 @@
 
     <Grid RowDefinitions="Auto,*,Auto,Auto,Auto,Auto">
 
+        <!-- Dynamic Chat Background Brush & Optional Custom Wallpaper -->
+        <BoxView Grid.RowSpan="6" InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="{Binding ChatBackgroundStartColor}" Offset="0.0" />
+                    <GradientStop Color="{Binding ChatBackgroundEndColor}" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+        <Image Grid.RowSpan="6"
+               Source="{Binding CustomWallpaperPath}"
+               Aspect="AspectFill"
+               Opacity="0.38"
+               IsVisible="{Binding HasCustomWallpaper}"
+               InputTransparent="True" />
+
         <!-- 1. Sleek Header / Top Bar (Mockup Style) -->
         <Border Grid.Row="0"
                 StrokeThickness="0,0,0,1"
                 Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#262033}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource ChatHeaderLight}, Dark=#13101A}"
-                Padding="16,12">
+                BackgroundColor="#CC13101A"
+                Padding="14,10">
 
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
                 <!-- Back Button -->
@@ -84,14 +100,14 @@
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
 
-                <!-- Actions: Search & Call -->
+                <!-- Actions: Search & Customize -->
                 <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
-                    <Border WidthRequest="38"
-                            HeightRequest="38"
+                    <Border WidthRequest="36"
+                            HeightRequest="36"
                             StrokeThickness="0"
                             BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#252131}">
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="19" />
+                            <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding ToggleSearchCommand}" />
@@ -105,20 +121,20 @@
                               VerticalOptions="Center" />
                     </Border>
 
-                    <Border WidthRequest="38"
-                            HeightRequest="38"
+                    <Border WidthRequest="36"
+                            HeightRequest="36"
                             StrokeThickness="0"
                             BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#252131}">
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="19" />
+                            <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding ShowCallComingSoonCommand}" />
+                            <TapGestureRecognizer Command="{Binding OpenCustomizeSheetCommand}" />
                         </Border.GestureRecognizers>
-                        <Path Data="{StaticResource IconPhone}"
-                              Fill="{AppThemeBinding Light={StaticResource Gray600}, Dark=#FFFFFF}"
-                              WidthRequest="16"
-                              HeightRequest="16"
+                        <Path Data="{StaticResource IconPalette}"
+                              Fill="{StaticResource BrandNeonPink}"
+                              WidthRequest="17"
+                              HeightRequest="17"
                               Aspect="Uniform"
                               HorizontalOptions="Center"
                               VerticalOptions="Center" />
@@ -229,8 +245,8 @@
                                     Padding="16,10">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#9B3BF9" Offset="0.0" />
-                                        <GradientStop Color="#7B2DF3" Offset="1.0" />
+                                        <GradientStop Color="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OutgoingBubbleStartColor}" Offset="0.0" />
+                                        <GradientStop Color="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OutgoingBubbleEndColor}" Offset="1.0" />
                                     </LinearGradientBrush>
                                 </Border.Background>
                                 <Border.StrokeShape>
@@ -1547,6 +1563,182 @@
                                        TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
                                        VerticalOptions="Center" />
                             </HorizontalStackLayout>
+                        </Border>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- 11. Premium Chat Customization Sheet (Wallpaper & Bubble Colors) -->
+        <Grid Grid.RowSpan="6"
+              IsVisible="{Binding IsCustomizeSheetVisible}"
+              BackgroundColor="#99090218">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseCustomizeSheetCommand}" />
+            </Grid.GestureRecognizers>
+
+            <Border VerticalOptions="End"
+                    StrokeThickness="1"
+                    Stroke="#4E2682"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D0A38}"
+                    Padding="20,16,20,28">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="28,28,0,0" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#FF4FB8" Offset="0,-4" Radius="24" Opacity="0.35" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer />
+                </Border.GestureRecognizers>
+
+                <VerticalStackLayout Spacing="16">
+                    <BoxView WidthRequest="44"
+                             HeightRequest="4"
+                             CornerRadius="2"
+                             Color="{AppThemeBinding Light={StaticResource Gray300}, Dark=#4E2682}"
+                             HorizontalOptions="Center" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="تخصيص الشات 🎨"
+                               FontFamily="CairoBold"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                        <Label Grid.Column="1"
+                               Text="استعادة الافتراضي"
+                               FontFamily="CairoBold"
+                               FontSize="12"
+                               TextColor="{StaticResource BrandNeonPink}"
+                               VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ResetChatCustomizationCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <!-- Wallpapers Section -->
+                    <Label Text="خلفية المحادثة"
+                           FontFamily="CairoBold"
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#C5AFE4}" />
+
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout Spacing="10">
+                            <!-- Default Dark -->
+                            <Border WidthRequest="72" HeightRequest="64" StrokeThickness="1.5" Stroke="#4E2682" BackgroundColor="#13101A">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectWallpaperPresetCommand}" CommandParameter="default" /></Border.GestureRecognizers>
+                                <Label Text="داكن" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- Cosmic Purple -->
+                            <Border WidthRequest="72" HeightRequest="64" StrokeThickness="1.5" Stroke="#7B2DF3">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#14042B" Offset="0.0" />
+                                        <GradientStop Color="#2E0854" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectWallpaperPresetCommand}" CommandParameter="cosmic" /></Border.GestureRecognizers>
+                                <Label Text="بنفسجي" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- Rose Glow -->
+                            <Border WidthRequest="72" HeightRequest="64" StrokeThickness="1.5" Stroke="#FF4FB8">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#280624" Offset="0.0" />
+                                        <GradientStop Color="#4A0E3E" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectWallpaperPresetCommand}" CommandParameter="rose" /></Border.GestureRecognizers>
+                                <Label Text="وردي" FontFamily="CairoBold" FontSize="11" TextColor="#FFD6F2" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- Midnight Blue -->
+                            <Border WidthRequest="72" HeightRequest="64" StrokeThickness="1.5" Stroke="#3B82F6">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#0A1128" Offset="0.0" />
+                                        <GradientStop Color="#1B2845" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectWallpaperPresetCommand}" CommandParameter="midnight" /></Border.GestureRecognizers>
+                                <Label Text="ليلي" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- Pick Custom Image from Gallery -->
+                            <Border WidthRequest="96" HeightRequest="64" StrokeThickness="1.5" Stroke="{StaticResource BrandNeonPink}" BackgroundColor="#2A114E">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding PickChatWallpaperCommand}" /></Border.GestureRecognizers>
+                                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="2">
+                                    <Path Data="{StaticResource IconImage}" Fill="#FFD6F2" WidthRequest="18" HeightRequest="18" Aspect="Uniform" HorizontalOptions="Center" />
+                                    <Label Text="صورة من المعرض" FontFamily="CairoBold" FontSize="10" TextColor="#FFD6F2" HorizontalOptions="Center" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+
+                    <!-- Bubble Colors Section -->
+                    <Label Text="لون فقاعات الرسائل"
+                           FontFamily="CairoBold"
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#C5AFE4}" />
+
+                    <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                        <Border WidthRequest="44" HeightRequest="44" StrokeThickness="2" Stroke="#FFFFFF">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="22" /></Border.StrokeShape>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#9B3BF9" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBubblePresetCommand}" CommandParameter="violet" /></Border.GestureRecognizers>
+                        </Border>
+
+                        <Border WidthRequest="44" HeightRequest="44" StrokeThickness="2" Stroke="#FFD6F2">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="22" /></Border.StrokeShape>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#D9268E" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBubblePresetCommand}" CommandParameter="pink" /></Border.GestureRecognizers>
+                        </Border>
+
+                        <Border WidthRequest="44" HeightRequest="44" StrokeThickness="2" Stroke="#DBEAFE">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="22" /></Border.StrokeShape>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#3B82F6" Offset="0.0" /><GradientStop Color="#1D4ED8" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBubblePresetCommand}" CommandParameter="ocean" /></Border.GestureRecognizers>
+                        </Border>
+
+                        <Border WidthRequest="44" HeightRequest="44" StrokeThickness="2" Stroke="#D1FAE5">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="22" /></Border.StrokeShape>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#10B981" Offset="0.0" /><GradientStop Color="#059669" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBubblePresetCommand}" CommandParameter="emerald" /></Border.GestureRecognizers>
+                        </Border>
+
+                        <Border WidthRequest="44" HeightRequest="44" StrokeThickness="2" Stroke="#FEF3C7">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="22" /></Border.StrokeShape>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#F59E0B" Offset="0.0" /><GradientStop Color="#D97706" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectBubblePresetCommand}" CommandParameter="gold" /></Border.GestureRecognizers>
                         </Border>
                     </HorizontalStackLayout>
                 </VerticalStackLayout>

@@ -35,6 +35,7 @@ public class MessageService : IMessageService
 
         var query = _dbContext.Messages
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(m => m.Sender)
             .Include(m => m.ReplyToMessage)
                 .ThenInclude(r => r!.Sender)
@@ -65,6 +66,7 @@ public class MessageService : IMessageService
         CancellationToken cancellationToken = default)
     {
         var participants = await _dbContext.ConversationParticipants
+            .AsNoTracking()
             .Where(cp => cp.ConversationId == request.ConversationId)
             .ToListAsync(cancellationToken);
 
@@ -79,6 +81,7 @@ public class MessageService : IMessageService
         {
             var existingMessage = await _dbContext.Messages
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(m => m.Sender)
                 .Include(m => m.ReplyToMessage)
                     .ThenInclude(r => r!.Sender)

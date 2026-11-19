@@ -1007,7 +1007,8 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         var hasCached = cached != null && cached.Count > 0;
         if (hasCached)
         {
-            Messages = new ObservableCollection<ChatMessageItem>(cached!.Select(m => ChatMessageItem.FromDto(m, currentUserId)));
+            Messages = new ObservableCollection<ChatMessageItem>(
+                cached!.TakeLast(30).Select(m => ChatMessageItem.FromDto(m, currentUserId)));
             IsBusy = false;
         }
         else
@@ -1017,13 +1018,10 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 
         try
         {
-            // 1. Run SignalR connect/join and REST history fetch in parallel
-            var hubTask = EnsureSignalRJoinedAsync(conversationId);
-            var historyTask = _messageApi.GetMessagesAsync(conversationId);
+            // 1. Connect SignalR in background without blocking REST message fetch
+            _ = EnsureSignalRJoinedAsync(conversationId);
 
-            await Task.WhenAll(hubTask, historyTask);
-
-            var historyResult = await historyTask;
+            var historyResult = await _messageApi.GetMessagesAsync(conversationId);
             if (historyResult.IsSuccess && historyResult.Value != null)
             {
                 var freshDtos = historyResult.Value.ToList();

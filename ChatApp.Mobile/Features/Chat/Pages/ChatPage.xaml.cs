@@ -30,6 +30,24 @@ public partial class ChatPage : ContentPage
             _viewModel.HeartPulseTriggered += OnHeartPulseTriggered;
             _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         }
+
+        MessagesList.HandlerChanged += OnMessagesListHandlerChanged;
+    }
+
+    private void OnMessagesListHandlerChanged(object? sender, EventArgs e)
+    {
+#if ANDROID
+        try
+        {
+            if (MessagesList.Handler?.PlatformView is AndroidX.RecyclerView.Widget.RecyclerView rv &&
+                rv.GetLayoutManager() is AndroidX.RecyclerView.Widget.LinearLayoutManager llm)
+            {
+                llm.StackFromEnd = true;
+            }
+        }
+        catch { }
+#endif
+        ScrollToBottom(animate: false);
     }
 
     private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -59,11 +77,19 @@ public partial class ChatPage : ContentPage
         {
             try
             {
-                await Task.Delay(60);
-                var count = _viewModel?.DisplayedMessages?.Count ?? 0;
-                if (count > 0 && MessagesList != null)
+                await Task.Delay(50);
+                var items = _viewModel?.DisplayedMessages;
+                if (items != null && items.Count > 0 && MessagesList != null)
                 {
-                    MessagesList.ScrollTo(count - 1, position: ScrollToPosition.End, animate: animate);
+                    var lastItem = items[^1];
+                    MessagesList.ScrollTo(lastItem, position: ScrollToPosition.End, animate: animate);
+                }
+
+                await Task.Delay(160);
+                items = _viewModel?.DisplayedMessages;
+                if (items != null && items.Count > 0 && MessagesList != null)
+                {
+                    MessagesList.ScrollTo(items[^1], position: ScrollToPosition.End, animate: false);
                 }
             }
             catch { }

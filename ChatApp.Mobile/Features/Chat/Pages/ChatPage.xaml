@@ -118,14 +118,14 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="dto:ChatMessageItem">
                     <Grid Padding="12,2">
-                        <!-- Outgoing Bubble (Mine) -->
+                        <!-- Outgoing Bubble (Mine) - Text & Media -->
                         <Border x:Name="OutgoingBubble"
                                 HorizontalOptions="End"
                                 MaximumWidthRequest="300"
                                 StrokeThickness="0"
                                 BackgroundColor="{AppThemeBinding Light={StaticResource BubbleOutgoingLight}, Dark={StaticResource BubbleOutgoingDark}}"
                                 Padding="12,8"
-                                IsVisible="{Binding IsMine}">
+                                IsVisible="{Binding IsOutgoingNormal}">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="18,18,4,18" />
                             </Border.StrokeShape>
@@ -152,13 +152,6 @@
                                            Aspect="AspectFill" />
                                 </Border>
 
-                                <!-- Sticker Content -->
-                                <Image Source="{Binding StickerUrl}"
-                                       WidthRequest="130"
-                                       HeightRequest="130"
-                                       Aspect="AspectFit"
-                                       IsVisible="{Binding IsSticker}" />
-
                                 <HorizontalStackLayout HorizontalOptions="End" Spacing="4">
                                     <Label Text="{Binding FormattedTime}"
                                            FontSize="10"
@@ -170,14 +163,41 @@
                             </VerticalStackLayout>
                         </Border>
 
-                        <!-- Incoming Bubble (Partner) -->
+                        <!-- Outgoing Sticker (Mine) - Borderless WhatsApp style -->
+                        <Grid HorizontalOptions="End"
+                              IsVisible="{Binding IsOutgoingSticker}">
+                            <Image Source="{Binding StickerUrl}"
+                                   WidthRequest="140"
+                                   HeightRequest="140"
+                                   Aspect="AspectFit" />
+                            <Border HorizontalOptions="End"
+                                    VerticalOptions="End"
+                                    Margin="0,0,4,4"
+                                    StrokeThickness="0"
+                                    BackgroundColor="#90000000"
+                                    Padding="6,2">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8" />
+                                </Border.StrokeShape>
+                                <HorizontalStackLayout Spacing="4">
+                                    <Label Text="{Binding FormattedTime}"
+                                           FontSize="10"
+                                           TextColor="#F0FDF4" />
+                                    <Label Text="{Binding StatusIcon}"
+                                           FontSize="11"
+                                           TextColor="{Binding StatusColor}" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </Grid>
+
+                        <!-- Incoming Bubble (Partner) - Text & Media -->
                         <Border x:Name="IncomingBubble"
                                 HorizontalOptions="Start"
                                 MaximumWidthRequest="300"
                                 StrokeThickness="0"
                                 BackgroundColor="{AppThemeBinding Light={StaticResource BubbleIncomingLight}, Dark={StaticResource BubbleIncomingDark}}"
                                 Padding="12,8"
-                                IsVisible="{Binding IsMine, Converter={StaticResource InverseBoolConverter}}">
+                                IsVisible="{Binding IsIncomingNormal}">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="18,18,18,4" />
                             </Border.StrokeShape>
@@ -204,19 +224,34 @@
                                            Aspect="AspectFill" />
                                 </Border>
 
-                                <!-- Sticker Content -->
-                                <Image Source="{Binding StickerUrl}"
-                                       WidthRequest="130"
-                                       HeightRequest="130"
-                                       Aspect="AspectFit"
-                                       IsVisible="{Binding IsSticker}" />
-
                                 <Label Text="{Binding FormattedTime}"
                                        FontSize="10"
                                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
                                        HorizontalOptions="End" />
                             </VerticalStackLayout>
                         </Border>
+
+                        <!-- Incoming Sticker (Partner) - Borderless WhatsApp style -->
+                        <Grid HorizontalOptions="Start"
+                              IsVisible="{Binding IsIncomingSticker}">
+                            <Image Source="{Binding StickerUrl}"
+                                   WidthRequest="140"
+                                   HeightRequest="140"
+                                   Aspect="AspectFit" />
+                            <Border HorizontalOptions="End"
+                                    VerticalOptions="End"
+                                    Margin="0,0,4,4"
+                                    StrokeThickness="0"
+                                    BackgroundColor="#90000000"
+                                    Padding="6,2">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8" />
+                                </Border.StrokeShape>
+                                <Label Text="{Binding FormattedTime}"
+                                       FontSize="10"
+                                       TextColor="#F0FDF4" />
+                            </Border>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
@@ -250,7 +285,7 @@
                         Opacity="0.8" />
             </Border.Shadow>
 
-            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalOptions="Center">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8" VerticalOptions="Center">
                 <!-- Attachment Button (Stickers & Media) -->
                 <Button Grid.Column="0"
                         Text="📎"
@@ -263,8 +298,20 @@
                         TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
                         Command="{Binding ToggleAttachmentPanelCommand}" />
 
+                <!-- Sticker Studio Direct Button -->
+                <Button Grid.Column="1"
+                        Text="🎨"
+                        FontSize="18"
+                        WidthRequest="42"
+                        HeightRequest="42"
+                        CornerRadius="21"
+                        Padding="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                        Command="{Binding OpenStickerStudioCommand}" />
+
                 <!-- Text Input Box -->
-                <Border Grid.Column="1"
+                <Border Grid.Column="2"
                         StrokeThickness="1"
                         Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray800}}"
@@ -282,7 +329,7 @@
                 </Border>
 
                 <!-- Send Button -->
-                <Button Grid.Column="2"
+                <Button Grid.Column="3"
                         Text="➤"
                         FontSize="18"
                         FontAttributes="Bold"
@@ -351,7 +398,7 @@
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=SendStickerCommand}"
                                                           CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
-                                <Image Source="{Binding ImageUrl}"
+                                <Image Source="{Binding FullImageUrl}"
                                        Aspect="AspectFit"
                                        WidthRequest="48"
                                        HeightRequest="48" />

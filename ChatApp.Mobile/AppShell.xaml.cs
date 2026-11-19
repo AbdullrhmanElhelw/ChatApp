@@ -18,5 +18,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(AppRoutes.UserSearch, typeof(UserSearchPage));
         Routing.RegisterRoute(AppRoutes.Chat, typeof(ChatPage));
         Routing.RegisterRoute(AppRoutes.StickerStudio, typeof(StickerStudioPage));
+        Routing.RegisterRoute($"chat/{AppRoutes.StickerStudio}", typeof(StickerStudioPage));
     }
 }

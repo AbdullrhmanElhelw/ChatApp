@@ -90,7 +90,7 @@
                                 Margin="0,0,0,16"
                                 BackgroundColor="#90000000"
                                 Padding="12,4"
-                                IsVisible="{Binding CaptionText, Converter={StaticResource InverseBoolConverter}, ConverterParameter=invert}">
+                                IsVisible="{Binding HasCaption}">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="12" />
                             </Border.StrokeShape>
@@ -108,7 +108,7 @@
                 <Border StrokeThickness="0"
                         BackgroundColor="{AppThemeBinding Light=#D1FAE5, Dark=#064E3B}"
                         Padding="12,8"
-                        IsVisible="{Binding StatusMessage, Converter={StaticResource InverseBoolConverter}, ConverterParameter=invert}">
+                        IsVisible="{Binding HasStatusMessage}">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="12" />
                     </Border.StrokeShape>

@@ -19,6 +19,7 @@ public partial class StickerStudioViewModel : BaseViewModel
     public partial string? SelectedImagePath { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasCaption))]
     public partial string CaptionText { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -31,9 +32,12 @@ public partial class StickerStudioViewModel : BaseViewModel
     public partial StickerPackClientDto? SelectedPack { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasStatusMessage))]
     public partial string StatusMessage { get; set; } = string.Empty;
 
     public bool HasImage => !string.IsNullOrEmpty(SelectedImagePath);
+    public bool HasCaption => !string.IsNullOrWhiteSpace(CaptionText);
+    public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
 
     public StickerStudioViewModel(
         IStickerApiService stickerApi,

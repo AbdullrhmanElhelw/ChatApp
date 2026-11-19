@@ -18,21 +18,21 @@ public static class AppDbContextSeed
                 OwnerId = ownerId,
                 Name = "ملصقات شات آب الرسمية ✨",
                 Description = "حزمة الملصقات التعبيرية الرسمية لتطبيق ChatApp",
-                CoverImageUrl = "https://api.iconify.design/noto:rocket.svg",
+                CoverImageUrl = "/uploads/stickers/rocket.png",
                 IsPublic = true,
                 CreatedAt = DateTime.UtcNow
             };
 
             var stickers = new List<Sticker>
             {
-                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "https://api.iconify.design/noto:rocket.svg", OrderIndex = 0 },
-                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "https://api.iconify.design/noto:smiling-face-with-sunglasses.svg", OrderIndex = 1 },
-                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "https://api.iconify.design/noto:fire.svg", OrderIndex = 2 },
-                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "https://api.iconify.design/noto:sparkles.svg", OrderIndex = 3 },
-                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "https://api.iconify.design/noto:hot-beverage.svg", OrderIndex = 4 },
-                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "https://api.iconify.design/noto:light-bulb.svg", OrderIndex = 5 },
-                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "https://api.iconify.design/noto:party-popper.svg", OrderIndex = 6 },
-                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "https://api.iconify.design/noto:handshake.svg", OrderIndex = 7 }
+                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "/uploads/stickers/rocket.png", OrderIndex = 0 },
+                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "/uploads/stickers/cool.png", OrderIndex = 1 },
+                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "/uploads/stickers/fire.png", OrderIndex = 2 },
+                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "/uploads/stickers/sparkles.png", OrderIndex = 3 },
+                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "/uploads/stickers/coffee.png", OrderIndex = 4 },
+                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "/uploads/stickers/idea.png", OrderIndex = 5 },
+                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "/uploads/stickers/party.png", OrderIndex = 6 },
+                new() { Id = Guid.NewGuid(), StickerPackId = officialPack.Id, ImageUrl = "/uploads/stickers/heart.png", OrderIndex = 7 }
             };
 
             context.StickerPacks.Add(officialPack);

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using ChatApp.Mobile.Features.Authentication.Services;
 using ChatApp.Mobile.Features.Conversations.DTOs;
 
 namespace ChatApp.Mobile.Features.Chat.DTOs;
@@ -10,7 +11,18 @@ public record StickerClientDto(
     [property: JsonPropertyName("width")] int Width,
     [property: JsonPropertyName("height")] int Height,
     [property: JsonPropertyName("orderIndex")] int OrderIndex
-);
+)
+{
+    public string FullImageUrl
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(ImageUrl)) return "";
+            if (ImageUrl.StartsWith("/")) return $"{ApiConfig.BaseUrl}{ImageUrl}";
+            return ImageUrl;
+        }
+    }
+}
 
 public record StickerPackClientDto(
     [property: JsonPropertyName("id")] Guid Id,
@@ -23,7 +35,18 @@ public record StickerPackClientDto(
     [property: JsonPropertyName("stickerCount")] int StickerCount,
     [property: JsonPropertyName("stickers")] List<StickerClientDto> Stickers,
     [property: JsonPropertyName("createdAt")] DateTime CreatedAt
-);
+)
+{
+    public string FullCoverImageUrl
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(CoverImageUrl)) return "";
+            if (CoverImageUrl.StartsWith("/")) return $"{ApiConfig.BaseUrl}{CoverImageUrl}";
+            return CoverImageUrl;
+        }
+    }
+}
 
 public record CreateStickerPackClientDto(
     [property: JsonPropertyName("name")] string Name,

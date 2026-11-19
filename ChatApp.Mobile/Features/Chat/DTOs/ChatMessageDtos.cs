@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ChatApp.Mobile.Features.Authentication.Services;
 using ChatApp.Mobile.Features.Conversations.DTOs;
 
 namespace ChatApp.Mobile.Features.Chat.DTOs;
@@ -96,9 +97,36 @@ public partial class ChatMessageItem : ObservableObject
     public bool HasMedia => !string.IsNullOrEmpty(MediaUrl);
     public bool IsImage => MessageType == MessageType.Image && HasMedia;
     public bool IsSticker => MessageType == MessageType.Sticker;
-    public string StickerUrl => MessageType == MessageType.Sticker ? (MediaUrl ?? Content ?? "") : "";
-    public string DisplayImageUrl => MessageType == MessageType.Sticker ? StickerUrl : (MediaUrl ?? "");
-    public bool IsTextMessage => MessageType == MessageType.Text || (!IsImage && !IsSticker);
+
+    public bool IsOutgoingNormal => IsMine && !IsSticker;
+    public bool IsOutgoingSticker => IsMine && IsSticker;
+    public bool IsIncomingNormal => !IsMine && !IsSticker;
+    public bool IsIncomingSticker => !IsMine && IsSticker;
+
+    public string StickerUrl
+    {
+        get
+        {
+            if (MessageType != MessageType.Sticker) return string.Empty;
+            var url = MediaUrl ?? Content ?? "";
+            if (string.IsNullOrEmpty(url)) return "";
+            if (url.StartsWith("/")) return $"{ApiConfig.BaseUrl}{url}";
+            return url;
+        }
+    }
+
+    public string DisplayImageUrl
+    {
+        get
+        {
+            var raw = MessageType == MessageType.Sticker ? StickerUrl : (MediaUrl ?? "");
+            if (string.IsNullOrEmpty(raw)) return "";
+            if (raw.StartsWith("/")) return $"{ApiConfig.BaseUrl}{raw}";
+            return raw;
+        }
+    }
+
+    public bool IsTextMessage => MessageType == MessageType.Text && !IsSticker && !IsImage;
 
     public string StatusIcon
     {

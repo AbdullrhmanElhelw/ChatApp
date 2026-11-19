@@ -489,4 +489,77 @@ public class MessageService : IMessageService
             reactionList
         );
     }
+
+    public async Task<MessageEditedDto> EditMessageAsync(
+        Guid currentUserId,
+        Guid conversationId,
+        Guid messageId,
+        string newContent,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(newContent))
+        {
+            throw new ValidationException("Message content cannot be empty.");
+        }
+
+        var trimmed = newContent.Trim();
+        if (trimmed.Length > 4000)
+        {
+            throw new ValidationException("Message content exceeds maximum length (4000 characters).");
+        }
+
+        var message = await _dbContext.Messages
+            .FirstOrDefaultAsync(m => m.Id == messageId && m.ConversationId == conversationId && !m.IsDeleted, cancellationToken);
+
+        if (message == null)
+        {
+            throw new NotFoundException("Message not found.");
+        }
+
+        if (message.SenderId != currentUserId)
+        {
+            throw new ForbiddenAccessException("You can only edit your own messages.");
+        }
+
+        if (message.MessageType != MessageType.Text)
+        {
+            throw new ValidationException("Only text messages can be edited.");
+        }
+
+        var now = DateTime.UtcNow;
+        message.Content = trimmed;
+        message.EditedAt = now;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return new MessageEditedDto(message.Id, conversationId, trimmed, now);
+    }
+
+    public async Task<MessageDeletedDto> DeleteMessageAsync(
+        Guid currentUserId,
+        Guid conversationId,
+        Guid messageId,
+        CancellationToken cancellationToken = default)
+    {
+        var message = await _dbContext.Messages
+            .FirstOrDefaultAsync(m => m.Id == messageId && m.ConversationId == conversationId && !m.IsDeleted, cancellationToken);
+
+        if (message == null)
+        {
+            throw new NotFoundException("Message not found.");
+        }
+
+        if (message.SenderId != currentUserId)
+        {
+            throw new ForbiddenAccessException("You can only delete your own messages.");
+        }
+
+        var now = DateTime.UtcNow;
+        message.IsDeleted = true;
+        message.DeletedAt = now;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return new MessageDeletedDto(message.Id, conversationId, now);
+    }
 }

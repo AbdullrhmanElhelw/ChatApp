@@ -20,6 +20,8 @@ public interface IChatHubService
     event Action<MessageClientDto>? MessageConfirmationReceived;
     event Action<MessageStatusUpdateClientDto>? MessageStatusChanged;
     event Action<MessageReactionUpdateClientDto>? MessageReactionUpdated;
+    event Action<MessageEditedClientDto>? MessageEdited;
+    event Action<MessageDeletedClientDto>? MessageDeleted;
     event Action<TypingIndicatorClientDto>? UserTyping;
     event Action<Guid, bool, DateTime?>? UserPresenceChanged;
     event Action<bool>? ConnectionStateChanged;

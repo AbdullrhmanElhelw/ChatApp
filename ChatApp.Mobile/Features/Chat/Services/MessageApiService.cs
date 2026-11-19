@@ -65,6 +65,54 @@ public class MessageApiService : IMessageApiService
         }
     }
 
+    public async Task<ApiResult<MessageEditedClientDto>> EditMessageAsync(
+        Guid conversationId,
+        Guid messageId,
+        string newContent)
+    {
+        try
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Put, $"/api/v1/conversations/{conversationId}/messages/{messageId}")
+            {
+                Content = JsonContent.Create(new EditMessageRequestClientDto(newContent), options: _jsonOptions)
+            };
+            await AttachAuthHeaderAsync(req);
+
+            var response = await _httpClient.SendAsync(req);
+            return await HandleResponseAsync<MessageEditedClientDto>(response);
+        }
+        catch (HttpRequestException)
+        {
+            return ApiResult<MessageEditedClientDto>.Failure("تعذر الاتصال بالخادم.");
+        }
+        catch (Exception ex)
+        {
+            return ApiResult<MessageEditedClientDto>.Failure($"تعذر تعديل الرسالة: {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResult<MessageDeletedClientDto>> DeleteMessageAsync(
+        Guid conversationId,
+        Guid messageId)
+    {
+        try
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Delete, $"/api/v1/conversations/{conversationId}/messages/{messageId}");
+            await AttachAuthHeaderAsync(req);
+
+            var response = await _httpClient.SendAsync(req);
+            return await HandleResponseAsync<MessageDeletedClientDto>(response);
+        }
+        catch (HttpRequestException)
+        {
+            return ApiResult<MessageDeletedClientDto>.Failure("تعذر الاتصال بالخادم.");
+        }
+        catch (Exception ex)
+        {
+            return ApiResult<MessageDeletedClientDto>.Failure($"تعذر حذف الرسالة: {ex.Message}");
+        }
+    }
+
     private async Task<ApiResult<T>> HandleResponseAsync<T>(HttpResponseMessage response)
     {
         var content = await response.Content.ReadAsStringAsync();

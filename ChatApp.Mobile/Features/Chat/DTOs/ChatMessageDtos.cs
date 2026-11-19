@@ -93,6 +93,23 @@ public record TypingIndicatorClientDto(
     [property: JsonPropertyName("isTyping")] bool IsTyping
 );
 
+public record EditMessageRequestClientDto(
+    [property: JsonPropertyName("content")] string Content
+);
+
+public record MessageEditedClientDto(
+    [property: JsonPropertyName("messageId")] Guid MessageId,
+    [property: JsonPropertyName("conversationId")] Guid ConversationId,
+    [property: JsonPropertyName("content")] string Content,
+    [property: JsonPropertyName("editedAt")] DateTime EditedAt
+);
+
+public record MessageDeletedClientDto(
+    [property: JsonPropertyName("messageId")] Guid MessageId,
+    [property: JsonPropertyName("conversationId")] Guid ConversationId,
+    [property: JsonPropertyName("deletedAt")] DateTime DeletedAt
+);
+
 public partial class ChatMessageItem : ObservableObject
 {
     public Guid Id { get; set; }
@@ -101,11 +118,18 @@ public partial class ChatMessageItem : ObservableObject
     public string SenderUserName { get; set; } = string.Empty;
     public string SenderFullName { get; set; } = string.Empty;
     public string? SenderAvatarUrl { get; set; }
-    public string? Content { get; set; }
+    [ObservableProperty]
+    public partial string? Content { get; set; }
+
     public MessageType MessageType { get; set; }
     public Guid ClientMessageId { get; set; }
     public DateTime SentAt { get; set; }
-    public DateTime? EditedAt { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEdited))]
+    public partial DateTime? EditedAt { get; set; }
+
+    public bool IsEdited => EditedAt.HasValue;
     public Guid? ReplyToMessageId { get; set; }
     public string? ReplyToContent { get; set; }
     public string? ReplyToSenderName { get; set; }

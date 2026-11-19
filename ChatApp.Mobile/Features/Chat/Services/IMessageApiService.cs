@@ -9,4 +9,13 @@ public interface IMessageApiService
         Guid conversationId,
         DateTime? before = null,
         int pageSize = 50);
+
+    Task<ApiResult<MessageEditedClientDto>> EditMessageAsync(
+        Guid conversationId,
+        Guid messageId,
+        string newContent);
+
+    Task<ApiResult<MessageDeletedClientDto>> DeleteMessageAsync(
+        Guid conversationId,
+        Guid messageId);
 }

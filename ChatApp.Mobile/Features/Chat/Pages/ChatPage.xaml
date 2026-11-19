@@ -144,8 +144,8 @@
             </Grid>
         </Border>
 
-        <!-- 2. Search Bar + Message Feed -->
-        <Grid Grid.Row="1" RowDefinitions="Auto,*">
+        <!-- 2. Search Bar + Pinned Banner + Message Feed -->
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*">
             <!-- Collapsible In-Chat Search Bar -->
             <Border Grid.Row="0"
                     IsVisible="{Binding IsSearchOpen}"
@@ -194,8 +194,30 @@
                 </Grid>
             </Border>
 
+            <!-- Pinned Message Banner -->
+            <Border Grid.Row="1"
+                    IsVisible="{Binding HasPinnedMessage}"
+                    StrokeThickness="1"
+                    Stroke="#4E2682"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
+                    Padding="12,8"
+                    Margin="12,6,12,2">
+                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                    <Path Grid.Column="0" Data="{StaticResource IconSparkles}" Fill="{StaticResource BrandNeonPink}" WidthRequest="15" HeightRequest="15" Aspect="Uniform" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                        <Label Text="رسالة مثبّتة" FontFamily="CairoBold" FontSize="11" TextColor="{StaticResource BrandNeonPink}" />
+                        <Label Text="{Binding PinnedMessagePreview}" FontFamily="CairoRegular" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark=#FFFFFF}" LineBreakMode="TailTruncation" MaxLines="1" />
+                    </VerticalStackLayout>
+                    <Border Grid.Column="2" WidthRequest="26" HeightRequest="26" StrokeThickness="0" BackgroundColor="Transparent" VerticalOptions="Center">
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding UnpinMessageCommand}" /></Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconClose}" Fill="#9B86B8" WidthRequest="12" HeightRequest="12" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+            </Border>
+
             <CollectionView x:Name="MessagesList"
-                            Grid.Row="1"
+                            Grid.Row="2"
                             ItemsSource="{Binding DisplayedMessages}"
                             SelectionMode="None"
                             ItemSizingStrategy="MeasureAllItems">
@@ -351,6 +373,12 @@
 
                                     <!-- Clean Timestamp & Read Status Row (WhatsApp Style) -->
                                     <HorizontalStackLayout HorizontalOptions="End" Spacing="5" VerticalOptions="Center">
+                                        <Label Text="معدّلة"
+                                               FontFamily="CairoRegular"
+                                               FontSize="10"
+                                               TextColor="#FFD6F2"
+                                               IsVisible="{Binding IsEdited}"
+                                               VerticalOptions="Center" />
                                         <Label Text="{Binding FormattedTime}"
                                                FontFamily="CairoRegular"
                                                FontSize="10"
@@ -633,6 +661,12 @@
 
                                     <!-- Clean Timestamp Row (WhatsApp Style) -->
                                     <HorizontalStackLayout HorizontalOptions="End" Spacing="5" VerticalOptions="Center">
+                                        <Label Text="معدّلة"
+                                               FontFamily="CairoRegular"
+                                               FontSize="10"
+                                               TextColor="{StaticResource BrandNeonPink}"
+                                               IsVisible="{Binding IsEdited}"
+                                               VerticalOptions="Center" />
                                         <Label Text="{Binding FormattedTime}"
                                                FontFamily="CairoRegular"
                                                FontSize="10"
@@ -888,6 +922,26 @@
                           Aspect="Uniform"
                           HorizontalOptions="Center"
                           VerticalOptions="Center" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- 4b. Editing Message Banner -->
+        <Border Grid.Row="3"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light=#FFF0FA, Dark=#2A0E49}"
+                Padding="16,10"
+                IsVisible="{Binding IsEditingMessage}">
+            <Grid ColumnDefinitions="4,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                <BoxView Grid.Column="0" Color="{StaticResource BrandNeonPink}" WidthRequest="4" CornerRadius="2" VerticalOptions="Fill" />
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                    <Label Text="تعديل الرسالة" FontFamily="CairoBold" FontSize="12" TextColor="{StaticResource BrandNeonPink}" />
+                    <Label Text="{Binding EditingMessage.Content}" FontFamily="CairoRegular" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#C5AFE4}" LineBreakMode="TailTruncation" MaxLines="1" />
+                </VerticalStackLayout>
+                <Border Grid.Column="2" WidthRequest="28" HeightRequest="28" StrokeThickness="0" BackgroundColor="#3A0B6B" VerticalOptions="Center">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding CancelEditCommand}" /></Border.GestureRecognizers>
+                    <Path Data="{StaticResource IconClose}" Fill="#FFFFFF" WidthRequest="12" HeightRequest="12" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
             </Grid>
         </Border>
@@ -1664,58 +1718,70 @@
                         </Border>
                     </HorizontalStackLayout>
 
-                    <!-- Quick Message Actions Bar (Reply & Copy) -->
-                    <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,4,0,0">
-                        <Border Padding="14,7"
+                    <!-- Quick Message Actions Bar (Reply, Copy, Edit, Pin, Delete) -->
+                    <FlexLayout Wrap="Wrap" JustifyContent="Center" AlignItems="Center" Margin="0,4,0,0">
+                        <Border Padding="12,7" Margin="4"
                                 StrokeThickness="1"
                                 Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="16" />
-                            </Border.StrokeShape>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ReplyFromReactionPickerCommand}" />
-                            </Border.GestureRecognizers>
+                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ReplyFromReactionPickerCommand}" /></Border.GestureRecognizers>
                             <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                                <Path Data="{StaticResource IconReply}"
-                                      Fill="{StaticResource BrandPrimary}"
-                                      WidthRequest="13"
-                                      HeightRequest="13"
-                                      Aspect="Uniform"
-                                      VerticalOptions="Center" />
-                                <Label Text="رد على الرسالة"
-                                       FontFamily="CairoBold"
-                                       FontSize="12"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
-                                       VerticalOptions="Center" />
+                                <Path Data="{StaticResource IconReply}" Fill="{StaticResource BrandPrimary}" WidthRequest="13" HeightRequest="13" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="رد" FontFamily="CairoBold" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}" VerticalOptions="Center" />
                             </HorizontalStackLayout>
                         </Border>
 
-                        <Border Padding="14,7"
+                        <Border Padding="12,7" Margin="4"
                                 StrokeThickness="1"
                                 Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="16" />
-                            </Border.StrokeShape>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding CopyTargetMessageCommand}" />
-                            </Border.GestureRecognizers>
+                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding CopyTargetMessageCommand}" /></Border.GestureRecognizers>
                             <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                                <Path Data="{StaticResource IconCopy}"
-                                      Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
-                                      WidthRequest="13"
-                                      HeightRequest="13"
-                                      Aspect="Uniform"
-                                      VerticalOptions="Center" />
-                                <Label Text="نسخ النص"
-                                       FontFamily="CairoBold"
-                                       FontSize="12"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
-                                       VerticalOptions="Center" />
+                                <Path Data="{StaticResource IconCopy}" Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}" WidthRequest="13" HeightRequest="13" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="نسخ" FontFamily="CairoBold" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}" VerticalOptions="Center" />
                             </HorizontalStackLayout>
                         </Border>
-                    </HorizontalStackLayout>
+
+                        <Border Padding="12,7" Margin="4"
+                                StrokeThickness="1"
+                                Stroke="#4E2682"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#2A114E}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding PinTargetMessageCommand}" /></Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconSparkles}" Fill="{StaticResource BrandNeonPink}" WidthRequest="13" HeightRequest="13" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="تثبيت" FontFamily="CairoBold" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border Padding="12,7" Margin="4"
+                                IsVisible="{Binding ReactionTargetMessage.IsMine, FallbackValue=False}"
+                                StrokeThickness="1"
+                                Stroke="#4E2682"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#2A114E}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding StartEditTargetMessageCommand}" /></Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconPen}" Fill="#A855F7" WidthRequest="13" HeightRequest="13" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="تعديل" FontFamily="CairoBold" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border Padding="12,7" Margin="4"
+                                IsVisible="{Binding ReactionTargetMessage.IsMine, FallbackValue=False}"
+                                StrokeThickness="1"
+                                Stroke="#6B1D4A"
+                                BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#3B0D22}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding DeleteTargetMessageCommand}" /></Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconTrash}" Fill="#F87171" WidthRequest="13" HeightRequest="13" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="حذف" FontFamily="CairoBold" FontSize="12" TextColor="{AppThemeBinding Light=#DC2626, Dark=#FCA5A5}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+                    </FlexLayout>
                 </VerticalStackLayout>
             </Border>
         </Grid>

@@ -74,3 +74,20 @@ public record TypingIndicatorDto(
 public record MarkReadRequestDto(
     Guid? UpToMessageId
 );
+
+public record EditMessageRequestDto(
+    string Content
+);
+
+public record MessageEditedDto(
+    Guid MessageId,
+    Guid ConversationId,
+    string Content,
+    DateTime EditedAt
+);
+
+public record MessageDeletedDto(
+    Guid MessageId,
+    Guid ConversationId,
+    DateTime DeletedAt
+);

@@ -113,6 +113,39 @@ public class MessagesController : ControllerBase
         return Ok(ApiResponse<MessageReactionUpdateDto>.Ok(update));
     }
 
+    [HttpPut("{messageId:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<MessageEditedDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> EditMessage(
+        [FromRoute] Guid conversationId,
+        [FromRoute] Guid messageId,
+        [FromBody] EditMessageRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        var currentUserId = GetCurrentUserId();
+        var edited = await _messageService.EditMessageAsync(currentUserId, conversationId, messageId, request.Content, cancellationToken);
+
+        var groupName = ChatHub.GetConversationGroupName(conversationId);
+        await _hubContext.Clients.Group(groupName).MessageEdited(edited);
+
+        return Ok(ApiResponse<MessageEditedDto>.Ok(edited));
+    }
+
+    [HttpDelete("{messageId:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<MessageDeletedDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteMessage(
+        [FromRoute] Guid conversationId,
+        [FromRoute] Guid messageId,
+        CancellationToken cancellationToken = default)
+    {
+        var currentUserId = GetCurrentUserId();
+        var deleted = await _messageService.DeleteMessageAsync(currentUserId, conversationId, messageId, cancellationToken);
+
+        var groupName = ChatHub.GetConversationGroupName(conversationId);
+        await _hubContext.Clients.Group(groupName).MessageDeleted(deleted);
+
+        return Ok(ApiResponse<MessageDeletedDto>.Ok(deleted));
+    }
+
     private Guid GetCurrentUserId()
     {
         var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ??

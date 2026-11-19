@@ -16,6 +16,8 @@ public class ChatHubService : IChatHubService, IAsyncDisposable
     public event Action<MessageClientDto>? MessageConfirmationReceived;
     public event Action<MessageStatusUpdateClientDto>? MessageStatusChanged;
     public event Action<MessageReactionUpdateClientDto>? MessageReactionUpdated;
+    public event Action<MessageEditedClientDto>? MessageEdited;
+    public event Action<MessageDeletedClientDto>? MessageDeleted;
     public event Action<TypingIndicatorClientDto>? UserTyping;
     public event Action<Guid, bool, DateTime?>? UserPresenceChanged;
     public event Action<bool>? ConnectionStateChanged;
@@ -153,6 +155,16 @@ public class ChatHubService : IChatHubService, IAsyncDisposable
         _hubConnection.On<MessageReactionUpdateClientDto>("MessageReactionUpdated", update =>
         {
             MessageReactionUpdated?.Invoke(update);
+        });
+
+        _hubConnection.On<MessageEditedClientDto>("MessageEdited", edited =>
+        {
+            MessageEdited?.Invoke(edited);
+        });
+
+        _hubConnection.On<MessageDeletedClientDto>("MessageDeleted", deleted =>
+        {
+            MessageDeleted?.Invoke(deleted);
         });
 
         _hubConnection.On<TypingIndicatorClientDto>("UserTyping", indicator =>

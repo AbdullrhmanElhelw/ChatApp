@@ -32,4 +32,17 @@ public interface IMessageService
         Guid messageId,
         string emoji,
         CancellationToken cancellationToken = default);
+
+    Task<MessageEditedDto> EditMessageAsync(
+        Guid currentUserId,
+        Guid conversationId,
+        Guid messageId,
+        string newContent,
+        CancellationToken cancellationToken = default);
+
+    Task<MessageDeletedDto> DeleteMessageAsync(
+        Guid currentUserId,
+        Guid conversationId,
+        Guid messageId,
+        CancellationToken cancellationToken = default);
 }

@@ -11,4 +11,6 @@ public interface IChatClient
     Task UserTyping(TypingIndicatorDto typing);
     Task UserPresenceChanged(Guid userId, bool isOnline, DateTime? lastSeenAt);
     Task MessageReactionUpdated(MessageReactionUpdateDto reactionUpdate);
+    Task MessageEdited(MessageEditedDto edited);
+    Task MessageDeleted(MessageDeletedDto deleted);
 }

@@ -70,6 +70,18 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public partial string RecordingDurationText { get; set; } = "00:00";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEditingMessage))]
+    public partial ChatMessageItem? EditingMessage { get; set; }
+
+    public bool IsEditingMessage => EditingMessage != null;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPinnedMessage))]
+    public partial string? PinnedMessagePreview { get; set; }
+
+    public bool HasPinnedMessage => !string.IsNullOrWhiteSpace(PinnedMessagePreview);
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasCustomWallpaper))]
     public partial string? CustomWallpaperPath { get; set; }
 
@@ -277,6 +289,80 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public void CloseReactionPicker()
     {
         ReactionTargetMessage = null;
+    }
+
+    [RelayCommand]
+    public void StartEditTargetMessage()
+    {
+        var target = ReactionTargetMessage;
+        CloseReactionPicker();
+        if (target == null || !target.IsMine || !target.IsTextMessage || target.Id == Guid.Empty) return;
+
+        EditingMessage = target;
+        ReplyingToMessage = null;
+        MessageText = target.Content ?? string.Empty;
+    }
+
+    [RelayCommand]
+    public void CancelEdit()
+    {
+        EditingMessage = null;
+        MessageText = string.Empty;
+    }
+
+    [RelayCommand]
+    public async Task DeleteTargetMessageAsync()
+    {
+        var target = ReactionTargetMessage;
+        CloseReactionPicker();
+        if (target == null || !target.IsMine || target.Id == Guid.Empty) return;
+
+        try
+        {
+            var result = await _messageApi.DeleteMessageAsync(ConversationId, target.Id);
+            if (result.IsSuccess)
+            {
+                Messages.Remove(target);
+            }
+            else
+            {
+                ErrorMessage = result.ErrorMessage ?? "تعذر حذف الرسالة.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر حذف الرسالة: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    public void PinTargetMessage()
+    {
+        var target = ReactionTargetMessage;
+        CloseReactionPicker();
+        if (target == null) return;
+
+        var preview = !string.IsNullOrWhiteSpace(target.Content)
+            ? target.Content
+            : (target.IsImage ? "صورة" : target.IsAudio ? "رسالة صوتية" : "ملصق");
+
+        PinnedMessagePreview = preview;
+        try
+        {
+            Preferences.Default.Set($"chat_pin_{ConversationId}", preview);
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    public void UnpinMessage()
+    {
+        PinnedMessagePreview = null;
+        try
+        {
+            Preferences.Default.Remove($"chat_pin_{ConversationId}");
+        }
+        catch { }
     }
 
     [RelayCommand]
@@ -805,6 +891,8 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             }
 
             ApplyBubblePreset(bubbleKey);
+            var pin = Preferences.Default.Get($"chat_pin_{conversationId}", string.Empty);
+            PinnedMessagePreview = string.IsNullOrWhiteSpace(pin) ? null : pin;
         }
         catch
         {
@@ -1156,6 +1244,30 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         IsEmojiPickerOpen = false;
         CancelTyping();
 
+        if (EditingMessage != null)
+        {
+            var toEdit = EditingMessage;
+            EditingMessage = null;
+            try
+            {
+                var editResult = await _messageApi.EditMessageAsync(ConversationId, toEdit.Id, text);
+                if (editResult.IsSuccess && editResult.Value != null)
+                {
+                    toEdit.Content = editResult.Value.Content;
+                    toEdit.EditedAt = editResult.Value.EditedAt;
+                }
+                else
+                {
+                    ErrorMessage = editResult.ErrorMessage ?? "تعذر تعديل الرسالة.";
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"تعذر تعديل الرسالة: {ex.Message}";
+            }
+            return;
+        }
+
         var clientMessageId = Guid.NewGuid();
         var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
 
@@ -1227,6 +1339,8 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         _chatHub.MessageConfirmationReceived += OnMessageConfirmationReceived;
         _chatHub.MessageStatusChanged += OnMessageStatusChanged;
         _chatHub.MessageReactionUpdated += OnMessageReactionUpdated;
+        _chatHub.MessageEdited += OnMessageEdited;
+        _chatHub.MessageDeleted += OnMessageDeleted;
         _chatHub.UserTyping += OnUserTyping;
         _chatHub.UserPresenceChanged += OnUserPresenceChanged;
         _chatHub.ConnectionStateChanged += OnConnectionStateChanged;
@@ -1397,9 +1511,38 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             _chatHub.MessageReactionUpdated -= OnMessageReactionUpdated;
             _chatHub.UserTyping -= OnUserTyping;
             _chatHub.UserPresenceChanged -= OnUserPresenceChanged;
+            _chatHub.MessageEdited -= OnMessageEdited;
+            _chatHub.MessageDeleted -= OnMessageDeleted;
             _chatHub.ConnectionStateChanged -= OnConnectionStateChanged;
             _typingCts?.Dispose();
             _isDisposed = true;
         }
+    }
+
+    private void OnMessageEdited(MessageEditedClientDto edited)
+    {
+        if (edited.ConversationId != ConversationId) return;
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var target = Messages.FirstOrDefault(m => m.Id == edited.MessageId);
+            if (target != null)
+            {
+                target.Content = edited.Content;
+                target.EditedAt = edited.EditedAt;
+            }
+        });
+    }
+
+    private void OnMessageDeleted(MessageDeletedClientDto deleted)
+    {
+        if (deleted.ConversationId != ConversationId) return;
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var target = Messages.FirstOrDefault(m => m.Id == deleted.MessageId);
+            if (target != null)
+            {
+                Messages.Remove(target);
+            }
+        });
     }
 }

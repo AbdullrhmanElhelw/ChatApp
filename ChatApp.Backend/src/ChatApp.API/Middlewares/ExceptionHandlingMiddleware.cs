@@ -74,6 +74,18 @@ public class ExceptionHandlingMiddleware
                 _logger.LogWarning("Unauthorized access attempt on request {Path} (TraceId: {TraceId})", context.Request.Path, traceId);
                 break;
 
+            case ForbiddenAccessException forbiddenException:
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status403Forbidden,
+                    Title = "Forbidden",
+                    Detail = forbiddenException.Message,
+                    Instance = context.Request.Path
+                };
+                _logger.LogWarning("Forbidden access on request {Path} (TraceId: {TraceId})", context.Request.Path, traceId);
+                break;
+
             case DomainException domainException:
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 problemDetails = new ProblemDetails

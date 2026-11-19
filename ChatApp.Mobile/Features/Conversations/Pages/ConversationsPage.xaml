@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Conversations.ViewModels"
+             xmlns:dtos="clr-namespace:ChatApp.Mobile.Features.Conversations.DTOs"
+             xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
+             x:Class="ChatApp.Mobile.Features.Conversations.Pages.ConversationsPage"
+             x:DataType="vm:ConversationsViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16,12,16,0">
+
+        <!-- 1. Modern Top Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,12" VerticalOptions="Center">
+            <!-- Current User Avatar / Status -->
+            <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+                <controls:AvatarView FullName="{Binding CurrentUser.FullName}"
+                                     AvatarUrl="{Binding CurrentUser.AvatarUrl}"
+                                     Size="42"
+                                     IsOnline="True" />
+                <Label Text="المحادثات"
+                       FontFamily="CairoBold"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <!-- Actions: Theme Toggle & Logout -->
+            <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                <Button Text="{Binding CurrentThemeIcon}"
+                        Command="{Binding ToggleThemeCommand}"
+                        Style="{StaticResource ChatGhostButton}"
+                        FontSize="16"
+                        HeightRequest="40"
+                        WidthRequest="40"
+                        Padding="0" />
+
+                <Button Text="🔍"
+                        Command="{Binding OpenUserSearchCommand}"
+                        Style="{StaticResource ChatGhostButton}"
+                        FontSize="16"
+                        HeightRequest="40"
+                        WidthRequest="40"
+                        Padding="0" />
+
+                <Button Text="🚪"
+                        Command="{Binding LogoutCommand}"
+                        Style="{StaticResource ChatGhostButton}"
+                        FontSize="15"
+                        HeightRequest="40"
+                        WidthRequest="40"
+                        Padding="0" />
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- 2. Local Search Bar -->
+        <Border Grid.Row="1"
+                Style="{StaticResource ChatCardBorder}"
+                Padding="12,4"
+                Margin="0,0,0,12">
+            <Grid ColumnDefinitions="Auto,*">
+                <Label Text="🔍"
+                       FontSize="16"
+                       VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                       Margin="0,0,8,0" />
+                <Entry Grid.Column="1"
+                       Text="{Binding SearchText, Mode=TwoWay}"
+                       Placeholder="ابحث في المحادثات أو الرسائل..."
+                       FontFamily="CairoRegular"
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                       BackgroundColor="Transparent"
+                       VerticalOptions="Center" />
+            </Grid>
+        </Border>
+
+        <!-- 3. Conversations List / RefreshView -->
+        <Grid Grid.Row="2">
+            <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                         Command="{Binding RefreshCommand}"
+                         RefreshColor="{StaticResource BrandPrimary}">
+
+                <CollectionView ItemsSource="{Binding FilteredConversations}"
+                                SelectionMode="None">
+
+                    <!-- Empty State View -->
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Spacing="16"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="Center"
+                                             Padding="24"
+                                             IsVisible="{Binding IsEmpty}">
+                            <Label Text="💬"
+                                   FontSize="64"
+                                   HorizontalOptions="Center" />
+
+                            <Label Text="لا توجد محادثات حتى الآن"
+                                   Style="{StaticResource TypographyH2}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
+                                   HorizontalOptions="Center" />
+
+                            <Label Text="ابدأ محادثتك الأولى الآن وتواصل فورياً مع أصدقائك ومجموعاتك!"
+                                   Style="{StaticResource TypographyBody}"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"
+                                   MaximumWidthRequest="300" />
+
+                            <Button Text="البحث عن مستخدمين وبدء محادثة ✍️"
+                                    Command="{Binding OpenUserSearchCommand}"
+                                    Style="{StaticResource ChatPrimaryButton}"
+                                    Margin="0,12,0,0"
+                                    HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <!-- Conversation Card Item Template -->
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dtos:ConversationSummaryDto">
+                            <Border Margin="0,0,0,8"
+                                    Padding="12,10"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                    StrokeThickness="1">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="16" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ConversationsViewModel}}, Path=SelectConversationCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <!-- Participant Avatar with Online Presence -->
+                                    <controls:AvatarView Grid.Column="0"
+                                                         FullName="{Binding Title}"
+                                                         AvatarUrl="{Binding AvatarUrl}"
+                                                         Size="52"
+                                                         IsOnline="{Binding IsOtherParticipantOnline}"
+                                                         VerticalOptions="Center" />
+
+                                    <!-- Middle Details: Title & Message Preview -->
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Spacing="4"
+                                                         VerticalOptions="Center">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="{Binding Title}"
+                                                   FontFamily="CairoBold"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1" />
+
+                                            <!-- Pinned Indicator -->
+                                            <Label Text="📌"
+                                                   FontSize="12"
+                                                   IsVisible="{Binding IsPinned}"
+                                                   VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+
+                                        <Label Text="{Binding LastMessagePreview}"
+                                               FontFamily="CairoRegular"
+                                               FontSize="13"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Right Meta: Timestamp & Unread Badge -->
+                                    <VerticalStackLayout Grid.Column="2"
+                                                         Spacing="6"
+                                                         HorizontalOptions="End"
+                                                         VerticalOptions="Center">
+                                        <Label Text="{Binding FormattedTime}"
+                                               Style="{StaticResource TypographyTiny}"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                               HorizontalOptions="End" />
+
+                                        <controls:BadgeIndicator Count="{Binding UnreadCount}"
+                                                                 HorizontalOptions="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <!-- Floating Action Button (New Chat) -->
+            <Border WidthRequest="56"
+                    HeightRequest="56"
+                    BackgroundColor="{StaticResource BrandPrimary}"
+                    StrokeThickness="0"
+                    HorizontalOptions="End"
+                    VerticalOptions="End"
+                    Margin="0,0,16,24">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="28" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
+                </Border.GestureRecognizers>
+                <Label Text="✍️"
+                       FontSize="24"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:auth="clr-namespace:ChatApp.Mobile.Features.Authentication.Pages"
+    xmlns:conv="clr-namespace:ChatApp.Mobile.Features.Conversations.Pages"
     xmlns:common="clr-namespace:ChatApp.Mobile.Features.Common"
     Title="ChatApp">
 
@@ -31,6 +32,11 @@
         Title="Profile Setup"
         ContentTemplate="{DataTemplate auth:ProfileSetupPage}"
         Route="profile-setup" />
+
+    <ShellContent
+        Title="Conversations"
+        ContentTemplate="{DataTemplate conv:ConversationsPage}"
+        Route="conversations" />
 
     <ShellContent
         Title="Design System"

@@ -29,13 +29,48 @@ public class UsersController : ApiControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<UserProfileDto>>> GetMe(CancellationToken cancellationToken)
     {
+        var currentUserId = GetCurrentUserId();
+        var result = await _userService.GetCurrentUserProfileAsync(currentUserId, cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Retrieves the public profile of a user by their unique identifier.
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<UserProfileDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ApiResponse<UserProfileDto>>> GetUserById(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _userService.GetUserByIdAsync(id, cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Searches for users by full name, username, or email.
+    /// </summary>
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(PagedResponse<UserProfileDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<PagedResponse<UserProfileDto>>> Search(
+        [FromQuery] string? query,
+        [FromQuery] int pageIndex = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        var currentUserId = GetCurrentUserId();
+        var result = await _userService.SearchUsersAsync(currentUserId, query, pageIndex, pageSize, cancellationToken);
+        return Ok(result);
+    }
+
+    private Guid GetCurrentUserId()
+    {
         var currentUserId = _currentUserService.UserId;
         if (!currentUserId.HasValue)
         {
             throw new UnauthorizedException("User identity could not be verified from token.");
         }
-
-        var result = await _userService.GetCurrentUserProfileAsync(currentUserId.Value, cancellationToken);
-        return Ok(result);
+        return currentUserId.Value;
     }
 }

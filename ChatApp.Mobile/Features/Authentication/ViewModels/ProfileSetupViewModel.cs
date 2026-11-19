@@ -75,8 +75,8 @@ public partial class ProfileSetupViewModel : BaseViewModel
                 _authStateService.UpdateCurrentUser(updatedUser);
             }
 
-            // Finish onboarding and enter main app
-            await _navigationService.NavigateToAsync(AppRoutes.DesignSystem);
+            // Finish onboarding and enter main conversations
+            await _navigationService.NavigateToAsync(AppRoutes.MainConversations);
         }
         catch (Exception ex)
         {

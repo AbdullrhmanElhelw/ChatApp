@@ -1,6 +1,7 @@
 using System.Text;
 using ChatApp.Application.Common.Interfaces;
 using ChatApp.Application.Features.Auth.Interfaces;
+using ChatApp.Application.Features.Conversations.Interfaces;
 using ChatApp.Application.Features.Users.Interfaces;
 using ChatApp.Domain.Entities;
 using ChatApp.Infrastructure.Identity;
@@ -89,6 +90,7 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IConversationService, ConversationService>();
 
         return services;
     }

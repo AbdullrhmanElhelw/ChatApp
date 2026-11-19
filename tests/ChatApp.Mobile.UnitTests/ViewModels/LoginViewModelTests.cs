@@ -68,7 +68,7 @@ public class LoginViewModelTests
         // Assert
         _authServiceMock.Verify(x => x.LoginAsync(It.Is<LoginRequestDto>(r => r.UserNameOrEmail == "john_doe" && r.Password == "Password123!")), Times.Once);
         _authStateMock.Verify(x => x.SetAuthenticated(It.IsAny<UserProfileDto>(), "access_token_123", "refresh_token_456"), Times.Once);
-        _navigationMock.Verify(x => x.NavigateToAsync(AppRoutes.DesignSystem, null), Times.Once);
+        _navigationMock.Verify(x => x.NavigateToAsync(AppRoutes.MainConversations, null), Times.Once);
         _sut.ErrorMessage.Should().BeNull();
         _sut.IsBusy.Should().BeFalse();
     }

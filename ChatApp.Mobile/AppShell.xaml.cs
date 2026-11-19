@@ -1,4 +1,4 @@
-﻿using ChatApp.Mobile.Features.Common;
+﻿using ChatApp.Mobile.Features.Conversations.Pages;
 using ChatApp.Mobile.Navigation;
 
 namespace ChatApp.Mobile;
@@ -13,6 +13,6 @@ public partial class AppShell : Shell
 
     private void RegisterRoutes()
     {
-        // Detail routes will be registered here (e.g. Chat, Profile)
+        Routing.RegisterRoute(AppRoutes.UserSearch, typeof(UserSearchPage));
     }
 }

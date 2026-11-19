@@ -95,7 +95,7 @@ public partial class LoginViewModel : BaseViewModel
                 );
 
                 _authStateService.SetAuthenticated(userProfile, authData.AccessToken, authData.RefreshToken);
-                await _navigationService.NavigateToAsync(AppRoutes.DesignSystem);
+                await _navigationService.NavigateToAsync(AppRoutes.MainConversations);
             }
             else
             {

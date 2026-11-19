@@ -74,7 +74,7 @@ public class SplashViewModelTests
 
         // Assert
         _authStateMock.Verify(x => x.SetAuthenticated(profile, "valid_access_token", "valid_refresh_token"), Times.Once);
-        _navigationMock.Verify(x => x.NavigateToAsync(AppRoutes.DesignSystem, null), Times.Once);
+        _navigationMock.Verify(x => x.NavigateToAsync(AppRoutes.MainConversations, null), Times.Once);
     }
 
     [Fact]
@@ -123,6 +123,6 @@ public class SplashViewModelTests
 
         // Assert
         _authStateMock.Verify(x => x.SetAuthenticated(refreshedProfile, "new_access_token", "new_refresh_token"), Times.Once);
-        _navigationMock.Verify(x => x.NavigateToAsync(AppRoutes.DesignSystem, null), Times.Once);
+        _navigationMock.Verify(x => x.NavigateToAsync(AppRoutes.MainConversations, null), Times.Once);
     }
 }

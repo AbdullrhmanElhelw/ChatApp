@@ -51,7 +51,7 @@ public partial class SplashViewModel : BaseViewModel
                 if (profileResult.IsSuccess && profileResult.Value != null)
                 {
                     _authStateService.SetAuthenticated(profileResult.Value, accessToken, refreshToken ?? "");
-                    await _navigationService.NavigateToAsync(AppRoutes.DesignSystem);
+                    await _navigationService.NavigateToAsync(AppRoutes.MainConversations);
                     return;
                 }
 
@@ -69,7 +69,7 @@ public partial class SplashViewModel : BaseViewModel
                         if (newProfile.IsSuccess && newProfile.Value != null)
                         {
                             _authStateService.SetAuthenticated(newProfile.Value, newTokens.AccessToken, newTokens.RefreshToken);
-                            await _navigationService.NavigateToAsync(AppRoutes.DesignSystem);
+                            await _navigationService.NavigateToAsync(AppRoutes.MainConversations);
                             return;
                         }
                     }

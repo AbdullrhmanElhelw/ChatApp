@@ -3,6 +3,9 @@ using ChatApp.Mobile.Features.Authentication.Pages;
 using ChatApp.Mobile.Features.Authentication.Services;
 using ChatApp.Mobile.Features.Authentication.ViewModels;
 using ChatApp.Mobile.Features.Common;
+using ChatApp.Mobile.Features.Conversations.Pages;
+using ChatApp.Mobile.Features.Conversations.Services;
+using ChatApp.Mobile.Features.Conversations.ViewModels;
 using ChatApp.Mobile.Navigation;
 using Microsoft.Extensions.Logging;
 
@@ -37,6 +40,7 @@ public static class MauiProgram
             Timeout = TimeSpan.FromSeconds(15)
         });
         builder.Services.AddSingleton<IAuthApiService, AuthApiService>();
+        builder.Services.AddSingleton<IConversationApiService, ConversationApiService>();
 
         // 3. ViewModels
         builder.Services.AddTransient<SplashViewModel>();
@@ -44,6 +48,8 @@ public static class MauiProgram
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<RegisterViewModel>();
         builder.Services.AddTransient<ProfileSetupViewModel>();
+        builder.Services.AddTransient<ConversationsViewModel>();
+        builder.Services.AddTransient<UserSearchViewModel>();
         builder.Services.AddTransient<DesignSystemViewModel>();
 
         // 4. Pages
@@ -52,6 +58,8 @@ public static class MauiProgram
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
         builder.Services.AddTransient<ProfileSetupPage>();
+        builder.Services.AddTransient<ConversationsPage>();
+        builder.Services.AddTransient<UserSearchPage>();
         builder.Services.AddTransient<DesignSystemPage>();
 
 #if DEBUG

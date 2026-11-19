@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Conversations.ViewModels"
+             xmlns:authDtos="clr-namespace:ChatApp.Mobile.Features.Authentication.DTOs"
+             xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
+             x:Class="ChatApp.Mobile.Features.Conversations.Pages.UserSearchPage"
+             x:DataType="vm:UserSearchViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16,12,16,0">
+
+        <!-- 1. Top Bar with Back Button & Title -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,4,0,12" VerticalOptions="Center">
+            <Button Grid.Column="0"
+                    Text="→ رجوع"
+                    Command="{Binding NavigateBackCommand}"
+                    Style="{StaticResource ChatGhostButton}"
+                    FontSize="14"
+                    HeightRequest="38"
+                    Padding="6,0" />
+
+            <Label Grid.Column="1"
+                   Text="البحث وبدء محادثة جديدة"
+                   FontFamily="CairoBold"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                   VerticalOptions="Center"
+                   Margin="12,0,0,0" />
+        </Grid>
+
+        <!-- 2. Search Input Box & Submit Button -->
+        <Border Grid.Row="1"
+                Style="{StaticResource ChatCardBorder}"
+                Padding="12,4"
+                Margin="0,0,0,16">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry Grid.Column="0"
+                       Text="{Binding SearchQuery, Mode=TwoWay}"
+                       Placeholder="ابحث بالاسم الكامل أو اسم المستخدم..."
+                       FontFamily="CairoRegular"
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                       ReturnCommand="{Binding SearchCommand}"
+                       BackgroundColor="Transparent"
+                       VerticalOptions="Center" />
+
+                <Button Grid.Column="1"
+                        Text="بحث"
+                        Command="{Binding SearchCommand}"
+                        Style="{StaticResource ChatPrimaryButton}"
+                        HeightRequest="38"
+                        Padding="14,0"
+                        FontSize="13" />
+            </Grid>
+        </Border>
+
+        <!-- 3. Results Container -->
+        <Grid Grid.Row="2">
+
+            <!-- Loading Indicator -->
+            <VerticalStackLayout Spacing="12"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 IsVisible="{Binding IsSearching}">
+                <ActivityIndicator IsRunning="{Binding IsSearching}"
+                                   Color="{StaticResource BrandPrimary}"
+                                   WidthRequest="40"
+                                   HeightRequest="40" />
+                <Label Text="جاري البحث..."
+                       Style="{StaticResource TypographyTiny}"
+                       TextColor="{StaticResource BrandPrimary}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Results List -->
+            <CollectionView ItemsSource="{Binding SearchResults}"
+                            SelectionMode="None"
+                            IsVisible="{Binding IsNotBusy}">
+
+                <!-- Empty Results State -->
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Spacing="12"
+                                         VerticalOptions="Center"
+                                         HorizontalOptions="Center"
+                                         Padding="24"
+                                         IsVisible="{Binding IsEmpty}">
+                        <Label Text="🔎" FontSize="52" HorizontalOptions="Center" />
+                        <Label Text="لم نجد أي مستخدمين بهذا الاسم"
+                               Style="{StaticResource TypographyH3}"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                               HorizontalOptions="Center" />
+                        <Label Text="تأكد من كتابة اسم المستخدم أو البريد بدقة."
+                               Style="{StaticResource TypographyCaption}"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <!-- User Result Card -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="authDtos:UserProfileDto">
+                        <Border Margin="0,0,0,10"
+                                Padding="12,10"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                StrokeThickness="1">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:UserSearchViewModel}}, Path=StartConversationCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                                <!-- User Avatar -->
+                                <controls:AvatarView Grid.Column="0"
+                                                     FullName="{Binding FullName}"
+                                                     AvatarUrl="{Binding AvatarUrl}"
+                                                     Size="48"
+                                                     IsOnline="{Binding IsOnline}"
+                                                     VerticalOptions="Center" />
+
+                                <!-- User Info -->
+                                <VerticalStackLayout Grid.Column="1"
+                                                     Spacing="2"
+                                                     VerticalOptions="Center">
+                                    <Label Text="{Binding FullName}"
+                                           FontFamily="CairoBold"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1" />
+
+                                    <Label Text="{Binding UserName, StringFormat='@{0}'}"
+                                           FontFamily="CairoRegular"
+                                           FontSize="13"
+                                           TextColor="{StaticResource BrandPrimary}"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1" />
+
+                                    <Label Text="{Binding Bio}"
+                                           FontFamily="CairoRegular"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="1"
+                                           IsVisible="{Binding Bio, Converter={StaticResource InverseBoolConverter}}" />
+                                </VerticalStackLayout>
+
+                                <!-- Message Button Action -->
+                                <Button Grid.Column="2"
+                                        Text="مراسلة 💬"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:UserSearchViewModel}}, Path=StartConversationCommand}"
+                                        CommandParameter="{Binding .}"
+                                        Style="{StaticResource ChatSecondaryButton}"
+                                        HeightRequest="36"
+                                        Padding="12,0"
+                                        FontSize="12"
+                                        VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

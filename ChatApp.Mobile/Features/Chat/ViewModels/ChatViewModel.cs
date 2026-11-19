@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChatApp.Mobile.Features.Authentication.Services;
@@ -22,6 +23,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     private CancellationTokenSource? _recordingTimerCts;
     private CancellationTokenSource? _playbackTimerCts;
     private ChatMessageItem? _currentlyPlayingAudioItem;
+    private static readonly ConcurrentDictionary<Guid, List<MessageClientDto>> _messageCache = new();
 
     private static readonly IReadOnlyDictionary<string, string[]> EmojiCatalog = new Dictionary<string, string[]>
     {
@@ -939,51 +941,130 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         };
     }
 
-    public async Task InitializeConversationAsync(Guid conversationId)
+    private static string GetCachePath(Guid conversationId) =>
+        Path.Combine(FileSystem.AppDataDirectory, $"chat_cache_{conversationId:N}.json");
+
+    private static List<MessageClientDto>? TryGetCachedMessages(Guid conversationId)
     {
-        LoadChatCustomization(conversationId);
-        IsBusy = true;
-        ClearError();
+        if (_messageCache.TryGetValue(conversationId, out var inMem) && inMem.Count > 0)
+            return inMem;
 
         try
         {
-            // 1. Ensure SignalR connection is active
-            if (!_chatHub.IsConnected)
+            var path = GetCachePath(conversationId);
+            if (!File.Exists(path)) return null;
+            var json = File.ReadAllText(path);
+            var list = JsonSerializer.Deserialize<List<MessageClientDto>>(json);
+            if (list != null && list.Count > 0)
             {
-                await _chatHub.ConnectAsync();
+                _messageCache[conversationId] = list;
+                return list;
             }
+        }
+        catch { }
 
-            IsConnected = _chatHub.IsConnected;
+        return null;
+    }
 
-            // 2. Join the real-time conversation group
-            await _chatHub.JoinConversationAsync(conversationId);
+    private static void SaveMessagesToCache(Guid conversationId, IEnumerable<MessageClientDto> messages)
+    {
+        try
+        {
+            var snapshot = messages.TakeLast(100).ToList();
+            _messageCache[conversationId] = snapshot;
+            var path = GetCachePath(conversationId);
+            _ = Task.Run(() =>
+            {
+                try { File.WriteAllText(path, JsonSerializer.Serialize(snapshot)); }
+                catch { }
+            });
+        }
+        catch { }
+    }
 
-            // 3. Load historical messages via REST
-            var historyResult = await _messageApi.GetMessagesAsync(conversationId);
+    public async Task InitializeConversationAsync(Guid conversationId)
+    {
+        LoadChatCustomization(conversationId);
+        ClearError();
+
+        // 0. Show cached messages immediately (0ms) without showing loading spinner
+        var cached = TryGetCachedMessages(conversationId);
+        var hasCached = cached != null && cached.Count > 0;
+        if (hasCached)
+        {
+            Messages = new ObservableCollection<ChatMessageItem>(cached!.Select(ChatMessageItem.FromDto));
+            IsBusy = false;
+        }
+        else
+        {
+            IsBusy = true;
+        }
+
+        try
+        {
+            // 1. Run SignalR connect/join and REST history fetch in parallel
+            var hubTask = EnsureSignalRJoinedAsync(conversationId);
+            var historyTask = _messageApi.GetMessagesAsync(conversationId);
+            var stickerTask = LoadStickerPacksAsync();
+
+            await Task.WhenAll(hubTask, historyTask);
+
+            var historyResult = await historyTask;
             if (historyResult.IsSuccess && historyResult.Value != null)
             {
-                Messages = new ObservableCollection<ChatMessageItem>(
-                    historyResult.Value.Select(ChatMessageItem.FromDto));
+                var freshDtos = historyResult.Value.ToList();
+                SaveMessagesToCache(conversationId, freshDtos);
 
-                // 4. Mark unread messages as read
-                await _chatHub.MarkAsReadAsync(conversationId);
+                if (!hasCached || !AreMessagesEquivalent(Messages, freshDtos))
+                {
+                    Messages = new ObservableCollection<ChatMessageItem>(
+                        freshDtos.Select(ChatMessageItem.FromDto));
+                }
+
+                _ = _chatHub.MarkAsReadAsync(conversationId);
             }
-            else
+            else if (!hasCached)
             {
                 ErrorMessage = historyResult.ErrorMessage;
             }
 
-            // 5. Preload available sticker packs in background
-            _ = LoadStickerPacksAsync();
+            _ = stickerTask;
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"تعذر تحميل المحادثة: {ex.Message}";
+            if (!hasCached)
+            {
+                ErrorMessage = $"تعذر تحميل المحادثة: {ex.Message}";
+            }
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    private async Task EnsureSignalRJoinedAsync(Guid conversationId)
+    {
+        try
+        {
+            if (!_chatHub.IsConnected)
+            {
+                await _chatHub.ConnectAsync();
+            }
+            IsConnected = _chatHub.IsConnected;
+            await _chatHub.JoinConversationAsync(conversationId);
+        }
+        catch { }
+    }
+
+    private static bool AreMessagesEquivalent(ObservableCollection<ChatMessageItem> current, List<MessageClientDto> fresh)
+    {
+        if (current.Count != fresh.Count) return false;
+        if (current.Count == 0) return true;
+        var lastCur = current[^1];
+        var lastFresh = fresh[^1];
+        return lastCur.Id == lastFresh.Id
+            && lastCur.Content == lastFresh.Content;
     }
 
     public async Task LoadStickerPacksAsync()

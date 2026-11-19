@@ -4,11 +4,19 @@ namespace ChatApp.Mobile.Features.CoupleSpace.Models;
 
 internal static class CoupleMediaHelper
 {
+    public static bool IsLocalDevicePath(string? path) =>
+        !string.IsNullOrWhiteSpace(path) &&
+        (path.StartsWith("/data/", StringComparison.OrdinalIgnoreCase) ||
+         path.StartsWith("/storage/", StringComparison.OrdinalIgnoreCase) ||
+         (Path.IsPathRooted(path) && File.Exists(path)));
+
     public static bool IsRemoteUrl(string? path) =>
         !string.IsNullOrWhiteSpace(path) &&
+        !IsLocalDevicePath(path) &&
         (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
          path.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
-         path.StartsWith("/"));
+         path.StartsWith("/uploads/", StringComparison.OrdinalIgnoreCase) ||
+         path.StartsWith("/media/", StringComparison.OrdinalIgnoreCase));
 
     public static bool IsAvailableImage(string? path) =>
         !string.IsNullOrWhiteSpace(path) && (IsRemoteUrl(path) || File.Exists(path));
@@ -16,6 +24,7 @@ internal static class CoupleMediaHelper
     public static string? ResolveImageUrl(string? path)
     {
         if (string.IsNullOrWhiteSpace(path)) return null;
+        if (IsLocalDevicePath(path)) return path;
         if (path.StartsWith("/")) return $"{ApiConfig.BaseUrl}{path}";
         return path;
     }

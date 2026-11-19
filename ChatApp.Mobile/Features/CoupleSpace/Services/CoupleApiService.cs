@@ -99,6 +99,18 @@ public class CoupleApiService : ICoupleApiService
                 try
                 {
                     using var doc = JsonDocument.Parse(content);
+                    if (doc.RootElement.TryGetProperty("errors", out var errorsProp) && errorsProp.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (var prop in errorsProp.EnumerateObject())
+                        {
+                            if (prop.Value.ValueKind == JsonValueKind.Array && prop.Value.GetArrayLength() > 0)
+                            {
+                                var firstErr = prop.Value[0].GetString();
+                                if (!string.IsNullOrWhiteSpace(firstErr))
+                                    return ApiResult<T>.Failure(firstErr, (int)response.StatusCode);
+                            }
+                        }
+                    }
                     if (doc.RootElement.TryGetProperty("detail", out var detailProp) && detailProp.ValueKind == JsonValueKind.String)
                         return ApiResult<T>.Failure(detailProp.GetString()!, (int)response.StatusCode);
                     if (doc.RootElement.TryGetProperty("message", out var msgProp) && msgProp.ValueKind == JsonValueKind.String)

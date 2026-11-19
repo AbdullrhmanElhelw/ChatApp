@@ -20,6 +20,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     private readonly INavigationService _navigationService;
     private readonly IVoiceAudioService? _voiceAudioService;
     private CancellationTokenSource? _recordingTimerCts;
+    private CancellationTokenSource? _playbackTimerCts;
     private ChatMessageItem? _currentlyPlayingAudioItem;
 
     private static readonly IReadOnlyDictionary<string, string[]> EmojiCatalog = new Dictionary<string, string[]>
@@ -598,29 +599,57 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         {
             if (item.IsPlayingAudio)
             {
+                _playbackTimerCts?.Cancel();
                 await _voiceAudioService.StopPlaybackAsync();
                 item.IsPlayingAudio = false;
+                item.PlaybackPositionText = null;
                 _currentlyPlayingAudioItem = null;
                 return;
             }
 
+            _playbackTimerCts?.Cancel();
             if (_currentlyPlayingAudioItem != null)
             {
                 _currentlyPlayingAudioItem.IsPlayingAudio = false;
+                _currentlyPlayingAudioItem.PlaybackPositionText = null;
             }
 
             _currentlyPlayingAudioItem = item;
+            item.PlaybackPositionText = "00:00";
             item.IsPlayingAudio = true;
+
+            _playbackTimerCts = new CancellationTokenSource();
+            var token = _playbackTimerCts.Token;
 
             await _voiceAudioService.PlayAsync(item.DisplayAudioUrl, () =>
             {
+                _playbackTimerCts?.Cancel();
                 item.IsPlayingAudio = false;
+                item.PlaybackPositionText = null;
                 if (_currentlyPlayingAudioItem == item) _currentlyPlayingAudioItem = null;
             });
+
+            _ = Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested && item.IsPlayingAudio)
+                {
+                    var pos = _voiceAudioService.CurrentPosition;
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (item.IsPlayingAudio)
+                        {
+                            item.PlaybackPositionText = pos.ToString(@"mm\:ss");
+                        }
+                    });
+                    await Task.Delay(250, token);
+                }
+            }, token);
         }
         catch (Exception ex)
         {
+            _playbackTimerCts?.Cancel();
             item.IsPlayingAudio = false;
+            item.PlaybackPositionText = null;
             ErrorMessage = $"تعذر تشغيل الصوت: {ex.Message}";
         }
     }

@@ -143,10 +143,18 @@ public partial class ChatMessageItem : ObservableObject
     public bool IsSticker => MessageType == MessageType.Sticker;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayAudioTime))]
     public partial bool IsPlayingAudio { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayAudioTime))]
+    public partial string? PlaybackPositionText { get; set; }
 
     public string DisplayAudioUrl => DisplayImageUrl;
     public string AudioDurationLabel => !string.IsNullOrWhiteSpace(Content) ? Content : "رسالة صوتية";
+    public string DisplayAudioTime => IsPlayingAudio && !string.IsNullOrWhiteSpace(PlaybackPositionText)
+        ? PlaybackPositionText
+        : AudioDurationLabel;
 
     public bool IsOutgoingNormal => IsMine && !IsSticker;
     public bool IsOutgoingSticker => IsMine && IsSticker;

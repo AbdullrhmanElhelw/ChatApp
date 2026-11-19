@@ -6,11 +6,27 @@ public class VoiceAudioService : IVoiceAudioService
     private Android.Media.MediaRecorder? _recorder;
     private Android.Media.MediaPlayer? _player;
 #endif
+    private static readonly HttpClient _downloadClient = new();
     private string? _currentRecordingPath;
     private DateTime _recordingStartedAt;
 
     public bool IsRecording { get; private set; }
     public bool IsPlaying { get; private set; }
+
+    public TimeSpan CurrentPosition
+    {
+        get
+        {
+#if ANDROID
+            if (_player != null && IsPlaying)
+            {
+                try { return TimeSpan.FromMilliseconds(_player.CurrentPosition); }
+                catch { }
+            }
+#endif
+            return TimeSpan.Zero;
+        }
+    }
 
     public async Task<bool> StartRecordingAsync()
     {
@@ -102,7 +118,31 @@ public class VoiceAudioService : IVoiceAudioService
         }
 
 #if ANDROID
+        var playablePath = urlOrPath;
+        if (urlOrPath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        {
+            var cacheFile = Path.Combine(FileSystem.CacheDirectory, $"play_{Math.Abs(urlOrPath.GetHashCode()):X}.m4a");
+            if (!File.Exists(cacheFile) || new FileInfo(cacheFile).Length == 0)
+            {
+                var bytes = await _downloadClient.GetByteArrayAsync(urlOrPath);
+                await File.WriteAllBytesAsync(cacheFile, bytes);
+            }
+            playablePath = cacheFile;
+        }
+
         _player = new Android.Media.MediaPlayer();
+        if (OperatingSystem.IsAndroidVersionAtLeast(21))
+        {
+            var attrs = new Android.Media.AudioAttributes.Builder()
+                .SetUsage(Android.Media.AudioUsageKind.Media)!
+                .SetContentType(Android.Media.AudioContentType.Speech)!
+                .Build();
+            if (attrs != null)
+            {
+                _player.SetAudioAttributes(attrs);
+            }
+        }
+
         _player.Completion += (_, _) =>
         {
             IsPlaying = false;
@@ -114,7 +154,7 @@ public class VoiceAudioService : IVoiceAudioService
             MainThread.BeginInvokeOnMainThread(() => onCompleted?.Invoke());
         };
 
-        await _player.SetDataSourceAsync(urlOrPath);
+        await _player.SetDataSourceAsync(playablePath);
         _player.Prepare();
         _player.Start();
         IsPlaying = true;

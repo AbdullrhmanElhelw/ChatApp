@@ -346,7 +346,7 @@
                                             <BoxView WidthRequest="3" HeightRequest="22" CornerRadius="1.5" Color="#FFFFFF" VerticalOptions="Center" />
                                             <BoxView WidthRequest="3" HeightRequest="12" CornerRadius="1.5" Color="#FFD6F2" VerticalOptions="Center" />
                                         </HorizontalStackLayout>
-                                        <Label Text="{Binding AudioDurationLabel}" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
+                                        <Label Text="{Binding DisplayAudioTime}" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
 
                                     <!-- Clean Timestamp & Read Status Row (WhatsApp Style) -->
@@ -628,7 +628,7 @@
                                             <BoxView WidthRequest="3" HeightRequest="22" CornerRadius="1.5" Color="{StaticResource BrandNeonViolet}" VerticalOptions="Center" />
                                             <BoxView WidthRequest="3" HeightRequest="12" CornerRadius="1.5" Color="{StaticResource BrandNeonPink}" VerticalOptions="Center" />
                                         </HorizontalStackLayout>
-                                        <Label Text="{Binding AudioDurationLabel}" FontFamily="CairoBold" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                                        <Label Text="{Binding DisplayAudioTime}" FontFamily="CairoBold" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
 
                                     <!-- Clean Timestamp Row (WhatsApp Style) -->

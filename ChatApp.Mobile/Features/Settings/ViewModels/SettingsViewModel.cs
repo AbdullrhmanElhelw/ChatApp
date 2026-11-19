@@ -22,7 +22,7 @@ public partial class SettingsViewModel : BaseViewModel
     public partial bool IsDarkMode { get; set; }
 
     [ObservableProperty]
-    public partial string CurrentMoodLabel { get; set; } = "💜 عالمكم الصغير";
+    public partial string CurrentMoodLabel { get; set; } = "عالمكم الصغير";
 
     public SettingsViewModel(
         IAuthenticationStateService authStateService,
@@ -43,7 +43,7 @@ public partial class SettingsViewModel : BaseViewModel
     {
         CurrentUser = _authStateService.CurrentUser;
         IsDarkMode = ThemeManager.IsDarkMode;
-        CurrentMoodLabel = Preferences.Default.Get("betweenus_mood", "💜 عالمكم الصغير");
+        CurrentMoodLabel = Preferences.Default.Get("betweenus_mood", "عالمكم الصغير");
     }
 
     [RelayCommand]

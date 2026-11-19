@@ -222,7 +222,7 @@
                                   HeightRequest="12"
                                   Aspect="Uniform"
                                   VerticalOptions="Center" />
-                            <Label Text="محادثاتك في BetweenUs خاصة بينكما 💜"
+                            <Label Text="محادثاتك في BetweenUs خاصة بينكما"
                                    FontFamily="CairoRegular"
                                    FontSize="11"
                                    TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
@@ -977,13 +977,19 @@
             <VerticalStackLayout Spacing="12">
                 <!-- Top Drag Handle & Dismiss Header -->
                 <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
-                    <!-- Header Title on the Right (RTL: Column 0 = Right) -->
-                    <Label Grid.Column="0"
-                           Text="الملصقات والوسائط 🎨"
-                           FontFamily="CairoBold"
-                           FontSize="14"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
-                           VerticalOptions="Center" />
+                    <HorizontalStackLayout Grid.Column="0" Spacing="6" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconSparkles}"
+                              Fill="{StaticResource BrandNeonPink}"
+                              WidthRequest="15"
+                              HeightRequest="15"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
+                        <Label Text="الملصقات والوسائط"
+                               FontFamily="CairoBold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
 
                     <!-- Top Drag Handle in Middle -->
                     <BoxView Grid.Column="1"
@@ -1166,7 +1172,13 @@
                 <!-- Header Row: Title + Active Category Badge on Right | Backspace + Close on Left -->
                 <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
                     <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
-                        <Label Text="لوحة الإيموجي ✨"
+                        <Path Data="{StaticResource IconSmiley}"
+                              Fill="{StaticResource BrandNeonPink}"
+                              WidthRequest="16"
+                              HeightRequest="16"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
+                        <Label Text="لوحة الإيموجي"
                                FontFamily="CairoBold"
                                FontSize="15"
                                FontAttributes="Bold"
@@ -1554,9 +1566,12 @@
                                 <TapGestureRecognizer Command="{Binding CopyTargetMessageCommand}" />
                             </Border.GestureRecognizers>
                             <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                                <Label Text="📋"
-                                       FontSize="12"
-                                       VerticalOptions="Center" />
+                                <Path Data="{StaticResource IconCopy}"
+                                      Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                                      WidthRequest="13"
+                                      HeightRequest="13"
+                                      Aspect="Uniform"
+                                      VerticalOptions="Center" />
                                 <Label Text="نسخ النص"
                                        FontFamily="CairoBold"
                                        FontSize="12"
@@ -1600,12 +1615,20 @@
                              HorizontalOptions="Center" />
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0"
-                               Text="تخصيص الشات 🎨"
-                               FontFamily="CairoBold"
-                               FontSize="18"
-                               FontAttributes="Bold"
-                               TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                        <HorizontalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                            <Path Data="{StaticResource IconPalette}"
+                                  Fill="{StaticResource BrandNeonPink}"
+                                  WidthRequest="18"
+                                  HeightRequest="18"
+                                  Aspect="Uniform"
+                                  VerticalOptions="Center" />
+                            <Label Text="تخصيص الشات"
+                                   FontFamily="CairoBold"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
                         <Label Grid.Column="1"
                                Text="استعادة الافتراضي"
                                FontFamily="CairoBold"

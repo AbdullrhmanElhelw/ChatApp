@@ -335,11 +335,19 @@
                            FontSize="12"
                            TextColor="{StaticResource BrandNeonPink}"
                            HorizontalOptions="Center" />
-                    <Label Text="A little world, just for two 💜"
-                           FontFamily="CairoRegular"
-                           FontSize="11"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#9B86B8}"
-                           HorizontalOptions="Center" />
+                    <HorizontalStackLayout Spacing="5" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="A little world, just for two"
+                               FontFamily="CairoRegular"
+                               FontSize="11"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#9B86B8}"
+                               VerticalOptions="Center" />
+                        <Path Data="{StaticResource IconHeart}"
+                              Fill="{StaticResource BrandNeonPink}"
+                              WidthRequest="11"
+                              HeightRequest="11"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
 
             </VerticalStackLayout>

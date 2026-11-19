@@ -50,7 +50,7 @@ public partial class ConversationsViewModel : BaseViewModel
     public partial string CurrentThemeIcon { get; set; } = "🌓";
 
     [ObservableProperty]
-    public partial string CurrentMoodLabel { get; set; } = "💜 عالمكم الصغير";
+    public partial string CurrentMoodLabel { get; set; } = "عالمكم الصغير";
 
     [ObservableProperty]
     public partial bool IsMoodSheetVisible { get; set; }

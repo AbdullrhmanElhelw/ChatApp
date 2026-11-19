@@ -56,16 +56,22 @@
                                TextColor="{StaticResource BrandNeonPink}"
                                VerticalOptions="Center" />
                     </HorizontalStackLayout>
-                    <Label Text="{Binding CurrentMoodLabel}"
-                           FontFamily="CairoRegular"
-                           FontSize="11"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource BrandBlush}}"
-                           HorizontalOptions="Center"
-                           Opacity="0.85">
-                        <Label.GestureRecognizers>
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="5" Opacity="0.9">
+                        <HorizontalStackLayout.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding OpenMoodCheckInCommand}" />
-                        </Label.GestureRecognizers>
-                    </Label>
+                        </HorizontalStackLayout.GestureRecognizers>
+                        <Path Data="{StaticResource IconHeart}"
+                              Fill="{StaticResource BrandNeonPink}"
+                              WidthRequest="11"
+                              HeightRequest="11"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
+                        <Label Text="{Binding CurrentMoodLabel}"
+                               FontFamily="CairoRegular"
+                               FontSize="11"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource BrandBlush}}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
 
                 <!-- Left (in RTL): Heart (Mood) + Settings Gear -->
@@ -315,12 +321,20 @@
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
                                 </Border.GestureRecognizers>
-                                <Label Text="ابعتلها أول رسالة 💜"
-                                       FontFamily="CairoBold"
-                                       FontSize="15"
-                                       FontAttributes="Bold"
-                                       TextColor="#FFFFFF"
-                                       VerticalOptions="Center" />
+                                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Path Data="{StaticResource IconHeart}"
+                                          Fill="#FFFFFF"
+                                          WidthRequest="16"
+                                          HeightRequest="16"
+                                          Aspect="Uniform"
+                                          VerticalOptions="Center" />
+                                    <Label Text="ابعتلها أول رسالة"
+                                           FontFamily="CairoBold"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="#FFFFFF"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
                             </Border>
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
@@ -546,38 +560,61 @@
                              Color="{AppThemeBinding Light={StaticResource Gray300}, Dark=#4E2682}"
                              HorizontalOptions="Center" />
 
-                    <Label Text="مزاجك النهارده إيه؟ 💕"
-                           FontFamily="CairoBold"
-                           FontSize="18"
-                           FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
-                           HorizontalOptions="Center" />
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconHeart}"
+                              Fill="{StaticResource BrandNeonPink}"
+                              WidthRequest="18"
+                              HeightRequest="18"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
+                        <Label Text="مزاجك النهارده إيه؟"
+                               FontFamily="CairoBold"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
 
                     <FlexLayout Wrap="Wrap" JustifyContent="Center" AlignItems="Center">
                         <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#2A114E}" Padding="14,10" Margin="5">
                             <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
-                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="🥰 سعيد ومبسوط" /></Border.GestureRecognizers>
-                            <Label Text="🥰 سعيد ومبسوط" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="سعيد ومبسوط" /></Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconSmiley}" Fill="#FBBF24" WidthRequest="15" HeightRequest="15" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="سعيد ومبسوط" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
                         </Border>
                         <Border StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="{AppThemeBinding Light=#FFF0FA, Dark=#3A0B6B}" Padding="14,10" Margin="5">
                             <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
-                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="💕 مشتاقلك" /></Border.GestureRecognizers>
-                            <Label Text="💕 مشتاقلك" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource BrandPrimary}, Dark=#FFD6F2}" />
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="مشتاقلك" /></Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconHeart}" Fill="#FF4FB8" WidthRequest="15" HeightRequest="15" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="مشتاقلك" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource BrandPrimary}, Dark=#FFD6F2}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
                         </Border>
                         <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#2A114E}" Padding="14,10" Margin="5">
                             <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
-                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="✨ متحمس" /></Border.GestureRecognizers>
-                            <Label Text="✨ متحمس" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="متحمس" /></Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconSparkles}" Fill="#A855F7" WidthRequest="15" HeightRequest="15" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="متحمس" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
                         </Border>
                         <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#2A114E}" Padding="14,10" Margin="5">
                             <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
-                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="🌙 هادئ" /></Border.GestureRecognizers>
-                            <Label Text="🌙 هادئ" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="هادئ" /></Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconMoon}" Fill="#93C5FD" WidthRequest="15" HeightRequest="15" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="هادئ" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
                         </Border>
                         <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#2A114E}" Padding="14,10" Margin="5">
                             <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
-                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="😴 تعبان" /></Border.GestureRecognizers>
-                            <Label Text="😴 تعبان" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="تعبان" /></Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconBolt}" Fill="#9B86B8" WidthRequest="15" HeightRequest="15" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="تعبان" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
                         </Border>
                     </FlexLayout>
                 </VerticalStackLayout>

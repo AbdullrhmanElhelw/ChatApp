@@ -123,7 +123,7 @@ public partial class UserSearchViewModel : BaseViewModel
             string.Equals(query, current.Email, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(query, current.FullName, StringComparison.OrdinalIgnoreCase)))
         {
-            ErrorMessage = "أنت تبحث عن حسابك الحالي! لا يمكن بدء محادثة مع نفسك، ابحث عن مستخدم آخر (مثل: momo أو walid).";
+            ErrorMessage = "أنت تبحث عن حسابك الحالي! لا يمكن بدء محادثة مع نفسك، ابحث عن اسم مستخدم آخر.";
             SearchResults.Clear();
             HasSearched = true;
             IsSearching = false;

@@ -87,7 +87,7 @@
                            IsVisible="{Binding IsPartnerTyping, Converter={StaticResource InverseBoolConverter}}" />
                 </VerticalStackLayout>
 
-                <!-- Actions: Call Placeholders & Connection Status -->
+                <!-- Actions: Search, Call & Connection Status -->
                 <HorizontalStackLayout Grid.Column="3" Spacing="6" VerticalOptions="Center">
                     <Border WidthRequest="36"
                             HeightRequest="36"
@@ -96,7 +96,10 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>
-                        <Path Data="{StaticResource IconVideo}"
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleSearchCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconSearch}"
                               Fill="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
                               WidthRequest="16"
                               HeightRequest="16"
@@ -112,6 +115,9 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="18" />
                         </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ShowCallComingSoonCommand}" />
+                        </Border.GestureRecognizers>
                         <Path Data="{StaticResource IconPhone}"
                               Fill="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
                               WidthRequest="16"
@@ -136,12 +142,61 @@
             </Grid>
         </Border>
 
-        <!-- 2. Message Feed -->
-        <CollectionView x:Name="MessagesList"
-                        Grid.Row="1"
-                        ItemsSource="{Binding Messages}"
-                        SelectionMode="None"
-                        ItemSizingStrategy="MeasureAllItems">
+        <!-- 2. Search Bar + Message Feed -->
+        <Grid Grid.Row="1" RowDefinitions="Auto,*">
+            <!-- Collapsible In-Chat Search Bar -->
+            <Border Grid.Row="0"
+                    IsVisible="{Binding IsSearchOpen}"
+                    StrokeThickness="1"
+                    Stroke="{StaticResource BrandPrimaryLight}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource DarkSurface}}"
+                    Padding="12,4"
+                    Margin="12,8,12,4">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14" />
+                </Border.StrokeShape>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                    <Path Grid.Column="0"
+                          Data="{StaticResource IconSearch}"
+                          Fill="{StaticResource BrandPrimaryLight}"
+                          WidthRequest="16"
+                          HeightRequest="16"
+                          Aspect="Uniform"
+                          VerticalOptions="Center" />
+                    <Entry Grid.Column="1"
+                           Text="{Binding SearchQuery, Mode=TwoWay}"
+                           Placeholder="ابحث في رسائل هذه المحادثة..."
+                           FontFamily="CairoRegular"
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                           PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                           BackgroundColor="Transparent"
+                           VerticalOptions="Center" />
+                    <Border Grid.Column="2"
+                            WidthRequest="28"
+                            HeightRequest="28"
+                            StrokeThickness="0"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="14" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ClearSearchCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="✕"
+                               FontSize="12"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <CollectionView x:Name="MessagesList"
+                            Grid.Row="1"
+                            ItemsSource="{Binding DisplayedMessages}"
+                            SelectionMode="None"
+                            ItemSizingStrategy="MeasureAllItems">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
             </CollectionView.ItemsLayout>
@@ -166,7 +221,7 @@
                                   HeightRequest="12"
                                   Aspect="Uniform"
                                   VerticalOptions="Center" />
-                            <Label Text="شارك معلوماتك الشخصية فقط مع الأشخاص الذين تثق بهم."
+                            <Label Text="محادثاتك في BetweenUs خاصة بينكما 💜"
                                    FontFamily="CairoRegular"
                                    FontSize="11"
                                    TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
@@ -684,6 +739,7 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        </Grid>
 
         <!-- 3. Real-Time Typing Banner -->
         <Border Grid.Row="2"
@@ -957,8 +1013,8 @@
                 </Grid>
 
                 <!-- Action Cards Bar: Sticker Studio, Photo -->
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                    <!-- Sticker Studio Card (Right in RTL) -->
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <!-- Sticker Studio Card -->
                     <Border Grid.Column="0"
                             StrokeThickness="0"
                             BackgroundColor="{StaticResource BrandPrimary}"
@@ -972,22 +1028,22 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding OpenStickerStudioCommand}" />
                         </Border.GestureRecognizers>
-                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                        <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
                             <Path Data="{StaticResource IconSparkles}"
                                   Fill="{StaticResource White}"
-                                  WidthRequest="16"
-                                  HeightRequest="16"
+                                  WidthRequest="15"
+                                  HeightRequest="15"
                                   Aspect="Uniform"
                                   VerticalOptions="Center" />
-                            <Label Text="صانع الاستيكرات (Studio)"
+                            <Label Text="استيكر"
                                    FontFamily="CairoBold"
-                                   FontSize="13"
+                                   FontSize="12"
                                    TextColor="{StaticResource White}"
                                    VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Border>
 
-                    <!-- Send Photo Card (Left in RTL) -->
+                    <!-- Send Photo from Gallery -->
                     <Border Grid.Column="1"
                             StrokeThickness="1"
                             Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
@@ -999,16 +1055,43 @@
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding PickAndSendImageCommand}" />
                         </Border.GestureRecognizers>
-                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                        <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
                             <Path Data="{StaticResource IconImage}"
                                   Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
-                                  WidthRequest="16"
-                                  HeightRequest="16"
+                                  WidthRequest="15"
+                                  HeightRequest="15"
                                   Aspect="Uniform"
                                   VerticalOptions="Center" />
-                            <Label Text="إرسال صورة"
+                            <Label Text="صورة"
                                    FontFamily="CairoBold"
-                                   FontSize="13"
+                                   FontSize="12"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Capture Photo with Camera -->
+                    <Border Grid.Column="2"
+                            StrokeThickness="1"
+                            Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                            HeightRequest="44">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="14" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CaptureAndSendPhotoCommand}" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Path Data="{StaticResource IconCamera}"
+                                  Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                                  WidthRequest="15"
+                                  HeightRequest="15"
+                                  Aspect="Uniform"
+                                  VerticalOptions="Center" />
+                            <Label Text="كاميرا"
+                                   FontFamily="CairoBold"
+                                   FontSize="12"
                                    TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
                                    VerticalOptions="Center" />
                         </HorizontalStackLayout>

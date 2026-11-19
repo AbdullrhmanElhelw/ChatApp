@@ -49,6 +49,30 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public partial ObservableCollection<ChatMessageItem> Messages { get; set; } = new();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayedMessages))]
+    public partial bool IsSearchOpen { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayedMessages))]
+    public partial string SearchQuery { get; set; } = string.Empty;
+
+    public ObservableCollection<ChatMessageItem> DisplayedMessages
+    {
+        get
+        {
+            if (!IsSearchOpen || string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                return Messages;
+            }
+
+            var q = SearchQuery.Trim();
+            return new ObservableCollection<ChatMessageItem>(
+                Messages.Where(m => !string.IsNullOrWhiteSpace(m.Content) &&
+                                    m.Content.Contains(q, StringComparison.CurrentCultureIgnoreCase)));
+        }
+    }
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SendMessageCommand))]
     public partial string MessageText { get; set; } = string.Empty;
 
@@ -353,6 +377,52 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         HandleTypingDetection(value);
     }
 
+    partial void OnMessagesChanged(ObservableCollection<ChatMessageItem> oldValue, ObservableCollection<ChatMessageItem> newValue)
+    {
+        if (oldValue != null)
+            oldValue.CollectionChanged -= OnMessagesCollectionChanged;
+        if (newValue != null)
+            newValue.CollectionChanged += OnMessagesCollectionChanged;
+        OnPropertyChanged(nameof(DisplayedMessages));
+    }
+
+    private void OnMessagesCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (IsSearchOpen && !string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            OnPropertyChanged(nameof(DisplayedMessages));
+        }
+    }
+
+    [RelayCommand]
+    public void ToggleSearch()
+    {
+        IsSearchOpen = !IsSearchOpen;
+        if (!IsSearchOpen)
+        {
+            SearchQuery = string.Empty;
+        }
+    }
+
+    [RelayCommand]
+    public void ClearSearch()
+    {
+        SearchQuery = string.Empty;
+        IsSearchOpen = false;
+    }
+
+    [RelayCommand]
+    public async Task ShowCallComingSoonAsync()
+    {
+        if (Shell.Current != null)
+        {
+            await Shell.Current.DisplayAlertAsync(
+                "المكالمات الصوتية والمرئية",
+                "ميزة مكالمات الصوت والفيديو في BetweenUs قادمة في التحديث القادم 💜",
+                "حسناً");
+        }
+    }
+
     public async Task InitializeConversationAsync(Guid conversationId)
     {
         IsBusy = true;
@@ -538,8 +608,46 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             });
 
             if (file == null) return;
+            await UploadAndSendImageAsync(file);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر إرسال الصورة: {ex.Message}";
+        }
+    }
 
-            IsBusy = true;
+    [RelayCommand]
+    public async Task CaptureAndSendPhotoAsync()
+    {
+        IsAttachmentPanelVisible = false;
+
+        try
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                ErrorMessage = "التقاط الصور غير مدعوم على هذا الجهاز.";
+                return;
+            }
+
+            var photo = await MediaPicker.Default.CapturePhotoAsync(new MediaPickerOptions
+            {
+                Title = "التقاط صورة"
+            });
+
+            if (photo == null) return;
+            await UploadAndSendImageAsync(photo);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر التقاط الصورة: {ex.Message}";
+        }
+    }
+
+    private async Task UploadAndSendImageAsync(FileResult file)
+    {
+        IsBusy = true;
+        try
+        {
             await using var stream = await file.OpenReadAsync();
             var ext = Path.GetExtension(file.FullPath).ToLowerInvariant();
             var contentType = ext switch
@@ -601,10 +709,6 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             );
 
             await _chatHub.SendMessageAsync(request);
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = $"تعذر إرسال الصورة: {ex.Message}";
         }
         finally
         {

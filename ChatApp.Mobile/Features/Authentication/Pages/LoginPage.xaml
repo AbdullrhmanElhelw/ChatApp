@@ -14,12 +14,25 @@
 
             <!-- 1. Top Bar with Back Button -->
             <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,10,0,20">
-                <Button Text="→ رجوع"
-                        Command="{Binding NavigateBackCommand}"
-                        Style="{StaticResource ChatGhostButton}"
-                        FontSize="14"
-                        HeightRequest="40"
-                        Padding="8,0" />
+                <Border Grid.Column="0"
+                        WidthRequest="38"
+                        HeightRequest="38"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="19" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateBackCommand}" />
+                    </Border.GestureRecognizers>
+                    <Path Data="{StaticResource IconBack}"
+                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                          WidthRequest="18"
+                          HeightRequest="18"
+                          Aspect="Uniform"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center" />
+                </Border>
             </Grid>
 
             <!-- 2. Form Card Container -->
@@ -27,7 +40,7 @@
 
                 <!-- Header -->
                 <VerticalStackLayout Spacing="6">
-                    <Label Text="مرحباً بعودتك 👋"
+                    <Label Text="مرحباً بعودتك"
                            Style="{StaticResource TypographyH1}"
                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
 
@@ -38,20 +51,25 @@
 
                 <!-- Global Error Banner -->
                 <Border IsVisible="{Binding HasError}"
-                        BackgroundColor="#FEF2F2"
-                        Stroke="#FCA5A5"
+                        BackgroundColor="{AppThemeBinding Light=#FEF2F2, Dark=#450A0A}"
+                        Stroke="#EF4444"
                         StrokeThickness="1"
                         Padding="14,10">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="12" />
                     </Border.StrokeShape>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
-                        <Label Text="⚠️" FontSize="18" VerticalOptions="Center" />
+                        <Path Data="{StaticResource IconWarning}"
+                              Fill="{AppThemeBinding Light=#B91C1C, Dark=#FECACA}"
+                              WidthRequest="16"
+                              HeightRequest="16"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
                         <Label Grid.Column="1"
                                Text="{Binding ErrorMessage}"
                                FontFamily="CairoRegular"
                                FontSize="13"
-                               TextColor="#B91C1C"
+                               TextColor="{AppThemeBinding Light=#B91C1C, Dark=#FECACA}"
                                VerticalOptions="Center" />
                     </Grid>
                 </Border>

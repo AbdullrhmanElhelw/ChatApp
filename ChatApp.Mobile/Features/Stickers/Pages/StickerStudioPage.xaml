@@ -11,31 +11,72 @@
     <Grid RowDefinitions="Auto,*,Auto" Padding="16,12,16,16">
 
         <!-- 1. Top Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,12" VerticalOptions="Center">
-            <Button Grid.Column="0"
-                    Text="← رجوع"
-                    Command="{Binding NavigateBackCommand}"
-                    Style="{StaticResource ChatGhostButton}"
-                    FontSize="14"
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,14" VerticalOptions="Center">
+            <!-- Back Button -->
+            <Border Grid.Column="0"
+                    WidthRequest="38"
                     HeightRequest="38"
-                    Padding="6,0" />
+                    StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="19" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateBackCommand}" />
+                </Border.GestureRecognizers>
+                <Path Data="{StaticResource IconBack}"
+                      Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                      WidthRequest="18"
+                      HeightRequest="18"
+                      Aspect="Uniform"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center" />
+            </Border>
 
-            <Label Grid.Column="1"
-                   Text="صانع الاستيكرات 🎨"
-                   FontFamily="CairoBold"
-                   FontSize="18"
-                   FontAttributes="Bold"
-                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                   VerticalOptions="Center"
-                   Margin="12,0,0,0" />
+            <!-- Page Title -->
+            <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center" Margin="12,0,0,0">
+                <Path Data="{StaticResource IconSparkles}"
+                      Fill="{StaticResource BrandPrimary}"
+                      WidthRequest="18"
+                      HeightRequest="18"
+                      Aspect="Uniform"
+                      VerticalOptions="Center" />
+                <Label Text="صانع الاستيكرات (Studio)"
+                       FontFamily="CairoBold"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
 
-            <Button Grid.Column="2"
-                    Text="حفظ الاستيكر 💾"
-                    Command="{Binding SaveStickerCommand}"
-                    Style="{StaticResource ChatPrimaryButton}"
-                    HeightRequest="38"
-                    Padding="12,0"
-                    FontSize="13" />
+            <!-- Save Action Button -->
+            <Border Grid.Column="2"
+                    BackgroundColor="{StaticResource BrandPrimary}"
+                    StrokeThickness="0"
+                    Padding="16,9">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,2" Radius="6" Opacity="0.35" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SaveStickerCommand}" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                    <Path Data="{StaticResource IconSave}"
+                          Fill="{StaticResource White}"
+                          WidthRequest="15"
+                          HeightRequest="15"
+                          Aspect="Uniform"
+                          VerticalOptions="Center" />
+                    <Label Text="حفظ الاستيكر"
+                           FontFamily="CairoBold"
+                           FontSize="13"
+                           TextColor="{StaticResource White}"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
         </Grid>
 
         <!-- 2. Main Studio Canvas / Preview -->
@@ -43,8 +84,8 @@
             <VerticalStackLayout Spacing="16" HorizontalOptions="Center" MaximumWidthRequest="500">
 
                 <!-- Preview Box -->
-                <Border StrokeThickness="2"
-                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
+                <Border StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
                         WidthRequest="320"
                         HeightRequest="320"
@@ -58,9 +99,25 @@
                         <!-- Empty Canvas State -->
                         <VerticalStackLayout VerticalOptions="Center"
                                              HorizontalOptions="Center"
-                                             Spacing="12"
+                                             Spacing="14"
                                              IsVisible="{Binding HasImage, Converter={StaticResource InverseBoolConverter}}">
-                            <Label Text="🖼️" FontSize="64" HorizontalOptions="Center" />
+                            <Border WidthRequest="64"
+                                    HeightRequest="64"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                                    HorizontalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="32" />
+                                </Border.StrokeShape>
+                                <Path Data="{StaticResource IconImage}"
+                                      Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                                      WidthRequest="28"
+                                      HeightRequest="28"
+                                      Aspect="Uniform"
+                                      HorizontalOptions="Center"
+                                      VerticalOptions="Center" />
+                            </Border>
+
                             <Label Text="اختر صورة للبدء في صنع استيكرك الخاص"
                                    FontFamily="CairoBold"
                                    FontSize="14"
@@ -68,13 +125,31 @@
                                    HorizontalOptions="Center"
                                    HorizontalTextAlignment="Center" />
 
-                            <Button Text="اختيار صورة من المعرض 📂"
-                                    Command="{Binding PickImageCommand}"
-                                    Style="{StaticResource ChatSecondaryButton}"
-                                    HeightRequest="42"
-                                    Padding="16,0"
-                                    FontSize="13"
-                                    HorizontalOptions="Center" />
+                            <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                                    StrokeThickness="1"
+                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                                    Padding="18,10"
+                                    HorizontalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="16" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PickImageCommand}" />
+                                </Border.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                    <Path Data="{StaticResource IconFolder}"
+                                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                                          WidthRequest="16"
+                                          HeightRequest="16"
+                                          Aspect="Uniform"
+                                          VerticalOptions="Center" />
+                                    <Label Text="اختيار صورة من المعرض"
+                                           FontFamily="CairoBold"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
                         </VerticalStackLayout>
 
                         <!-- Selected Image Canvas -->
@@ -105,61 +180,89 @@
                 </Border>
 
                 <!-- Feedback Banner -->
-                <Border StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light=#D1FAE5, Dark=#064E3B}"
-                        Padding="12,8"
+                <Border StrokeThickness="1"
+                        Stroke="#10B981"
+                        BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}"
+                        Padding="14,10"
                         IsVisible="{Binding HasStatusMessage}">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12" />
+                        <RoundRectangle CornerRadius="14" />
                     </Border.StrokeShape>
-                    <Label Text="{Binding StatusMessage}"
-                           TextColor="{AppThemeBinding Light=#065F46, Dark=#A7F3D0}"
-                           FontSize="12"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center" />
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconCheck}"
+                              Fill="{AppThemeBinding Light=#065F46, Dark=#A7F3D0}"
+                              WidthRequest="16"
+                              HeightRequest="16"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{AppThemeBinding Light=#065F46, Dark=#A7F3D0}"
+                               FontSize="13"
+                               FontFamily="CairoBold"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
                 </Border>
 
                 <!-- Error Banner -->
-                <Border StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light=#FEE2E2, Dark=#7F1D1D}"
-                        Padding="12,8"
+                <Border StrokeThickness="1"
+                        Stroke="#EF4444"
+                        BackgroundColor="{AppThemeBinding Light=#FEF2F2, Dark=#450A0A}"
+                        Padding="14,10"
                         IsVisible="{Binding HasError}">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12" />
+                        <RoundRectangle CornerRadius="14" />
                     </Border.StrokeShape>
-                    <Label Text="{Binding ErrorMessage}"
-                           TextColor="{AppThemeBinding Light=#991B1B, Dark=#FECACA}"
-                           FontSize="12"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center" />
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconWarning}"
+                              Fill="{AppThemeBinding Light=#991B1B, Dark=#FECACA}"
+                              WidthRequest="16"
+                              HeightRequest="16"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
+                        <Label Text="{Binding ErrorMessage}"
+                               TextColor="{AppThemeBinding Light=#991B1B, Dark=#FECACA}"
+                               FontSize="13"
+                               FontFamily="CairoBold"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
                 </Border>
 
                 <!-- 3. Editing Tools -->
-                <Border Padding="16"
+                <Border Padding="18"
                         BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
                         Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
                         StrokeThickness="1">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="16" />
+                        <RoundRectangle CornerRadius="18" />
                     </Border.StrokeShape>
 
-                    <VerticalStackLayout Spacing="12">
+                    <VerticalStackLayout Spacing="14">
                         <Label Text="إضافة تعليق نصي على الاستيكر"
                                FontFamily="CairoBold"
                                FontSize="14"
                                TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}" />
 
-                        <Entry Text="{Binding CaptionText, Mode=TwoWay}"
-                               Placeholder="اكتب كلمة أو جملة مضحكة..."
-                               FontFamily="CairoRegular"
-                               FontSize="14"
-                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                               PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray800}}"
-                               HeightRequest="44" />
+                        <!-- Text Input Pill Container -->
+                        <Border StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                                Padding="16,0"
+                                HeightRequest="44">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="22" />
+                            </Border.StrokeShape>
+                            <Entry Text="{Binding CaptionText, Mode=TwoWay}"
+                                   Placeholder="اكتب كلمة أو جملة مضحكة..."
+                                   FontFamily="CairoRegular"
+                                   FontSize="14"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                   PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                                   BackgroundColor="Transparent"
+                                   VerticalOptions="Center" />
+                        </Border>
 
                         <!-- Quick Emojis -->
-                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
                             <Button Text="🔥" Command="{Binding AddQuickEmojiCommand}" CommandParameter="🔥" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
                             <Button Text="😂" Command="{Binding AddQuickEmojiCommand}" CommandParameter="😂" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
                             <Button Text="❤️" Command="{Binding AddQuickEmojiCommand}" CommandParameter="❤️" Style="{StaticResource ChatGhostButton}" WidthRequest="38" HeightRequest="38" Padding="0" />
@@ -169,13 +272,32 @@
                         </HorizontalStackLayout>
 
                         <!-- Change Image Button -->
-                        <Button Text="تغيير الصورة 🔄"
-                                Command="{Binding PickImageCommand}"
-                                Style="{StaticResource ChatGhostButton}"
-                                HeightRequest="38"
-                                FontSize="13"
-                                IsVisible="{Binding HasImage}"
-                                HorizontalOptions="Center" />
+                        <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                                Padding="16,8"
+                                HorizontalOptions="Center"
+                                IsVisible="{Binding HasImage}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PickImageCommand}" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconCamera}"
+                                      Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                                      WidthRequest="15"
+                                      HeightRequest="15"
+                                      Aspect="Uniform"
+                                      VerticalOptions="Center" />
+                                <Label Text="تغيير الصورة"
+                                       FontFamily="CairoBold"
+                                       FontSize="13"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
                     </VerticalStackLayout>
                 </Border>
 

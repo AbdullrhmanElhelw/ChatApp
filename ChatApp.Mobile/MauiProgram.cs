@@ -74,6 +74,22 @@ public static class MauiProgram
         builder.Services.AddTransient<StickerStudioPage>();
         builder.Services.AddTransient<DesignSystemPage>();
 
+        // 5. Native Platform UI Tweaks: Strip default ugly Windows borders on Entry & Editor
+#if WINDOWS
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("BorderlessEntry", (handler, view) =>
+        {
+            handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+            handler.PlatformView.BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            handler.PlatformView.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+        });
+        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("BorderlessEditor", (handler, view) =>
+        {
+            handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+            handler.PlatformView.BorderBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            handler.PlatformView.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+        });
+#endif
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif

@@ -12,10 +12,10 @@
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12,16,0">
 
-        <!-- 1. Modern Top Header (WhatsApp / Signal Style) -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,12" VerticalOptions="Center">
+        <!-- 1. Modern Top Header (Telegram / Signal Style) -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,14" VerticalOptions="Center">
             <!-- Brand & Current User -->
-            <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
                 <controls:AvatarView FullName="{Binding CurrentUser.FullName}"
                                      AvatarUrl="{Binding CurrentUser.AvatarUrl}"
                                      Size="42"
@@ -28,50 +28,89 @@
                        VerticalOptions="Center" />
             </HorizontalStackLayout>
 
-            <!-- Actions: Search, Theme Toggle & Logout -->
-            <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
-                <Button Text="{Binding CurrentThemeIcon}"
-                        Command="{Binding ToggleThemeCommand}"
-                        Style="{StaticResource ChatGhostButton}"
-                        FontSize="16"
-                        HeightRequest="40"
-                        WidthRequest="40"
-                        Padding="0" />
+            <!-- Actions: Search, Theme Toggle & Logout (Vector Icons) -->
+            <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
+                <!-- Theme Toggle -->
+                <Border WidthRequest="38"
+                        HeightRequest="38"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="19" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleThemeCommand}" />
+                    </Border.GestureRecognizers>
+                    <Path Data="{AppThemeBinding Light={StaticResource IconMoon}, Dark={StaticResource IconSun}}"
+                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                          WidthRequest="16"
+                          HeightRequest="16"
+                          Aspect="Uniform"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center" />
+                </Border>
 
-                <Button Text="🔍"
-                        Command="{Binding OpenUserSearchCommand}"
-                        Style="{StaticResource ChatGhostButton}"
-                        FontSize="16"
-                        HeightRequest="40"
-                        WidthRequest="40"
-                        Padding="0" />
+                <!-- Search -->
+                <Border WidthRequest="38"
+                        HeightRequest="38"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="19" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
+                    </Border.GestureRecognizers>
+                    <Path Data="{StaticResource IconSearch}"
+                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                          WidthRequest="16"
+                          HeightRequest="16"
+                          Aspect="Uniform"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center" />
+                </Border>
 
-                <Button Text="🚪"
-                        Command="{Binding LogoutCommand}"
-                        Style="{StaticResource ChatGhostButton}"
-                        FontSize="15"
-                        HeightRequest="40"
-                        WidthRequest="40"
-                        Padding="0" />
+                <!-- Logout -->
+                <Border WidthRequest="38"
+                        HeightRequest="38"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="19" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding LogoutCommand}" />
+                    </Border.GestureRecognizers>
+                    <Path Data="{StaticResource IconLogout}"
+                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                          WidthRequest="16"
+                          HeightRequest="16"
+                          Aspect="Uniform"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center" />
+                </Border>
             </HorizontalStackLayout>
         </Grid>
 
-        <!-- 2. Search Bar -->
+        <!-- 2. Search Bar (Luxury Pill) -->
         <Border Grid.Row="1"
                 StrokeThickness="1"
                 Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                Padding="12,3"
-                Margin="0,0,0,10">
+                Padding="16,0"
+                HeightRequest="44"
+                Margin="0,0,0,12">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="20" />
+                <RoundRectangle CornerRadius="22" />
             </Border.StrokeShape>
-            <Grid ColumnDefinitions="Auto,*">
-                <Label Text="🔍"
-                       FontSize="15"
-                       VerticalOptions="Center"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                       Margin="0,0,8,0" />
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
+                <Path Grid.Column="0"
+                      Data="{StaticResource IconSearch}"
+                      Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                      WidthRequest="16"
+                      HeightRequest="16"
+                      Aspect="Uniform"
+                      VerticalOptions="Center" />
                 <Entry Grid.Column="1"
                        Text="{Binding SearchText, Mode=TwoWay}"
                        Placeholder="ابحث في المحادثات أو الرسائل..."
@@ -84,11 +123,11 @@
             </Grid>
         </Border>
 
-        <!-- 3. Category Filter Tabs (WhatsApp Style) -->
+        <!-- 3. Category Filter Tabs -->
         <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="0,0,0,12">
             <Border BackgroundColor="{StaticResource BrandPrimary}"
                     StrokeThickness="0"
-                    Padding="14,5">
+                    Padding="14,6">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="16" />
                 </Border.StrokeShape>
@@ -100,7 +139,7 @@
 
             <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
                     StrokeThickness="0"
-                    Padding="14,5">
+                    Padding="14,6">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="16" />
                 </Border.StrokeShape>
@@ -112,7 +151,7 @@
 
             <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
                     StrokeThickness="0"
-                    Padding="14,5">
+                    Padding="14,6">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="16" />
                 </Border.StrokeShape>
@@ -139,9 +178,22 @@
                                              HorizontalOptions="Center"
                                              Padding="24"
                                              IsVisible="{Binding IsEmpty}">
-                            <Label Text="💬"
-                                   FontSize="64"
-                                   HorizontalOptions="Center" />
+                            <Border WidthRequest="72"
+                                    HeightRequest="72"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                                    HorizontalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="36" />
+                                </Border.StrokeShape>
+                                <Path Data="{StaticResource IconEdit}"
+                                      Fill="{StaticResource BrandPrimary}"
+                                      WidthRequest="32"
+                                      HeightRequest="32"
+                                      Aspect="Uniform"
+                                      HorizontalOptions="Center"
+                                      VerticalOptions="Center" />
+                            </Border>
 
                             <Label Text="لا توجد محادثات حتى الآن"
                                    Style="{StaticResource TypographyH2}"
@@ -155,11 +207,31 @@
                                    HorizontalTextAlignment="Center"
                                    MaximumWidthRequest="300" />
 
-                            <Button Text="البحث عن مستخدمين وبدء محادثة ✍️"
-                                    Command="{Binding OpenUserSearchCommand}"
-                                    Style="{StaticResource ChatPrimaryButton}"
+                            <Border BackgroundColor="{StaticResource BrandPrimary}"
+                                    StrokeThickness="0"
+                                    Padding="20,10"
                                     Margin="0,12,0,0"
-                                    HorizontalOptions="Center" />
+                                    HorizontalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="16" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
+                                </Border.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                    <Path Data="{StaticResource IconSearch}"
+                                          Fill="{StaticResource White}"
+                                          WidthRequest="16"
+                                          HeightRequest="16"
+                                          Aspect="Uniform"
+                                          VerticalOptions="Center" />
+                                    <Label Text="البحث عن مستخدمين وبدء محادثة"
+                                           FontFamily="CairoBold"
+                                           FontSize="13"
+                                           TextColor="{StaticResource White}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
 
@@ -167,7 +239,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="dtos:ConversationSummaryDto">
                             <Border Margin="0,0,0,8"
-                                    Padding="12,10"
+                                    Padding="14,10"
                                     BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
                                     Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
                                     StrokeThickness="1">
@@ -184,7 +256,7 @@
                                     <controls:AvatarView Grid.Column="0"
                                                          FullName="{Binding Title}"
                                                          AvatarUrl="{Binding AvatarUrl}"
-                                                         Size="52"
+                                                         Size="50"
                                                          IsOnline="{Binding IsOtherParticipantOnline}"
                                                          VerticalOptions="Center" />
 
@@ -200,12 +272,6 @@
                                                    TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
                                                    LineBreakMode="TailTruncation"
                                                    MaxLines="1" />
-
-                                            <!-- Pinned Indicator -->
-                                            <Label Text="📌"
-                                                   FontSize="12"
-                                                   IsVisible="{Binding IsPinned}"
-                                                   VerticalOptions="Center" />
                                         </HorizontalStackLayout>
 
                                         <Label Text="{Binding LastMessagePreview}"
@@ -237,7 +303,7 @@
                 </CollectionView>
             </RefreshView>
 
-            <!-- Floating Action Button (New Chat - WhatsApp Green FAB) -->
+            <!-- Floating Action Button (New Chat FAB) -->
             <Border WidthRequest="56"
                     HeightRequest="56"
                     BackgroundColor="{StaticResource BrandPrimary}"
@@ -249,15 +315,18 @@
                     <RoundRectangle CornerRadius="28" />
                 </Border.StrokeShape>
                 <Border.Shadow>
-                    <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,4" Radius="8" Opacity="0.5" />
+                    <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,4" Radius="8" Opacity="0.45" />
                 </Border.Shadow>
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
                 </Border.GestureRecognizers>
-                <Label Text="✍️"
-                       FontSize="22"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
+                <Path Data="{StaticResource IconEdit}"
+                      Fill="{StaticResource White}"
+                      WidthRequest="20"
+                      HeightRequest="20"
+                      Aspect="Uniform"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center" />
             </Border>
         </Grid>
 

@@ -16,11 +16,11 @@
         <!-- Input Box Border -->
         <Border StrokeThickness="1"
                 Stroke="{Binding BorderStroke, Source={x:Reference ThisEntry}}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
-                Padding="14,0"
-                HeightRequest="50">
+                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                Padding="16,0"
+                HeightRequest="48">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="12" />
+                <RoundRectangle CornerRadius="14" />
             </Border.StrokeShape>
 
             <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
@@ -30,9 +30,10 @@
                        PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
                        FontFamily="CairoRegular"
-                       FontSize="15"
+                       FontSize="14"
                        IsPassword="{Binding IsPassword, Source={x:Reference ThisEntry}}"
                        Keyboard="{Binding Keyboard, Source={x:Reference ThisEntry}}"
+                       BackgroundColor="Transparent"
                        VerticalOptions="Center" />
 
                 <!-- Password Toggle / Clear button (optional) -->

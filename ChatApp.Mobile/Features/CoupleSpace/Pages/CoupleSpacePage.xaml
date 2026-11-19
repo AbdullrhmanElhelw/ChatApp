@@ -583,7 +583,7 @@
             <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
                 <VerticalStackLayout Padding="18,6,18,32" Spacing="16">
                     <!-- Memory Note Banner -->
-                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}" Padding="14" IsVisible="{Binding SelectedMemory.Note, Converter={StaticResource StringNotEmptyConverter}}">
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}" Padding="14" IsVisible="{Binding SelectedMemory.HasNote}">
                         <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
                         <Label Text="{Binding SelectedMemory.Note}" FontFamily="CairoRegular" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#E5D7FA}" LineBreakMode="WordWrap" />
                     </Border>

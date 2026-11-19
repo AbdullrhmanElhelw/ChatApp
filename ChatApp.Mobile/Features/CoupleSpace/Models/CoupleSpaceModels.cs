@@ -102,6 +102,7 @@ public record MemoryItem(
     public bool HasImages => DisplayImages.Count > 0;
     public bool HasMultipleImages => DisplayImages.Count > 1;
     public string ImageCountBadge => DisplayImages.Count == 1 ? "صورة واحدة" : $"{DisplayImages.Count} صور";
+    public bool HasNote => !string.IsNullOrWhiteSpace(Note);
     public bool HasLocation => !string.IsNullOrWhiteSpace(Location);
 }
 

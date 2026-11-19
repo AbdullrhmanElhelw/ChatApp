@@ -67,6 +67,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IChatHubService, ChatHubService>();
         builder.Services.AddSingleton<IMessageApiService, MessageApiService>();
         builder.Services.AddSingleton<IStickerApiService, StickerApiService>();
+        builder.Services.AddSingleton<IVoiceAudioService, VoiceAudioService>();
 
         // 3. ViewModels
         builder.Services.AddTransient<SplashViewModel>();

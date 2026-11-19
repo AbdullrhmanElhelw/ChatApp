@@ -139,7 +139,14 @@ public partial class ChatMessageItem : ObservableObject
 
     public bool HasMedia => !string.IsNullOrEmpty(MediaUrl);
     public bool IsImage => MessageType == MessageType.Image && HasMedia;
+    public bool IsAudio => MessageType == MessageType.Audio && HasMedia;
     public bool IsSticker => MessageType == MessageType.Sticker;
+
+    [ObservableProperty]
+    public partial bool IsPlayingAudio { get; set; }
+
+    public string DisplayAudioUrl => DisplayImageUrl;
+    public string AudioDurationLabel => !string.IsNullOrWhiteSpace(Content) ? Content : "رسالة صوتية";
 
     public bool IsOutgoingNormal => IsMine && !IsSticker;
     public bool IsOutgoingSticker => IsMine && IsSticker;

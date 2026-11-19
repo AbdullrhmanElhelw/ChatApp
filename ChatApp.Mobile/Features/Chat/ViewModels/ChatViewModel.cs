@@ -18,6 +18,9 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     private readonly IStickerApiService _stickerApi;
     private readonly IAuthenticationStateService _authState;
     private readonly INavigationService _navigationService;
+    private readonly IVoiceAudioService? _voiceAudioService;
+    private CancellationTokenSource? _recordingTimerCts;
+    private ChatMessageItem? _currentlyPlayingAudioItem;
 
     private static readonly IReadOnlyDictionary<string, string[]> EmojiCatalog = new Dictionary<string, string[]>
     {
@@ -58,6 +61,12 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 
     [ObservableProperty]
     public partial bool IsCustomizeSheetVisible { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRecordingVoice { get; set; }
+
+    [ObservableProperty]
+    public partial string RecordingDurationText { get; set; } = "00:00";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasCustomWallpaper))]
@@ -359,13 +368,15 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         IMessageApiService messageApi,
         IStickerApiService stickerApi,
         IAuthenticationStateService authState,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        IVoiceAudioService? voiceAudioService = null)
     {
         _chatHub = chatHub;
         _messageApi = messageApi;
         _stickerApi = stickerApi;
         _authState = authState;
         _navigationService = navigationService;
+        _voiceAudioService = voiceAudioService;
 
         SubscribeToHubEvents();
     }
@@ -451,6 +462,166 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 "المكالمات الصوتية والمرئية",
                 "ميزة مكالمات الصوت والفيديو في BetweenUs قادمة في التحديث القادم 💜",
                 "حسناً");
+        }
+    }
+
+    [RelayCommand]
+    public async Task StartVoiceRecordingAsync()
+    {
+        if (_voiceAudioService == null || IsRecordingVoice) return;
+
+        try
+        {
+            var started = await _voiceAudioService.StartRecordingAsync();
+            if (!started)
+            {
+                ErrorMessage = "يرجى السماح بصلاحية الميكروفون لتسجيل الرسائل الصوتية.";
+                return;
+            }
+
+            IsRecordingVoice = true;
+            RecordingDurationText = "00:00";
+            _recordingTimerCts?.Cancel();
+            _recordingTimerCts = new CancellationTokenSource();
+            var token = _recordingTimerCts.Token;
+            var startTime = DateTime.UtcNow;
+
+            _ = Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested && IsRecordingVoice)
+                {
+                    var elapsed = DateTime.UtcNow - startTime;
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        RecordingDurationText = elapsed.ToString(@"mm\:ss");
+                    });
+                    await Task.Delay(500, token);
+                }
+            }, token);
+        }
+        catch (Exception ex)
+        {
+            IsRecordingVoice = false;
+            ErrorMessage = $"تعذر بدء التسجيل: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    public async Task CancelVoiceRecordingAsync()
+    {
+        if (_voiceAudioService == null) return;
+        _recordingTimerCts?.Cancel();
+        IsRecordingVoice = false;
+        RecordingDurationText = "00:00";
+        await _voiceAudioService.StopRecordingAsync(cancel: true);
+    }
+
+    [RelayCommand]
+    public async Task StopAndSendVoiceRecordingAsync()
+    {
+        if (_voiceAudioService == null || !IsRecordingVoice) return;
+
+        _recordingTimerCts?.Cancel();
+        IsRecordingVoice = false;
+        var (filePath, duration) = await _voiceAudioService.StopRecordingAsync(cancel: false);
+        RecordingDurationText = "00:00";
+
+        if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath) || duration.TotalSeconds < 0.7)
+        {
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            await using var stream = File.OpenRead(filePath);
+            var durationLabel = duration.ToString(@"mm\:ss");
+            var uploadResult = await _stickerApi.UploadMediaAsync(stream, Path.GetFileName(filePath), "audio/mp4", MessageType.Audio);
+            if (!uploadResult.IsSuccess || uploadResult.Value == null)
+            {
+                ErrorMessage = uploadResult.ErrorMessage ?? "فشل رفع الرسالة الصوتية.";
+                return;
+            }
+
+            var media = uploadResult.Value;
+            var clientMessageId = Guid.NewGuid();
+            var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+
+            var optimisticItem = new ChatMessageItem
+            {
+                Id = Guid.Empty,
+                ConversationId = ConversationId,
+                SenderId = currentUserId,
+                SenderUserName = _authState.CurrentUser?.UserName ?? "",
+                SenderFullName = _authState.CurrentUser?.FullName ?? "",
+                SenderAvatarUrl = _authState.CurrentUser?.AvatarUrl,
+                Content = durationLabel,
+                MediaUrl = media.FileUrl,
+                MediaSizeBytes = media.FileSizeBytes,
+                MessageType = MessageType.Audio,
+                ClientMessageId = clientMessageId,
+                SentAt = DateTime.UtcNow,
+                IsMine = true,
+                Status = MessageDeliveryStatus.Sent,
+                IsSending = true
+            };
+
+            Messages.Add(optimisticItem);
+
+            var request = new SendMessageRequestClientDto(
+                ConversationId,
+                Content: durationLabel,
+                MessageType: MessageType.Audio,
+                ClientMessageId: clientMessageId,
+                MediaAttachmentId: media.MediaId
+            );
+
+            await _chatHub.SendMessageAsync(request);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر إرسال الرسالة الصوتية: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+            try { if (File.Exists(filePath)) File.Delete(filePath); } catch { }
+        }
+    }
+
+    [RelayCommand]
+    public async Task TogglePlayAudioAsync(ChatMessageItem? item)
+    {
+        if (item == null || _voiceAudioService == null || string.IsNullOrWhiteSpace(item.DisplayAudioUrl)) return;
+
+        try
+        {
+            if (item.IsPlayingAudio)
+            {
+                await _voiceAudioService.StopPlaybackAsync();
+                item.IsPlayingAudio = false;
+                _currentlyPlayingAudioItem = null;
+                return;
+            }
+
+            if (_currentlyPlayingAudioItem != null)
+            {
+                _currentlyPlayingAudioItem.IsPlayingAudio = false;
+            }
+
+            _currentlyPlayingAudioItem = item;
+            item.IsPlayingAudio = true;
+
+            await _voiceAudioService.PlayAsync(item.DisplayAudioUrl, () =>
+            {
+                item.IsPlayingAudio = false;
+                if (_currentlyPlayingAudioItem == item) _currentlyPlayingAudioItem = null;
+            });
+        }
+        catch (Exception ex)
+        {
+            item.IsPlayingAudio = false;
+            ErrorMessage = $"تعذر تشغيل الصوت: {ex.Message}";
         }
     }
 

@@ -322,6 +322,33 @@
                                                Aspect="AspectFill" />
                                     </Border>
 
+                                    <!-- Voice Message Player (Outgoing) -->
+                                    <HorizontalStackLayout Spacing="10" IsVisible="{Binding IsAudio}" VerticalOptions="Center" Padding="2,4">
+                                        <Border WidthRequest="36" HeightRequest="36" StrokeThickness="0" BackgroundColor="#33FFFFFF">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.TogglePlayAudioCommand}" CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Path Data="{StaticResource IconPlay}" Fill="#FFFFFF" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Path.Triggers>
+                                                    <DataTrigger TargetType="Path" Binding="{Binding IsPlayingAudio}" Value="True">
+                                                        <Setter Property="Data" Value="{StaticResource IconPause}" />
+                                                    </DataTrigger>
+                                                </Path.Triggers>
+                                            </Path>
+                                        </Border>
+                                        <HorizontalStackLayout Spacing="3" VerticalOptions="Center">
+                                            <BoxView WidthRequest="3" HeightRequest="12" CornerRadius="1.5" Color="#FFD6F2" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="20" CornerRadius="1.5" Color="#FFFFFF" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="14" CornerRadius="1.5" Color="#FFD6F2" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="24" CornerRadius="1.5" Color="#FFFFFF" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="16" CornerRadius="1.5" Color="#FFD6F2" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="22" CornerRadius="1.5" Color="#FFFFFF" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="12" CornerRadius="1.5" Color="#FFD6F2" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding AudioDurationLabel}" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+
                                     <!-- Clean Timestamp & Read Status Row (WhatsApp Style) -->
                                     <HorizontalStackLayout HorizontalOptions="End" Spacing="5" VerticalOptions="Center">
                                         <Label Text="{Binding FormattedTime}"
@@ -576,6 +603,33 @@
                                         <Image Source="{Binding DisplayImageUrl}"
                                                Aspect="AspectFill" />
                                     </Border>
+
+                                    <!-- Voice Message Player (Incoming) -->
+                                    <HorizontalStackLayout Spacing="10" IsVisible="{Binding IsAudio}" VerticalOptions="Center" Padding="2,4">
+                                        <Border WidthRequest="36" HeightRequest="36" StrokeThickness="0" BackgroundColor="{StaticResource BrandNeonViolet}">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.TogglePlayAudioCommand}" CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Path Data="{StaticResource IconPlay}" Fill="#FFFFFF" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Path.Triggers>
+                                                    <DataTrigger TargetType="Path" Binding="{Binding IsPlayingAudio}" Value="True">
+                                                        <Setter Property="Data" Value="{StaticResource IconPause}" />
+                                                    </DataTrigger>
+                                                </Path.Triggers>
+                                            </Path>
+                                        </Border>
+                                        <HorizontalStackLayout Spacing="3" VerticalOptions="Center">
+                                            <BoxView WidthRequest="3" HeightRequest="12" CornerRadius="1.5" Color="{StaticResource BrandNeonPink}" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="20" CornerRadius="1.5" Color="{StaticResource BrandNeonViolet}" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="14" CornerRadius="1.5" Color="{StaticResource BrandNeonPink}" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="24" CornerRadius="1.5" Color="{StaticResource BrandNeonViolet}" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="16" CornerRadius="1.5" Color="{StaticResource BrandNeonPink}" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="22" CornerRadius="1.5" Color="{StaticResource BrandNeonViolet}" VerticalOptions="Center" />
+                                            <BoxView WidthRequest="3" HeightRequest="12" CornerRadius="1.5" Color="{StaticResource BrandNeonPink}" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding AudioDurationLabel}" FontFamily="CairoBold" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
 
                                     <!-- Clean Timestamp Row (WhatsApp Style) -->
                                     <HorizontalStackLayout HorizontalOptions="End" Spacing="5" VerticalOptions="Center">
@@ -872,18 +926,19 @@
                        Margin="0,-2,0,0" />
             </Border>
 
-            <!-- Rounded Pill Input + Emoji + Circular Violet Send Button -->
+            <!-- Rounded Pill Input + Heart + Emoji + Mic + Circular Violet Send Button -->
             <Border Grid.Column="1"
                     StrokeThickness="{AppThemeBinding Light=1, Dark=0}"
                     Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=Transparent}"
                     BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#252131}"
                     Padding="14,0,6,0"
-                    HeightRequest="48">
+                    HeightRequest="48"
+                    IsVisible="{Binding IsRecordingVoice, Converter={StaticResource InverseBoolConverter}}">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="24" />
                 </Border.StrokeShape>
 
-                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="6" VerticalOptions="Center">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="4" VerticalOptions="Center">
                     <Entry x:Name="MessageInputEntry"
                            Grid.Column="0"
                            Text="{Binding MessageText, Mode=TwoWay}"
@@ -900,19 +955,19 @@
 
                     <!-- Send Heart Pulse / Hug Button -->
                     <Border Grid.Column="1"
-                            WidthRequest="34"
-                            HeightRequest="34"
+                            WidthRequest="32"
+                            HeightRequest="32"
                             StrokeThickness="0"
                             BackgroundColor="Transparent"
                             VerticalOptions="Center">
-                        <Border.StrokeShape><RoundRectangle CornerRadius="17" /></Border.StrokeShape>
+                        <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding SendHeartPulseCommand}" />
                         </Border.GestureRecognizers>
                         <Path Data="{StaticResource IconHeart}"
                               Fill="{StaticResource BrandNeonPink}"
-                              WidthRequest="19"
-                              HeightRequest="19"
+                              WidthRequest="18"
+                              HeightRequest="18"
                               Aspect="Uniform"
                               HorizontalOptions="Center"
                               VerticalOptions="Center" />
@@ -920,13 +975,13 @@
 
                     <!-- Emoji Toggle -->
                     <Border Grid.Column="2"
-                            WidthRequest="34"
-                            HeightRequest="34"
+                            WidthRequest="32"
+                            HeightRequest="32"
                             StrokeThickness="0"
                             BackgroundColor="Transparent"
                             VerticalOptions="Center">
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="17" />
+                            <RoundRectangle CornerRadius="16" />
                         </Border.StrokeShape>
                         <Border.Triggers>
                             <DataTrigger TargetType="Border" Binding="{Binding IsEmojiPickerVisible}" Value="True">
@@ -938,15 +993,37 @@
                         </Border.GestureRecognizers>
                         <Path Data="{StaticResource IconSmiley}"
                               Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark=#B69AD8}"
-                              WidthRequest="20"
-                              HeightRequest="20"
+                              WidthRequest="19"
+                              HeightRequest="19"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
+
+                    <!-- Voice Mic Button -->
+                    <Border Grid.Column="3"
+                            WidthRequest="32"
+                            HeightRequest="32"
+                            StrokeThickness="0"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding StartVoiceRecordingCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconMic}"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark=#B69AD8}"
+                              WidthRequest="18"
+                              HeightRequest="18"
                               Aspect="Uniform"
                               HorizontalOptions="Center"
                               VerticalOptions="Center" />
                     </Border>
 
                     <!-- Circular Violet Send Button -->
-                    <Border Grid.Column="3"
+                    <Border Grid.Column="4"
                             WidthRequest="38"
                             HeightRequest="38"
                             StrokeThickness="0"
@@ -974,6 +1051,49 @@
                               HorizontalOptions="Center"
                               VerticalOptions="Center"
                               Margin="2,0,0,0" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Live Voice Recording Pill -->
+            <Border Grid.Column="1"
+                    StrokeThickness="1.5"
+                    Stroke="{StaticResource BrandNeonPink}"
+                    BackgroundColor="{AppThemeBinding Light=#FFF0FA, Dark=#2A0E49}"
+                    Padding="12,0,6,0"
+                    HeightRequest="48"
+                    IsVisible="{Binding IsRecordingVoice}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="24" />
+                </Border.StrokeShape>
+
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                    <BoxView Grid.Column="0" WidthRequest="10" HeightRequest="10" CornerRadius="5" Color="#EF4444" VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="{Binding RecordingDurationText, StringFormat='جاري التسجيل... {0}'}"
+                           FontFamily="CairoBold"
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                           VerticalOptions="Center" />
+
+                    <Border Grid.Column="2" WidthRequest="34" HeightRequest="34" StrokeThickness="0" BackgroundColor="Transparent" VerticalOptions="Center">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CancelVoiceRecordingCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconTrash}" Fill="#EF4444" WidthRequest="18" HeightRequest="18" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+
+                    <Border Grid.Column="3" WidthRequest="38" HeightRequest="38" StrokeThickness="0" VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="19" /></Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding StopAndSendVoiceRecordingCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconSend}" Fill="#FFFFFF" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0" />
                     </Border>
                 </Grid>
             </Border>

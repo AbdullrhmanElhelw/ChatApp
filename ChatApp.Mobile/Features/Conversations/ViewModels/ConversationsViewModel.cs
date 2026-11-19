@@ -49,6 +49,9 @@ public partial class ConversationsViewModel : BaseViewModel
     [ObservableProperty]
     public partial string CurrentThemeIcon { get; set; } = "🌓";
 
+    [ObservableProperty]
+    public partial string CurrentMoodLabel { get; set; } = "💜 عالمكم الصغير";
+
     public bool IsEmpty => FilteredConversations.Count == 0 && !IsBusy;
 
     public ConversationsViewModel(
@@ -160,6 +163,54 @@ public partial class ConversationsViewModel : BaseViewModel
     private async Task OpenProfileSetupAsync()
     {
         await _navigationService.NavigateToAsync(AppRoutes.ProfileSetup);
+    }
+
+    [RelayCommand]
+    private async Task OpenSettingsMenuAsync()
+    {
+        if (Shell.Current == null) return;
+
+        var choice = await Shell.Current.DisplayActionSheetAsync(
+            "إعدادات BetweenUs",
+            "إلغاء",
+            null,
+            "تعديل الملف الشخصي",
+            "تبديل المظهر (فاتح / داكن)",
+            "تسجيل الخروج");
+
+        switch (choice)
+        {
+            case "تعديل الملف الشخصي":
+                await OpenProfileSetupAsync();
+                break;
+            case "تبديل المظهر (فاتح / داكن)":
+                ToggleTheme();
+                break;
+            case "تسجيل الخروج":
+                await LogoutAsync();
+                break;
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenMoodCheckInAsync()
+    {
+        if (Shell.Current == null) return;
+
+        var choice = await Shell.Current.DisplayActionSheetAsync(
+            "مزاجك النهارده إيه؟",
+            "إلغاء",
+            null,
+            "🥰 سعيد ومبسوط",
+            "💕 مشتاقلك",
+            "✨ متحمس",
+            "🌙 هادئ",
+            "😴 تعبان");
+
+        if (!string.IsNullOrWhiteSpace(choice) && choice != "إلغاء")
+        {
+            CurrentMoodLabel = choice;
+        }
     }
 
     [RelayCommand]

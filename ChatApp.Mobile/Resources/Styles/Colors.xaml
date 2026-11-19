@@ -13,11 +13,14 @@
     <Color x:Key="SoftPink">#FFB5DC</Color>
     <Color x:Key="OffWhite">#FFF5FF</Color>
 
-    <!-- BetweenUs Dark Theme Core Tokens -->
-    <Color x:Key="DarkBackground">#10091F</Color>
-    <Color x:Key="DarkSurface">#1C1230</Color>
-    <Color x:Key="DarkElevated">#281A3E</Color>
-    <Color x:Key="DarkBorder">#39274F</Color>
+    <!-- BetweenUs Dark Theme Core Tokens (Cosmic Purple + Neon Pink) -->
+    <Color x:Key="DarkBackground">#1A0035</Color>
+    <Color x:Key="DarkSurface">#220E3F</Color>
+    <Color x:Key="DarkElevated">#3A0B6B</Color>
+    <Color x:Key="DarkBorder">#4B2082</Color>
+    <Color x:Key="BrandNeonPink">#FF4FB8</Color>
+    <Color x:Key="BrandNeonViolet">#7B2DF3</Color>
+    <Color x:Key="BrandBlush">#FFD6F2</Color>
 
     <!-- Semantic Status Colors -->
     <Color x:Key="StatusOnline">#10B981</Color>

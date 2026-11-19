@@ -9,307 +9,338 @@
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
              FlowDirection="RightToLeft"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource DarkBackground}}">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12,16,0">
+    <Grid>
+        <!-- Cosmic Ambient Gradient Background -->
+        <BoxView InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="{AppThemeBinding Light=#FFF5FF, Dark=#14042B}" Offset="0.0" />
+                    <GradientStop Color="{AppThemeBinding Light=#FAF0FC, Dark=#1A0035}" Offset="0.55" />
+                    <GradientStop Color="{AppThemeBinding Light=#F3E4FA, Dark=#2E0854}" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
 
-        <!-- 1. Modern Top Header (Telegram / Signal Style) -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,14" VerticalOptions="Center">
-            <!-- Brand & Current User -->
-            <HorizontalStackLayout Grid.Column="0" Spacing="12" VerticalOptions="Center">
-                <controls:AvatarView FullName="{Binding CurrentUser.FullName}"
+        <!-- Main Layout: Header, Search, Filters, List, Floating Bottom Nav -->
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="16,14,16,0">
+
+            <!-- 1. Centered Brand Header (BetweenUs Style) -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,14" VerticalOptions="Center">
+                <!-- Right (in RTL): Current User Avatar -->
+                <controls:AvatarView Grid.Column="0"
+                                     FullName="{Binding CurrentUser.FullName}"
                                      AvatarUrl="{Binding CurrentUser.AvatarUrl}"
-                                     Size="42"
-                                     IsOnline="True">
+                                     Size="40"
+                                     IsOnline="True"
+                                     VerticalOptions="Center">
                     <controls:AvatarView.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding OpenProfileSetupCommand}" />
                     </controls:AvatarView.GestureRecognizers>
                 </controls:AvatarView>
-                <Border WidthRequest="30"
-                        HeightRequest="30"
-                        StrokeThickness="0"
-                        VerticalOptions="Center">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="9" />
-                    </Border.StrokeShape>
-                    <Image Source="betweenus_logo.png"
-                           WidthRequest="30"
-                           HeightRequest="30"
-                           Aspect="AspectFill" />
-                </Border>
-                <Label Text="BetweenUs"
-                       FontFamily="CairoBold"
-                       FontSize="22"
-                       FontAttributes="Bold"
-                       TextColor="#F044A5"
-                       VerticalOptions="Center" />
-            </HorizontalStackLayout>
 
-            <!-- Actions: Search, Theme Toggle & Logout (Vector Icons) -->
-            <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
-                <!-- Theme Toggle -->
-                <Border WidthRequest="38"
-                        HeightRequest="38"
-                        StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="19" />
-                    </Border.StrokeShape>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleThemeCommand}" />
-                    </Border.GestureRecognizers>
-                    <Path Data="{AppThemeBinding Light={StaticResource IconMoon}, Dark={StaticResource IconSun}}"
-                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
-                          WidthRequest="16"
-                          HeightRequest="16"
-                          Aspect="Uniform"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center" />
-                </Border>
+                <!-- Center: BetweenUs Wordmark + Mood Pill -->
+                <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" Spacing="0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="0">
+                        <Label Text="Between"
+                               FontFamily="CairoBold"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                               VerticalOptions="Center" />
+                        <Label Text="Us"
+                               FontFamily="CairoBold"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource BrandNeonPink}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Label Text="{Binding CurrentMoodLabel}"
+                           FontFamily="CairoRegular"
+                           FontSize="11"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource BrandBlush}}"
+                           HorizontalOptions="Center"
+                           Opacity="0.85">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenMoodCheckInCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </VerticalStackLayout>
 
-                <!-- Search -->
-                <Border WidthRequest="38"
-                        HeightRequest="38"
-                        StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="19" />
-                    </Border.StrokeShape>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
-                    </Border.GestureRecognizers>
-                    <Path Data="{StaticResource IconSearch}"
-                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
-                          WidthRequest="16"
-                          HeightRequest="16"
-                          Aspect="Uniform"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center" />
-                </Border>
+                <!-- Left (in RTL): Heart (Mood) + Settings Gear -->
+                <HorizontalStackLayout Grid.Column="2" Spacing="10" VerticalOptions="Center">
+                    <Border WidthRequest="38"
+                            HeightRequest="38"
+                            StrokeThickness="1"
+                            Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="19" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenMoodCheckInCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconHeartOutline}"
+                              Fill="{AppThemeBinding Light={StaticResource BrandPrimary}, Dark={StaticResource BrandBlush}}"
+                              WidthRequest="18"
+                              HeightRequest="18"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
 
-                <!-- Logout -->
-                <Border WidthRequest="38"
-                        HeightRequest="38"
-                        StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="19" />
-                    </Border.StrokeShape>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding LogoutCommand}" />
-                    </Border.GestureRecognizers>
-                    <Path Data="{StaticResource IconLogout}"
-                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
-                          WidthRequest="16"
-                          HeightRequest="16"
-                          Aspect="Uniform"
-                          HorizontalOptions="Center"
-                          VerticalOptions="Center" />
-                </Border>
-            </HorizontalStackLayout>
-        </Grid>
-
-        <!-- 2. Search Bar (Luxury Pill) -->
-        <Border Grid.Row="1"
-                StrokeThickness="1"
-                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                Padding="16,0"
-                HeightRequest="44"
-                Margin="0,0,0,12">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="22" />
-            </Border.StrokeShape>
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
-                <Path Grid.Column="0"
-                      Data="{StaticResource IconSearch}"
-                      Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                      WidthRequest="16"
-                      HeightRequest="16"
-                      Aspect="Uniform"
-                      VerticalOptions="Center" />
-                <Entry Grid.Column="1"
-                       Text="{Binding SearchText, Mode=TwoWay}"
-                       Placeholder="ابحث في المحادثات أو الرسائل..."
-                       FontFamily="CairoRegular"
-                       FontSize="14"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                       PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                       BackgroundColor="Transparent"
-                       VerticalOptions="Center" />
+                    <Border WidthRequest="38"
+                            HeightRequest="38"
+                            StrokeThickness="1"
+                            Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="19" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenSettingsMenuCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconSettings}"
+                              Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark=#FFFFFF}"
+                              WidthRequest="18"
+                              HeightRequest="18"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
+                </HorizontalStackLayout>
             </Grid>
-        </Border>
 
-        <!-- 3. Conversation filters -->
-        <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="0,0,0,12">
-            <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                    StrokeThickness="0"
-                    Padding="14,6">
+            <!-- 2. Glassy Search Bar -->
+            <Border Grid.Row="1"
+                    StrokeThickness="1"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3D1E6D}"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
+                    Padding="16,0"
+                    HeightRequest="46"
+                    Margin="0,0,0,12">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16" />
+                    <RoundRectangle CornerRadius="23" />
                 </Border.StrokeShape>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
-                                          CommandParameter="{x:Static vm:ConversationFilter.All}" />
-                </Border.GestureRecognizers>
-                <Border.Triggers>
-                    <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.All}">
-                        <Setter Property="BackgroundColor" Value="{StaticResource BrandPrimary}" />
-                    </DataTrigger>
-                </Border.Triggers>
-                <Label Text="الكل"
-                       FontFamily="CairoBold"
-                       FontSize="12"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}">
-                    <Label.Triggers>
-                        <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.All}">
-                            <Setter Property="TextColor" Value="{StaticResource White}" />
-                        </DataTrigger>
-                    </Label.Triggers>
-                </Label>
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
+                    <Path Grid.Column="0"
+                          Data="{StaticResource IconSearch}"
+                          Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark=#B69AD8}"
+                          WidthRequest="17"
+                          HeightRequest="17"
+                          Aspect="Uniform"
+                          VerticalOptions="Center" />
+                    <Entry Grid.Column="1"
+                           Text="{Binding SearchText, Mode=TwoWay}"
+                           Placeholder="ابحث في المحادثات أو الرسائل..."
+                           FontFamily="CairoRegular"
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}"
+                           PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark=#9B86B8}"
+                           BackgroundColor="Transparent"
+                           VerticalOptions="Center" />
+                </Grid>
             </Border>
 
-            <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                    StrokeThickness="0"
-                    Padding="14,6">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16" />
-                </Border.StrokeShape>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
-                                          CommandParameter="{x:Static vm:ConversationFilter.Unread}" />
-                </Border.GestureRecognizers>
-                <Border.Triggers>
-                    <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Unread}">
-                        <Setter Property="BackgroundColor" Value="{StaticResource BrandPrimary}" />
-                    </DataTrigger>
-                </Border.Triggers>
-                <Label Text="غير مقروءة"
-                       FontFamily="CairoBold"
-                       FontSize="12"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}">
-                    <Label.Triggers>
-                        <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Unread}">
-                            <Setter Property="TextColor" Value="{StaticResource White}" />
+            <!-- 3. Filter Pills -->
+            <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="0,0,0,12">
+                <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#220E3F}"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        Padding="16,6">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
+                                              CommandParameter="{x:Static vm:ConversationFilter.All}" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.All}">
+                            <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                            <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
                         </DataTrigger>
-                    </Label.Triggers>
-                </Label>
-            </Border>
+                    </Border.Triggers>
+                    <Label Text="الكل"
+                           FontFamily="CairoBold"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#D5C2F0}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.All}">
+                                <Setter Property="TextColor" Value="#FFFFFF" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Border>
 
-            <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                    StrokeThickness="0"
-                    Padding="14,6">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16" />
-                </Border.StrokeShape>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
-                                          CommandParameter="{x:Static vm:ConversationFilter.Groups}" />
-                </Border.GestureRecognizers>
-                <Border.Triggers>
-                    <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Groups}">
-                        <Setter Property="BackgroundColor" Value="{StaticResource BrandPrimary}" />
-                    </DataTrigger>
-                </Border.Triggers>
-                <Label Text="المجموعات"
-                       FontFamily="CairoBold"
-                       FontSize="12"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}">
-                    <Label.Triggers>
-                        <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Groups}">
-                            <Setter Property="TextColor" Value="{StaticResource White}" />
+                <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#220E3F}"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        Padding="16,6">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
+                                              CommandParameter="{x:Static vm:ConversationFilter.Unread}" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Unread}">
+                            <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                            <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
                         </DataTrigger>
-                    </Label.Triggers>
-                </Label>
-            </Border>
-        </HorizontalStackLayout>
+                    </Border.Triggers>
+                    <Label Text="غير مقروءة"
+                           FontFamily="CairoBold"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#D5C2F0}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Unread}">
+                                <Setter Property="TextColor" Value="#FFFFFF" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Border>
 
-        <!-- 4. Conversations List / RefreshView -->
-        <Grid Grid.Row="3">
-            <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#220E3F}"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        Padding="16,6">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectFilterCommand}"
+                                              CommandParameter="{x:Static vm:ConversationFilter.Groups}" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Groups}">
+                            <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                            <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="المجموعات"
+                           FontFamily="CairoBold"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#D5C2F0}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding SelectedFilter}" Value="{x:Static vm:ConversationFilter.Groups}">
+                                <Setter Property="TextColor" Value="#FFFFFF" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Border>
+            </HorizontalStackLayout>
+
+            <!-- 4. Conversations List / Empty State -->
+            <RefreshView Grid.Row="3"
+                         IsRefreshing="{Binding IsRefreshing}"
                          Command="{Binding RefreshCommand}"
-                         RefreshColor="{StaticResource BrandPrimary}">
+                         RefreshColor="{StaticResource BrandNeonPink}">
 
                 <CollectionView ItemsSource="{Binding FilteredConversations}"
                                 SelectionMode="None">
                     <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
                     </CollectionView.ItemsLayout>
 
-                    <!-- Empty State View -->
+                    <!-- BetweenUs Signature Empty State -->
                     <CollectionView.EmptyView>
-                        <VerticalStackLayout Spacing="16"
+                        <VerticalStackLayout Spacing="12"
                                              VerticalOptions="Center"
                                              HorizontalOptions="Center"
                                              Padding="24"
                                              IsVisible="{Binding IsEmpty}">
-                            <Border WidthRequest="72"
-                                    HeightRequest="72"
-                                    StrokeThickness="0"
-                                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                                    HorizontalOptions="Center">
+                            <!-- Glowing Logo Container -->
+                            <Border WidthRequest="120"
+                                    HeightRequest="120"
+                                    StrokeThickness="1.5"
+                                    Stroke="#4E2682"
+                                    BackgroundColor="#240D47"
+                                    HorizontalOptions="Center"
+                                    Margin="0,0,0,8">
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="36" />
                                 </Border.StrokeShape>
-                                <Path Data="{StaticResource IconEdit}"
-                                      Fill="{StaticResource BrandPrimary}"
-                                      WidthRequest="32"
-                                      HeightRequest="32"
-                                      Aspect="Uniform"
-                                      HorizontalOptions="Center"
-                                      VerticalOptions="Center" />
+                                <Border.Shadow>
+                                    <Shadow Brush="#FF4FB8" Offset="0,0" Radius="24" Opacity="0.45" />
+                                </Border.Shadow>
+                                <Image Source="betweenus_logo.png"
+                                       WidthRequest="116"
+                                       HeightRequest="116"
+                                       Aspect="AspectFill" />
                             </Border>
 
-                            <Label Text="لا توجد محادثات حتى الآن"
-                                   Style="{StaticResource TypographyH2}"
-                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
-                                   HorizontalOptions="Center" />
+                            <VerticalStackLayout Spacing="0" HorizontalOptions="Center">
+                                <Label Text="لا توجد محادثات"
+                                       FontFamily="CairoBold"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                                       HorizontalOptions="Center" />
+                                <Label Text="حتى الآن"
+                                       FontFamily="CairoBold"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource BrandNeonPink}"
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
 
-                            <Label Text="ابدأ محادثتك الأولى الآن وتواصل فورياً مع أصدقائك ومجموعاتك!"
-                                   Style="{StaticResource TypographyBody}"
-                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                            <Label Text="ابدأوا أول محادثة وخلي عالمكم الصغير يبدأ هنا"
+                                   FontFamily="CairoRegular"
+                                   FontSize="14"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#D5C2F0}"
                                    HorizontalOptions="Center"
                                    HorizontalTextAlignment="Center"
-                                   MaximumWidthRequest="300" />
+                                   MaximumWidthRequest="280" />
 
-                            <Border BackgroundColor="{StaticResource BrandPrimary}"
-                                    StrokeThickness="0"
-                                    Padding="20,10"
+                            <!-- Glowing Gradient CTA Pill -->
+                            <Border StrokeThickness="0"
+                                    Padding="28,14"
                                     Margin="0,12,0,0"
                                     HorizontalOptions="Center">
                                 <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="16" />
+                                    <RoundRectangle CornerRadius="26" />
                                 </Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#FF4FB8" Offset="0.0" />
+                                        <GradientStop Color="#9B4DDB" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.Shadow>
+                                    <Shadow Brush="#FF4FB8" Offset="0,6" Radius="18" Opacity="0.5" />
+                                </Border.Shadow>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
                                 </Border.GestureRecognizers>
-                                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                                    <Path Data="{StaticResource IconSearch}"
-                                          Fill="{StaticResource White}"
-                                          WidthRequest="16"
-                                          HeightRequest="16"
-                                          Aspect="Uniform"
-                                          VerticalOptions="Center" />
-                                    <Label Text="البحث عن مستخدمين وبدء محادثة"
-                                           FontFamily="CairoBold"
-                                           FontSize="13"
-                                           TextColor="{StaticResource White}"
-                                           VerticalOptions="Center" />
-                                </HorizontalStackLayout>
+                                <Label Text="ابعتلها أول رسالة 💜"
+                                       FontFamily="CairoBold"
+                                       FontSize="15"
+                                       FontAttributes="Bold"
+                                       TextColor="#FFFFFF"
+                                       VerticalOptions="Center" />
                             </Border>
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
 
-                    <!-- Compact conversation rows with subtle separators -->
+                    <!-- Glassy Conversation Cards -->
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="dtos:ConversationSummaryDto">
-                            <Grid RowDefinitions="Auto,1" Padding="0,4">
-                                <Grid.GestureRecognizers>
+                            <Border StrokeThickness="1"
+                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
+                                    Padding="14,12">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="18" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ConversationsViewModel}}, Path=SelectConversationCommand}"
                                                           CommandParameter="{Binding .}" />
-                                </Grid.GestureRecognizers>
+                                </Border.GestureRecognizers>
 
-                                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="8,8">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                                     <controls:AvatarView Grid.Column="0"
                                                          FullName="{Binding Title}"
                                                          AvatarUrl="{Binding AvatarUrl}"
@@ -324,7 +355,7 @@
                                                FontFamily="CairoBold"
                                                FontSize="15"
                                                FontAttributes="Bold"
-                                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}"
                                                LineBreakMode="TailTruncation"
                                                MaxLines="1">
                                             <Label.Triggers>
@@ -337,7 +368,7 @@
                                         <Label Text="{Binding LastMessagePreview}"
                                                FontFamily="CairoRegular"
                                                FontSize="13"
-                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#C5AFE4}"
                                                LineBreakMode="TailTruncation"
                                                MaxLines="1" />
                                     </VerticalStackLayout>
@@ -349,51 +380,142 @@
                                         <Label Text="{Binding FormattedTime}"
                                                FontFamily="CairoRegular"
                                                FontSize="11"
-                                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#9B86B8}"
                                                HorizontalOptions="End" />
 
                                         <controls:BadgeIndicator Count="{Binding UnreadCount}"
                                                                  HorizontalOptions="End" />
                                     </VerticalStackLayout>
                                 </Grid>
-
-                                <BoxView Grid.Row="1"
-                                         HeightRequest="1"
-                                         Margin="70,0,8,0"
-                                         Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}" />
-                            </Grid>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </RefreshView>
 
-            <!-- Floating Action Button (New Chat FAB) -->
-            <Border WidthRequest="56"
-                    HeightRequest="56"
-                    BackgroundColor="{StaticResource BrandPrimary}"
-                    StrokeThickness="0"
-                    HorizontalOptions="End"
-                    VerticalOptions="End"
-                    Margin="0,0,16,24">
+            <!-- 5. Floating Bottom Navigation Bar (BetweenUs Signature) -->
+            <Border Grid.Row="4"
+                    StrokeThickness="1"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3D1E6D}"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D0A38}"
+                    Margin="0,8,0,14"
+                    Padding="12,6"
+                    HeightRequest="64">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="28" />
+                    <RoundRectangle CornerRadius="26" />
                 </Border.StrokeShape>
                 <Border.Shadow>
-                    <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,4" Radius="8" Opacity="0.45" />
+                    <Shadow Brush="{AppThemeBinding Light=#15000000, Dark=#7B2DF3}" Offset="0,4" Radius="16" Opacity="0.35" />
                 </Border.Shadow>
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
-                </Border.GestureRecognizers>
-                <Path Data="{StaticResource IconEdit}"
-                      Fill="{StaticResource White}"
-                      WidthRequest="20"
-                      HeightRequest="20"
-                      Aspect="Uniform"
-                      HorizontalOptions="Center"
-                      VerticalOptions="Center" />
-            </Border>
-        </Grid>
 
+                <Grid ColumnDefinitions="*,*,Auto,*,*" VerticalOptions="Center">
+                    <!-- Tab 1: Chats (Active) -->
+                    <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center" Spacing="2">
+                        <VerticalStackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding RefreshCommand}" />
+                        </VerticalStackLayout.GestureRecognizers>
+                        <Path Data="{StaticResource IconChat}"
+                              Fill="{StaticResource BrandNeonPink}"
+                              WidthRequest="19"
+                              HeightRequest="19"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center" />
+                        <Label Text="المحادثات"
+                               FontFamily="CairoBold"
+                               FontSize="10"
+                               TextColor="{StaticResource BrandNeonPink}"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Tab 2: New Chat / Search -->
+                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" Spacing="2">
+                        <VerticalStackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
+                        </VerticalStackLayout.GestureRecognizers>
+                        <Path Data="{StaticResource IconSearch}"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark=#B69AD8}"
+                              WidthRequest="19"
+                              HeightRequest="19"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center" />
+                        <Label Text="بحث"
+                               FontFamily="CairoRegular"
+                               FontSize="10"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#B69AD8}"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Center Glowing Heart CTA -->
+                    <Border Grid.Column="2"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            StrokeThickness="1.5"
+                            Stroke="#FFD6F2"
+                            Margin="6,0"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="24" />
+                        </Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#FF4FB8" Offset="0.0" />
+                                <GradientStop Color="#7B2DF3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.Shadow>
+                            <Shadow Brush="#FF4FB8" Offset="0,0" Radius="14" Opacity="0.65" />
+                        </Border.Shadow>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconHeart}"
+                              Fill="#FFFFFF"
+                              WidthRequest="22"
+                              HeightRequest="22"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
+
+                    <!-- Tab 3: Mood Check-in -->
+                    <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" VerticalOptions="Center" Spacing="2">
+                        <VerticalStackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenMoodCheckInCommand}" />
+                        </VerticalStackLayout.GestureRecognizers>
+                        <Path Data="{StaticResource IconHeartOutline}"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark=#B69AD8}"
+                              WidthRequest="19"
+                              HeightRequest="19"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center" />
+                        <Label Text="المزاج"
+                               FontFamily="CairoRegular"
+                               FontSize="10"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#B69AD8}"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Tab 4: Theme Toggle -->
+                    <VerticalStackLayout Grid.Column="4" HorizontalOptions="Center" VerticalOptions="Center" Spacing="2">
+                        <VerticalStackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleThemeCommand}" />
+                        </VerticalStackLayout.GestureRecognizers>
+                        <Path Data="{AppThemeBinding Light={StaticResource IconMoon}, Dark={StaticResource IconSun}}"
+                              Fill="{AppThemeBinding Light={StaticResource Gray500}, Dark=#B69AD8}"
+                              WidthRequest="19"
+                              HeightRequest="19"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center" />
+                        <Label Text="المظهر"
+                               FontFamily="CairoRegular"
+                               FontSize="10"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#B69AD8}"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+        </Grid>
     </Grid>
 
 </ContentPage>

@@ -69,6 +69,12 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 
     public bool HasReply => ReplyingToMessage != null;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsReactionPickerVisible))]
+    public partial ChatMessageItem? ReactionTargetMessage { get; set; }
+
+    public bool IsReactionPickerVisible => ReactionTargetMessage != null;
+
     [RelayCommand]
     public void StartReply(ChatMessageItem message)
     {
@@ -79,6 +85,57 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public void CancelReply()
     {
         ReplyingToMessage = null;
+    }
+
+    [RelayCommand]
+    public void OpenReactionPicker(ChatMessageItem? message)
+    {
+        if (message == null || message.Id == Guid.Empty) return;
+        ReactionTargetMessage = message;
+    }
+
+    [RelayCommand]
+    public void CloseReactionPicker()
+    {
+        ReactionTargetMessage = null;
+    }
+
+    [RelayCommand]
+    public async Task ReactWithEmojiAsync(string? emoji)
+    {
+        if (ReactionTargetMessage == null || string.IsNullOrWhiteSpace(emoji))
+        {
+            CloseReactionPicker();
+            return;
+        }
+
+        var messageId = ReactionTargetMessage.Id;
+        CloseReactionPicker();
+
+        try
+        {
+            await _chatHub.ReactToMessageAsync(messageId, emoji.Trim());
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر إرسال التفاعل: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    public async Task ToggleReactionPillAsync(ReactionCountClientDto? reaction)
+    {
+        if (reaction == null || reaction.MessageId == Guid.Empty || string.IsNullOrWhiteSpace(reaction.Emoji))
+            return;
+
+        try
+        {
+            await _chatHub.ReactToMessageAsync(reaction.MessageId, reaction.Emoji.Trim());
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر التفاعل: {ex.Message}";
+        }
     }
 
     public string ConnectionStatusText => IsConnected ? "متصل" : "جارٍ الاتصال...";
@@ -236,6 +293,12 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         {
             _ = LoadStickerPacksAsync();
         }
+    }
+
+    [RelayCommand]
+    public void CloseAttachmentPanel()
+    {
+        IsAttachmentPanelVisible = false;
     }
 
     [RelayCommand]
@@ -398,6 +461,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 
         var text = MessageText.Trim();
         MessageText = string.Empty;
+        IsAttachmentPanelVisible = false;
         CancelTyping();
 
         var clientMessageId = Guid.NewGuid();
@@ -470,6 +534,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         _chatHub.MessageReceived += OnMessageReceived;
         _chatHub.MessageConfirmationReceived += OnMessageConfirmationReceived;
         _chatHub.MessageStatusChanged += OnMessageStatusChanged;
+        _chatHub.MessageReactionUpdated += OnMessageReactionUpdated;
         _chatHub.UserTyping += OnUserTyping;
         _chatHub.UserPresenceChanged += OnUserPresenceChanged;
         _chatHub.ConnectionStateChanged += OnConnectionStateChanged;
@@ -519,6 +584,38 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             if (item != null && update.Status > item.Status)
             {
                 item.Status = update.Status;
+            }
+        });
+    }
+
+    private void OnMessageReactionUpdated(MessageReactionUpdateClientDto update)
+    {
+        if (update.ConversationId != ConversationId) return;
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var msg = Messages.FirstOrDefault(m => m.Id == update.MessageId);
+            if (msg != null)
+            {
+                var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+                bool isMe = update.UserId == currentUserId;
+
+                var clientReactions = update.Reactions.Select(r =>
+                {
+                    bool hasReacted;
+                    if (isMe)
+                    {
+                        hasReacted = r.HasReacted;
+                    }
+                    else
+                    {
+                        var prev = msg.Reactions.FirstOrDefault(p => p.Emoji == r.Emoji);
+                        hasReacted = prev?.HasReacted ?? false;
+                    }
+                    return new ReactionCountClientDto(r.Emoji, r.Count, hasReacted, msg.Id);
+                }).ToList();
+
+                msg.Reactions = new ObservableCollection<ReactionCountClientDto>(clientReactions);
             }
         });
     }
@@ -605,6 +702,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             _chatHub.MessageReceived -= OnMessageReceived;
             _chatHub.MessageConfirmationReceived -= OnMessageConfirmationReceived;
             _chatHub.MessageStatusChanged -= OnMessageStatusChanged;
+            _chatHub.MessageReactionUpdated -= OnMessageReactionUpdated;
             _chatHub.UserTyping -= OnUserTyping;
             _chatHub.UserPresenceChanged -= OnUserPresenceChanged;
             _chatHub.ConnectionStateChanged -= OnConnectionStateChanged;

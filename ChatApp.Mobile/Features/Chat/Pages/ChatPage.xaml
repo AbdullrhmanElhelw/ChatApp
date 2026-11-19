@@ -8,6 +8,7 @@
              x:Class="ChatApp.Mobile.Features.Chat.Pages.ChatPage"
              x:DataType="vm:ChatViewModel"
              Shell.NavBarIsVisible="False"
+             FlowDirection="RightToLeft"
              BackgroundColor="{AppThemeBinding Light={StaticResource ChatCanvasLight}, Dark={StaticResource ChatCanvasDark}}">
 
     <ContentPage.Resources>
@@ -44,7 +45,7 @@
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding NavigateBackCommand}" />
                     </Border.GestureRecognizers>
-                    <Path Data="{StaticResource IconBack}"
+                    <Path Data="{StaticResource IconArrowRight}"
                           Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
                           WidthRequest="18"
                           HeightRequest="18"
@@ -177,342 +178,607 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="dto:ChatMessageItem">
                     <Grid Padding="16,2">
-                        <!-- Outgoing Bubble (Mine) - Signal Royal Cobalt Style -->
-                        <Border x:Name="OutgoingBubble"
-                                HorizontalOptions="End"
-                                MaximumWidthRequest="340"
-                                StrokeThickness="0"
-                                BackgroundColor="{StaticResource BrandPrimary}"
-                                Padding="14,9"
-                                IsVisible="{Binding IsOutgoingNormal}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="18,18,4,18" />
-                            </Border.StrokeShape>
-                            <Border.Shadow>
-                                <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,2" Radius="4" Opacity="0.3" />
-                            </Border.Shadow>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer NumberOfTapsRequired="2"
-                                                      Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                      CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="5">
-                                <!-- Quoted Reply Inset Card -->
-                                <Border IsVisible="{Binding HasReplyTo}"
-                                        BackgroundColor="#22FFFFFF"
-                                        Padding="10,6"
-                                        StrokeThickness="0"
-                                        Margin="0,0,0,2">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8" />
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="3,*" ColumnSpacing="8">
-                                        <BoxView Grid.Column="0" Color="#FFFFFF" WidthRequest="3" CornerRadius="1" VerticalOptions="Fill" />
-                                        <VerticalStackLayout Grid.Column="1" Spacing="1">
-                                            <Label Text="{Binding DisplayReplySender}"
-                                                   FontFamily="CairoBold"
-                                                   FontSize="11"
-                                                   TextColor="#BFDBFE"
-                                                   FontAttributes="Bold"
-                                                   LineBreakMode="TailTruncation"
-                                                   MaxLines="1" />
-                                            <Label Text="{Binding ReplyToContent}"
-                                                   FontFamily="CairoRegular"
-                                                   FontSize="11"
-                                                   TextColor="#F1F5F9"
-                                                   LineBreakMode="TailTruncation"
-                                                   MaxLines="1" />
-                                        </VerticalStackLayout>
-                                    </Grid>
-                                </Border>
-
-                                <!-- Text Message Content -->
-                                <Label Text="{Binding Content}"
-                                       FontFamily="CairoRegular"
-                                       FontSize="15"
-                                       TextColor="{StaticResource White}"
-                                       LineBreakMode="WordWrap"
-                                       IsVisible="{Binding IsTextMessage}" />
-
-                                <!-- Image Attachment Preview -->
-                                <Border StrokeThickness="0"
-                                        MaximumWidthRequest="260"
-                                        MaximumHeightRequest="260"
-                                        IsVisible="{Binding IsImage}">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="12" />
-                                    </Border.StrokeShape>
-                                    <Image Source="{Binding DisplayImageUrl}"
-                                           Aspect="AspectFill" />
-                                </Border>
-
-                                <!-- Timestamp, Reply Action and Read Status -->
-                                <HorizontalStackLayout HorizontalOptions="End" Spacing="6" VerticalOptions="Center">
-                                    <!-- Quick Reply Button -->
-                                    <Border WidthRequest="22"
-                                            HeightRequest="22"
+                        <!-- Outgoing Bubble (Mine) - Signal Royal Cobalt Style (RTL: End = Right) -->
+                        <VerticalStackLayout HorizontalOptions="End"
+                                             MaximumWidthRequest="340"
+                                             Spacing="3"
+                                             IsVisible="{Binding IsOutgoingNormal}">
+                            <Border x:Name="OutgoingBubble"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{StaticResource BrandPrimary}"
+                                    Padding="14,9">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="18,18,4,18" />
+                                </Border.StrokeShape>
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,2" Radius="4" Opacity="0.3" />
+                                </Border.Shadow>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer NumberOfTapsRequired="1"
+                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="5">
+                                    <!-- Quoted Reply Inset Card -->
+                                    <Border IsVisible="{Binding HasReplyTo}"
+                                            BackgroundColor="#22FFFFFF"
+                                            Padding="10,6"
                                             StrokeThickness="0"
-                                            BackgroundColor="Transparent"
-                                            VerticalOptions="Center">
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                                  CommandParameter="{Binding .}" />
-                                        </Border.GestureRecognizers>
-                                        <Path Data="{StaticResource IconReply}"
-                                              Fill="#BFDBFE"
-                                              WidthRequest="12"
-                                              HeightRequest="12"
-                                              Aspect="Uniform"
-                                              HorizontalOptions="Center"
-                                              VerticalOptions="Center" />
-                                    </Border>
-
-                                    <Label Text="{Binding FormattedTime}"
-                                           FontFamily="CairoRegular"
-                                           FontSize="10"
-                                           TextColor="#BFDBFE"
-                                           VerticalOptions="Center" />
-                                    <Label Text="{Binding StatusIcon}"
-                                           FontSize="11"
-                                           TextColor="#93C5FD"
-                                           VerticalOptions="Center" />
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-                        </Border>
-
-                        <!-- Outgoing Sticker (Mine) - Borderless Floating Sticker -->
-                        <Grid HorizontalOptions="End"
-                              IsVisible="{Binding IsOutgoingSticker}">
-                            <VerticalStackLayout Spacing="4">
-                                <!-- Quoted Reply Inset Card for Sticker -->
-                                <Border IsVisible="{Binding HasReplyTo}"
-                                        BackgroundColor="#22FFFFFF"
-                                        Padding="8,4"
-                                        StrokeThickness="0"
-                                        MaximumWidthRequest="150"
-                                        HorizontalOptions="End">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8" />
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="3,*" ColumnSpacing="6">
-                                        <BoxView Grid.Column="0" Color="{StaticResource BrandPrimary}" WidthRequest="3" CornerRadius="1" VerticalOptions="Fill" />
-                                        <Label Grid.Column="1"
-                                               Text="{Binding ReplyToContent}"
-                                               FontFamily="CairoRegular"
-                                               FontSize="11"
-                                               TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
-                                               LineBreakMode="TailTruncation"
-                                               MaxLines="1" />
-                                    </Grid>
-                                </Border>
-
-                                <Grid>
-                                    <Image Source="{Binding StickerUrl}"
-                                           WidthRequest="150"
-                                           HeightRequest="150"
-                                           Aspect="AspectFit" />
-                                    <Border HorizontalOptions="End"
-                                            VerticalOptions="End"
-                                            Margin="0,0,4,4"
-                                            StrokeThickness="0"
-                                            BackgroundColor="#90000000"
-                                            Padding="6,2">
+                                            Margin="0,0,0,2">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8" />
                                         </Border.StrokeShape>
-                                        <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
-                                            <Border WidthRequest="18"
-                                                    HeightRequest="18"
-                                                    StrokeThickness="0"
-                                                    BackgroundColor="Transparent">
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                                          CommandParameter="{Binding .}" />
-                                                </Border.GestureRecognizers>
-                                                <Path Data="{StaticResource IconReply}"
-                                                      Fill="#F8FAFC"
-                                                      WidthRequest="10"
-                                                      HeightRequest="10"
-                                                      Aspect="Uniform"
-                                                      HorizontalOptions="Center"
-                                                      VerticalOptions="Center" />
-                                            </Border>
-                                            <Label Text="{Binding FormattedTime}"
-                                                   FontSize="10"
-                                                   TextColor="#F8FAFC" />
-                                            <Label Text="{Binding StatusIcon}"
-                                                   FontSize="11"
-                                                   TextColor="{Binding StatusColor}" />
-                                        </HorizontalStackLayout>
-                                    </Border>
-                                </Grid>
-                            </VerticalStackLayout>
-                        </Grid>
-
-                        <!-- Incoming Bubble (Partner) - Slate Surface Style -->
-                        <Border x:Name="IncomingBubble"
-                                HorizontalOptions="Start"
-                                MaximumWidthRequest="340"
-                                StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray800}}"
-                                Padding="14,9"
-                                IsVisible="{Binding IsIncomingNormal}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="18,18,18,4" />
-                            </Border.StrokeShape>
-                            <Border.Shadow>
-                                <Shadow Brush="#08000000" Offset="0,1" Radius="3" Opacity="0.5" />
-                            </Border.Shadow>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer NumberOfTapsRequired="2"
-                                                      Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                      CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="5">
-                                <!-- Quoted Reply Inset Card -->
-                                <Border IsVisible="{Binding HasReplyTo}"
-                                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                                        Padding="10,6"
-                                        StrokeThickness="0"
-                                        Margin="0,0,0,2">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8" />
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="3,*" ColumnSpacing="8">
-                                        <BoxView Grid.Column="0" Color="{StaticResource BrandPrimary}" WidthRequest="3" CornerRadius="1" VerticalOptions="Fill" />
-                                        <VerticalStackLayout Grid.Column="1" Spacing="1">
-                                            <Label Text="{Binding DisplayReplySender}"
-                                                   FontFamily="CairoBold"
-                                                   FontSize="11"
-                                                   TextColor="{StaticResource BrandPrimary}"
-                                                   FontAttributes="Bold"
-                                                   LineBreakMode="TailTruncation"
-                                                   MaxLines="1" />
-                                            <Label Text="{Binding ReplyToContent}"
-                                                   FontFamily="CairoRegular"
-                                                   FontSize="11"
-                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
-                                                   LineBreakMode="TailTruncation"
-                                                   MaxLines="1" />
-                                        </VerticalStackLayout>
-                                    </Grid>
-                                </Border>
-
-                                <!-- Text Message Content -->
-                                <Label Text="{Binding Content}"
-                                       FontFamily="CairoRegular"
-                                       FontSize="15"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                                       LineBreakMode="WordWrap"
-                                       IsVisible="{Binding IsTextMessage}" />
-
-                                <!-- Image Attachment Preview -->
-                                <Border StrokeThickness="0"
-                                        MaximumWidthRequest="260"
-                                        MaximumHeightRequest="260"
-                                        IsVisible="{Binding IsImage}">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="12" />
-                                    </Border.StrokeShape>
-                                    <Image Source="{Binding DisplayImageUrl}"
-                                           Aspect="AspectFill" />
-                                </Border>
-
-                                <!-- Timestamp and Quick Reply Button -->
-                                <HorizontalStackLayout HorizontalOptions="End" Spacing="6" VerticalOptions="Center">
-                                    <Border WidthRequest="22"
-                                            HeightRequest="22"
-                                            StrokeThickness="0"
-                                            BackgroundColor="Transparent"
-                                            VerticalOptions="Center">
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                                  CommandParameter="{Binding .}" />
-                                        </Border.GestureRecognizers>
-                                        <Path Data="{StaticResource IconReply}"
-                                              Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                                              WidthRequest="12"
-                                              HeightRequest="12"
-                                              Aspect="Uniform"
-                                              HorizontalOptions="Center"
-                                              VerticalOptions="Center" />
+                                        <Grid ColumnDefinitions="3,*" ColumnSpacing="8">
+                                            <BoxView Grid.Column="0" Color="#FFFFFF" WidthRequest="3" CornerRadius="1" VerticalOptions="Fill" />
+                                            <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                                <Label Text="{Binding DisplayReplySender}"
+                                                       FontFamily="CairoBold"
+                                                       FontSize="11"
+                                                       TextColor="#BFDBFE"
+                                                       FontAttributes="Bold"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="1" />
+                                                <Label Text="{Binding ReplyToContent}"
+                                                       FontFamily="CairoRegular"
+                                                       FontSize="11"
+                                                       TextColor="#F1F5F9"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="1" />
+                                            </VerticalStackLayout>
+                                        </Grid>
                                     </Border>
 
-                                    <Label Text="{Binding FormattedTime}"
+                                    <!-- Text Message Content -->
+                                    <Label Text="{Binding Content}"
                                            FontFamily="CairoRegular"
-                                           FontSize="10"
-                                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
-                                           VerticalOptions="Center" />
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-                        </Border>
+                                           FontSize="15"
+                                           TextColor="{StaticResource White}"
+                                           LineBreakMode="WordWrap"
+                                           HorizontalTextAlignment="End"
+                                           IsVisible="{Binding IsTextMessage}" />
 
-                        <!-- Incoming Sticker (Partner) - Borderless Floating Sticker -->
-                        <Grid HorizontalOptions="Start"
-                              IsVisible="{Binding IsIncomingSticker}">
-                            <VerticalStackLayout Spacing="4">
-                                <!-- Quoted Reply Inset Card for Sticker -->
-                                <Border IsVisible="{Binding HasReplyTo}"
-                                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                                        Padding="8,4"
-                                        StrokeThickness="0"
-                                        MaximumWidthRequest="150"
-                                        HorizontalOptions="Start">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8" />
-                                    </Border.StrokeShape>
-                                    <Grid ColumnDefinitions="3,*" ColumnSpacing="6">
-                                        <BoxView Grid.Column="0" Color="{StaticResource BrandPrimary}" WidthRequest="3" CornerRadius="1" VerticalOptions="Fill" />
-                                        <Label Grid.Column="1"
-                                               Text="{Binding ReplyToContent}"
+                                    <!-- Image Attachment Preview -->
+                                    <Border StrokeThickness="0"
+                                            MaximumWidthRequest="260"
+                                            MaximumHeightRequest="260"
+                                            IsVisible="{Binding IsImage}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12" />
+                                        </Border.StrokeShape>
+                                        <Image Source="{Binding DisplayImageUrl}"
+                                               Aspect="AspectFill" />
+                                    </Border>
+
+                                    <!-- Actions Row: Quick Reaction, Reply, Timestamp & Read Status -->
+                                    <HorizontalStackLayout HorizontalOptions="End" Spacing="8" VerticalOptions="Center">
+                                        <!-- Quick Reaction Smiley Trigger -->
+                                        <Border WidthRequest="22"
+                                                HeightRequest="22"
+                                                StrokeThickness="0"
+                                                BackgroundColor="Transparent"
+                                                VerticalOptions="Center">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Path Data="{StaticResource IconSmiley}"
+                                                  Fill="#BFDBFE"
+                                                  WidthRequest="13"
+                                                  HeightRequest="13"
+                                                  Aspect="Uniform"
+                                                  HorizontalOptions="Center"
+                                                  VerticalOptions="Center" />
+                                        </Border>
+
+                                        <!-- Quick Reply Button -->
+                                        <Border WidthRequest="22"
+                                                HeightRequest="22"
+                                                StrokeThickness="0"
+                                                BackgroundColor="Transparent"
+                                                VerticalOptions="Center">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Path Data="{StaticResource IconReply}"
+                                                  Fill="#BFDBFE"
+                                                  WidthRequest="12"
+                                                  HeightRequest="12"
+                                                  Aspect="Uniform"
+                                                  HorizontalOptions="Center"
+                                                  VerticalOptions="Center" />
+                                        </Border>
+
+                                        <Label Text="{Binding FormattedTime}"
                                                FontFamily="CairoRegular"
+                                               FontSize="10"
+                                               TextColor="#BFDBFE"
+                                               VerticalOptions="Center" />
+                                        <Label Text="{Binding StatusIcon}"
                                                FontSize="11"
-                                               TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
-                                               LineBreakMode="TailTruncation"
-                                               MaxLines="1" />
-                                    </Grid>
-                                </Border>
+                                               TextColor="#93C5FD"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
 
-                                <Grid>
-                                    <Image Source="{Binding StickerUrl}"
-                                           WidthRequest="150"
-                                           HeightRequest="150"
-                                           Aspect="AspectFit" />
-                                    <Border HorizontalOptions="End"
-                                            VerticalOptions="End"
-                                            Margin="0,0,4,4"
+                            <!-- Reaction Pills Row (Under Outgoing Bubble) -->
+                            <FlexLayout BindableLayout.ItemsSource="{Binding Reactions}"
+                                        Wrap="Wrap"
+                                        Direction="Row"
+                                        JustifyContent="End"
+                                        IsVisible="{Binding HasReactions}"
+                                        Margin="4,2,4,2">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="dto:ReactionCountClientDto">
+                                        <Border StrokeThickness="1"
+                                                Stroke="{AppThemeBinding Light=#30000000, Dark=#40FFFFFF}"
+                                                BackgroundColor="{AppThemeBinding Light=#14000000, Dark=#25FFFFFF}"
+                                                Padding="7,3"
+                                                Margin="0,0,5,4">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="12" />
+                                            </Border.StrokeShape>
+                                            <Border.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding HasReacted}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#251E63D8, Dark=#401E63D8}" />
+                                                    <Setter Property="Stroke" Value="{StaticResource BrandPrimary}" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=ToggleReactionPillCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                                <Label Text="{Binding Emoji}" FontSize="13" VerticalOptions="Center" />
+                                                <Label Text="{Binding Count}" FontSize="11" FontFamily="CairoBold" FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                                       VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+                        </VerticalStackLayout>
+
+                        <!-- Outgoing Sticker (Mine) - Borderless Floating Sticker (RTL: End = Right) -->
+                        <VerticalStackLayout HorizontalOptions="End"
+                                             Spacing="3"
+                                             IsVisible="{Binding IsOutgoingSticker}">
+                            <Grid>
+                                <VerticalStackLayout Spacing="4">
+                                    <!-- Quoted Reply Inset Card for Sticker -->
+                                    <Border IsVisible="{Binding HasReplyTo}"
+                                            BackgroundColor="#22FFFFFF"
+                                            Padding="8,4"
                                             StrokeThickness="0"
-                                            BackgroundColor="#90000000"
-                                            Padding="6,2">
+                                            MaximumWidthRequest="150"
+                                            HorizontalOptions="Start">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8" />
                                         </Border.StrokeShape>
-                                        <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
-                                            <Border WidthRequest="18"
-                                                    HeightRequest="18"
-                                                    StrokeThickness="0"
-                                                    BackgroundColor="Transparent">
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                                          CommandParameter="{Binding .}" />
-                                                </Border.GestureRecognizers>
-                                                <Path Data="{StaticResource IconReply}"
-                                                      Fill="#F8FAFC"
-                                                      WidthRequest="10"
-                                                      HeightRequest="10"
-                                                      Aspect="Uniform"
-                                                      HorizontalOptions="Center"
-                                                      VerticalOptions="Center" />
-                                            </Border>
-                                            <Label Text="{Binding FormattedTime}"
-                                                   FontSize="10"
-                                                   TextColor="#F8FAFC" />
-                                        </HorizontalStackLayout>
+                                        <Grid ColumnDefinitions="3,*" ColumnSpacing="6">
+                                            <BoxView Grid.Column="0" Color="{StaticResource BrandPrimary}" WidthRequest="3" CornerRadius="1" VerticalOptions="Fill" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding ReplyToContent}"
+                                                   FontFamily="CairoRegular"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1" />
+                                        </Grid>
                                     </Border>
-                                </Grid>
-                            </VerticalStackLayout>
-                        </Grid>
+
+                                    <Grid>
+                                        <Image Source="{Binding StickerUrl}"
+                                               WidthRequest="150"
+                                               HeightRequest="150"
+                                               Aspect="AspectFit">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                                      Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                                <TapGestureRecognizer NumberOfTapsRequired="1"
+                                                                      Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                        <Border HorizontalOptions="End"
+                                                VerticalOptions="End"
+                                                Margin="0,0,4,4"
+                                                StrokeThickness="0"
+                                                BackgroundColor="#90000000"
+                                                Padding="6,2">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="8" />
+                                            </Border.StrokeShape>
+                                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                                <!-- Quick Reaction Trigger -->
+                                                <Border WidthRequest="18"
+                                                        HeightRequest="18"
+                                                        StrokeThickness="0"
+                                                        BackgroundColor="Transparent">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Path Data="{StaticResource IconSmiley}"
+                                                          Fill="#F8FAFC"
+                                                          WidthRequest="11"
+                                                          HeightRequest="11"
+                                                          Aspect="Uniform"
+                                                          HorizontalOptions="Center"
+                                                          VerticalOptions="Center" />
+                                                </Border>
+
+                                                <!-- Quick Reply -->
+                                                <Border WidthRequest="18"
+                                                        HeightRequest="18"
+                                                        StrokeThickness="0"
+                                                        BackgroundColor="Transparent">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Path Data="{StaticResource IconReply}"
+                                                          Fill="#F8FAFC"
+                                                          WidthRequest="10"
+                                                          HeightRequest="10"
+                                                          Aspect="Uniform"
+                                                          HorizontalOptions="Center"
+                                                          VerticalOptions="Center" />
+                                                </Border>
+                                                <Label Text="{Binding FormattedTime}"
+                                                       FontSize="10"
+                                                       TextColor="#F8FAFC" />
+                                                <Label Text="{Binding StatusIcon}"
+                                                       FontSize="11"
+                                                       TextColor="{Binding StatusColor}" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <!-- Reaction Pills Row (Under Outgoing Sticker) -->
+                            <FlexLayout BindableLayout.ItemsSource="{Binding Reactions}"
+                                        Wrap="Wrap"
+                                        Direction="Row"
+                                        JustifyContent="End"
+                                        IsVisible="{Binding HasReactions}"
+                                        Margin="4,2,4,2">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="dto:ReactionCountClientDto">
+                                        <Border StrokeThickness="1"
+                                                Stroke="{AppThemeBinding Light=#30000000, Dark=#40FFFFFF}"
+                                                BackgroundColor="{AppThemeBinding Light=#14000000, Dark=#25FFFFFF}"
+                                                Padding="7,3"
+                                                Margin="0,0,5,4">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="12" />
+                                            </Border.StrokeShape>
+                                            <Border.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding HasReacted}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#251E63D8, Dark=#401E63D8}" />
+                                                    <Setter Property="Stroke" Value="{StaticResource BrandPrimary}" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=ToggleReactionPillCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                                <Label Text="{Binding Emoji}" FontSize="13" VerticalOptions="Center" />
+                                                <Label Text="{Binding Count}" FontSize="11" FontFamily="CairoBold" FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                                       VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+                        </VerticalStackLayout>
+
+                        <!-- Incoming Bubble (Partner) - Slate Surface Style (RTL: Start = Left) -->
+                        <VerticalStackLayout HorizontalOptions="Start"
+                                             MaximumWidthRequest="340"
+                                             Spacing="3"
+                                             IsVisible="{Binding IsIncomingNormal}">
+                            <Border x:Name="IncomingBubble"
+                                    StrokeThickness="1"
+                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray800}}"
+                                    Padding="14,9">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="18,18,18,4" />
+                                </Border.StrokeShape>
+                                <Border.Shadow>
+                                    <Shadow Brush="#08000000" Offset="0,1" Radius="3" Opacity="0.5" />
+                                </Border.Shadow>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer NumberOfTapsRequired="1"
+                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="5">
+                                    <!-- Quoted Reply Inset Card -->
+                                    <Border IsVisible="{Binding HasReplyTo}"
+                                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                                            Padding="10,6"
+                                            StrokeThickness="0"
+                                            Margin="0,0,0,2">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8" />
+                                        </Border.StrokeShape>
+                                        <Grid ColumnDefinitions="3,*" ColumnSpacing="8">
+                                            <BoxView Grid.Column="0" Color="{StaticResource BrandPrimary}" WidthRequest="3" CornerRadius="1" VerticalOptions="Fill" />
+                                            <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                                <Label Text="{Binding DisplayReplySender}"
+                                                       FontFamily="CairoBold"
+                                                       FontSize="11"
+                                                       TextColor="{StaticResource BrandPrimary}"
+                                                       FontAttributes="Bold"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="1" />
+                                                <Label Text="{Binding ReplyToContent}"
+                                                       FontFamily="CairoRegular"
+                                                       FontSize="11"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="1" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Text Message Content -->
+                                    <Label Text="{Binding Content}"
+                                           FontFamily="CairoRegular"
+                                           FontSize="15"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                           LineBreakMode="WordWrap"
+                                           HorizontalTextAlignment="End"
+                                           IsVisible="{Binding IsTextMessage}" />
+
+                                    <!-- Image Attachment Preview -->
+                                    <Border StrokeThickness="0"
+                                            MaximumWidthRequest="260"
+                                            MaximumHeightRequest="260"
+                                            IsVisible="{Binding IsImage}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="12" />
+                                        </Border.StrokeShape>
+                                        <Image Source="{Binding DisplayImageUrl}"
+                                               Aspect="AspectFill" />
+                                    </Border>
+
+                                    <!-- Timestamp and Actions -->
+                                    <HorizontalStackLayout HorizontalOptions="End" Spacing="8" VerticalOptions="Center">
+                                        <!-- Quick Reaction Trigger -->
+                                        <Border WidthRequest="22"
+                                                HeightRequest="22"
+                                                StrokeThickness="0"
+                                                BackgroundColor="Transparent"
+                                                VerticalOptions="Center">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Path Data="{StaticResource IconSmiley}"
+                                                  Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                                                  WidthRequest="13"
+                                                  HeightRequest="13"
+                                                  Aspect="Uniform"
+                                                  HorizontalOptions="Center"
+                                                  VerticalOptions="Center" />
+                                        </Border>
+
+                                        <!-- Quick Reply Button -->
+                                        <Border WidthRequest="22"
+                                                HeightRequest="22"
+                                                StrokeThickness="0"
+                                                BackgroundColor="Transparent"
+                                                VerticalOptions="Center">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <Path Data="{StaticResource IconReply}"
+                                                  Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                                                  WidthRequest="12"
+                                                  HeightRequest="12"
+                                                  Aspect="Uniform"
+                                                  HorizontalOptions="Center"
+                                                  VerticalOptions="Center" />
+                                        </Border>
+
+                                        <Label Text="{Binding FormattedTime}"
+                                               FontFamily="CairoRegular"
+                                               FontSize="10"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Reaction Pills Row (Under Incoming Bubble) -->
+                            <FlexLayout BindableLayout.ItemsSource="{Binding Reactions}"
+                                        Wrap="Wrap"
+                                        Direction="Row"
+                                        JustifyContent="Start"
+                                        IsVisible="{Binding HasReactions}"
+                                        Margin="4,2,4,2">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="dto:ReactionCountClientDto">
+                                        <Border StrokeThickness="1"
+                                                Stroke="{AppThemeBinding Light=#30000000, Dark=#40FFFFFF}"
+                                                BackgroundColor="{AppThemeBinding Light=#14000000, Dark=#25FFFFFF}"
+                                                Padding="7,3"
+                                                Margin="0,0,5,4">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="12" />
+                                            </Border.StrokeShape>
+                                            <Border.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding HasReacted}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#251E63D8, Dark=#401E63D8}" />
+                                                    <Setter Property="Stroke" Value="{StaticResource BrandPrimary}" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=ToggleReactionPillCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                                <Label Text="{Binding Emoji}" FontSize="13" VerticalOptions="Center" />
+                                                <Label Text="{Binding Count}" FontSize="11" FontFamily="CairoBold" FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                                       VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+                        </VerticalStackLayout>
+
+                        <!-- Incoming Sticker (Partner) - Borderless Floating Sticker (RTL: Start = Left) -->
+                        <VerticalStackLayout HorizontalOptions="Start"
+                                             Spacing="3"
+                                             IsVisible="{Binding IsIncomingSticker}">
+                            <Grid>
+                                <VerticalStackLayout Spacing="4">
+                                    <!-- Quoted Reply Inset Card for Sticker -->
+                                    <Border IsVisible="{Binding HasReplyTo}"
+                                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                                            Padding="8,4"
+                                            StrokeThickness="0"
+                                            MaximumWidthRequest="150"
+                                            HorizontalOptions="Start">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8" />
+                                        </Border.StrokeShape>
+                                        <Grid ColumnDefinitions="3,*" ColumnSpacing="6">
+                                            <BoxView Grid.Column="0" Color="{StaticResource BrandPrimary}" WidthRequest="3" CornerRadius="1" VerticalOptions="Fill" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding ReplyToContent}"
+                                                   FontFamily="CairoRegular"
+                                                   FontSize="11"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Grid>
+                                        <Image Source="{Binding StickerUrl}"
+                                               WidthRequest="150"
+                                               HeightRequest="150"
+                                               Aspect="AspectFit">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                                      Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                                <TapGestureRecognizer NumberOfTapsRequired="1"
+                                                                      Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                        <Border HorizontalOptions="End"
+                                                VerticalOptions="End"
+                                                Margin="0,0,4,4"
+                                                StrokeThickness="0"
+                                                BackgroundColor="#90000000"
+                                                Padding="6,2">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="8" />
+                                            </Border.StrokeShape>
+                                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                                <!-- Quick Reaction Trigger -->
+                                                <Border WidthRequest="18"
+                                                        HeightRequest="18"
+                                                        StrokeThickness="0"
+                                                        BackgroundColor="Transparent">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Path Data="{StaticResource IconSmiley}"
+                                                          Fill="#F8FAFC"
+                                                          WidthRequest="11"
+                                                          HeightRequest="11"
+                                                          Aspect="Uniform"
+                                                          HorizontalOptions="Center"
+                                                          VerticalOptions="Center" />
+                                                </Border>
+
+                                                <!-- Quick Reply -->
+                                                <Border WidthRequest="18"
+                                                        HeightRequest="18"
+                                                        StrokeThickness="0"
+                                                        BackgroundColor="Transparent">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                              CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Path Data="{StaticResource IconReply}"
+                                                          Fill="#F8FAFC"
+                                                          WidthRequest="10"
+                                                          HeightRequest="10"
+                                                          Aspect="Uniform"
+                                                          HorizontalOptions="Center"
+                                                          VerticalOptions="Center" />
+                                                </Border>
+                                                <Label Text="{Binding FormattedTime}"
+                                                       FontSize="10"
+                                                       TextColor="#F8FAFC" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <!-- Reaction Pills Row (Under Incoming Sticker) -->
+                            <FlexLayout BindableLayout.ItemsSource="{Binding Reactions}"
+                                        Wrap="Wrap"
+                                        Direction="Row"
+                                        JustifyContent="Start"
+                                        IsVisible="{Binding HasReactions}"
+                                        Margin="4,2,4,2">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="dto:ReactionCountClientDto">
+                                        <Border StrokeThickness="1"
+                                                Stroke="{AppThemeBinding Light=#30000000, Dark=#40FFFFFF}"
+                                                BackgroundColor="{AppThemeBinding Light=#14000000, Dark=#25FFFFFF}"
+                                                Padding="7,3"
+                                                Margin="0,0,5,4">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="12" />
+                                            </Border.StrokeShape>
+                                            <Border.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding HasReacted}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#251E63D8, Dark=#401E63D8}" />
+                                                    <Setter Property="Stroke" Value="{StaticResource BrandPrimary}" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=ToggleReactionPillCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                                <Label Text="{Binding Emoji}" FontSize="13" VerticalOptions="Center" />
+                                                <Label Text="{Binding Count}" FontSize="11" FontFamily="CairoBold" FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"
+                                                       VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+                        </VerticalStackLayout>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
@@ -626,30 +892,58 @@
                         Opacity="0.7" />
             </Border.Shadow>
 
-            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
-                <!-- Attachment Button (Vector Paperclip) -->
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                <!-- Floating Send Button (Vector Modern Paper Plane - Far Left in RTL) -->
                 <Border Grid.Column="0"
-                        WidthRequest="42"
-                        HeightRequest="42"
+                        WidthRequest="44"
+                        HeightRequest="44"
                         StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                        BackgroundColor="{StaticResource BrandPrimary}">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="21" />
+                        <RoundRectangle CornerRadius="22" />
                     </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,3" Radius="8" Opacity="0.45" />
+                    </Border.Shadow>
                     <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleAttachmentPanelCommand}" />
+                        <TapGestureRecognizer Command="{Binding SendMessageCommand}" />
                     </Border.GestureRecognizers>
-                    <Path Data="{StaticResource IconPaperclip}"
-                          Fill="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                    <Path Data="{StaticResource IconSendRTL}"
+                          Fill="{StaticResource White}"
                           WidthRequest="18"
                           HeightRequest="18"
                           Aspect="Uniform"
                           HorizontalOptions="Center"
-                          VerticalOptions="Center" />
+                          VerticalOptions="Center"
+                          Margin="0,0,2,0" />
+                </Border>
+
+                <!-- Text Input Box (Ultra Clean Floating Pill - Centered / Right Flow) -->
+                <Border Grid.Column="1"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                        Padding="16,0"
+                        HeightRequest="44">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <Entry x:Name="MessageInputEntry"
+                           Text="{Binding MessageText, Mode=TwoWay}"
+                           Placeholder="اكتب رسالة..."
+                           FontFamily="CairoRegular"
+                           FlowDirection="RightToLeft"
+                           HorizontalTextAlignment="End"
+                           Focused="OnMessageInputEntryFocused"
+                           PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                           FontSize="14"
+                           VerticalOptions="Center"
+                           ReturnCommand="{Binding SendMessageCommand}" />
                 </Border>
 
                 <!-- Stickers Drawer Quick Button (Vector Smiley/Sticker) -->
-                <Border Grid.Column="1"
+                <Border Grid.Column="2"
                         WidthRequest="42"
                         HeightRequest="42"
                         StrokeThickness="0"
@@ -669,49 +963,25 @@
                           VerticalOptions="Center" />
                 </Border>
 
-                <!-- Text Input Box (Ultra Clean Floating Pill) -->
-                <Border Grid.Column="2"
-                        StrokeThickness="1"
-                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                        Padding="16,0"
-                        HeightRequest="44">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="22" />
-                    </Border.StrokeShape>
-                    <Entry Text="{Binding MessageText, Mode=TwoWay}"
-                           Placeholder="اكتب رسالة..."
-                           FontFamily="CairoRegular"
-                           PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                           FontSize="14"
-                           VerticalOptions="Center"
-                           ReturnCommand="{Binding SendMessageCommand}" />
-                </Border>
-
-                <!-- Floating Send Button (Vector Modern Paper Plane) -->
+                <!-- Attachment Button (Vector Paperclip - Far Right) -->
                 <Border Grid.Column="3"
-                        WidthRequest="44"
-                        HeightRequest="44"
+                        WidthRequest="42"
+                        HeightRequest="42"
                         StrokeThickness="0"
-                        BackgroundColor="{StaticResource BrandPrimary}">
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="22" />
+                        <RoundRectangle CornerRadius="21" />
                     </Border.StrokeShape>
-                    <Border.Shadow>
-                        <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,3" Radius="8" Opacity="0.45" />
-                    </Border.Shadow>
                     <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding SendMessageCommand}" />
+                        <TapGestureRecognizer Command="{Binding ToggleAttachmentPanelCommand}" />
                     </Border.GestureRecognizers>
-                    <Path Data="{StaticResource IconSend}"
-                          Fill="{StaticResource White}"
+                    <Path Data="{StaticResource IconPaperclip}"
+                          Fill="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
                           WidthRequest="18"
                           HeightRequest="18"
                           Aspect="Uniform"
                           HorizontalOptions="Center"
-                          VerticalOptions="Center"
-                          Margin="2,0,0,0" />
+                          VerticalOptions="Center" />
                 </Border>
             </Grid>
         </Border>
@@ -728,12 +998,49 @@
             </Border.StrokeShape>
 
             <VerticalStackLayout Spacing="14">
-                <!-- Top Drag Handle -->
-                <BoxView WidthRequest="40"
-                         HeightRequest="4"
-                         CornerRadius="2"
-                         Color="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
-                         HorizontalOptions="Center" />
+                <!-- Top Drag Handle & Dismiss Header -->
+                <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                    <!-- Close Button (X) on the Left -->
+                    <Border Grid.Column="0"
+                            WidthRequest="32"
+                            HeightRequest="32"
+                            StrokeThickness="0"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CloseAttachmentPanelCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconClose}"
+                              Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray200}}"
+                              WidthRequest="12"
+                              HeightRequest="12"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
+
+                    <!-- Top Drag Handle in Middle -->
+                    <BoxView Grid.Column="1"
+                             WidthRequest="40"
+                             HeightRequest="4"
+                             CornerRadius="2"
+                             Color="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
+                             HorizontalOptions="Center">
+                        <BoxView.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CloseAttachmentPanelCommand}" />
+                        </BoxView.GestureRecognizers>
+                    </BoxView>
+
+                    <!-- Header Title on the Right (RTL) -->
+                    <Label Grid.Column="2"
+                           Text="الملصقات والوسائط"
+                           FontFamily="CairoBold"
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}"
+                           VerticalOptions="Center" />
+                </Grid>
 
                 <!-- Action Cards Bar: Photo, Sticker Studio -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
@@ -797,6 +1104,8 @@
                 <Label Text="ملصقاتك والاستيكرات السريعة:"
                        FontFamily="CairoBold"
                        FontSize="13"
+                       HorizontalOptions="End"
+                       HorizontalTextAlignment="End"
                        TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}" />
 
                 <!-- Stickers Grid / Horizontal Collection -->
@@ -831,6 +1140,167 @@
                 </CollectionView>
             </VerticalStackLayout>
         </Border>
+
+        <!-- 7. Floating Reaction Bar Modal Overlay (iOS / Telegram / WhatsApp Style) -->
+        <Grid Grid.Row="0"
+              Grid.RowSpan="6"
+              ZIndex="1000"
+              IsVisible="{Binding IsReactionPickerVisible}"
+              BackgroundColor="#50000000">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseReactionPickerCommand}" />
+            </Grid.GestureRecognizers>
+
+            <!-- Floating Capsule Card -->
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    StrokeThickness="1"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                    Padding="18,14"
+                    Margin="24">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="28" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{AppThemeBinding Light=#30000000, Dark=#B0000000}"
+                            Offset="0,8"
+                            Radius="24"
+                            Opacity="0.8" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <!-- Stop tap propagation so tapping inside does not dismiss picker -->
+                    <TapGestureRecognizer />
+                </Border.GestureRecognizers>
+
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <!-- Title Bar with Close Button -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16" VerticalOptions="Center">
+                        <Label Grid.Column="0"
+                               Text="اختر تفاعلاً مع الرسالة"
+                               FontFamily="CairoBold"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}"
+                               VerticalOptions="Center" />
+
+                        <Border Grid.Column="1"
+                                WidthRequest="24"
+                                HeightRequest="24"
+                                StrokeThickness="0"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CloseReactionPickerCommand}" />
+                            </Border.GestureRecognizers>
+                            <Path Data="{StaticResource IconClose}"
+                                  Fill="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                                  WidthRequest="10"
+                                  HeightRequest="10"
+                                  Aspect="Uniform"
+                                  HorizontalOptions="Center"
+                                  VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+
+                    <!-- Reaction Emojis Row: ❤️ 👍 😂 🔥 😮 😢 -->
+                    <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
+                        <!-- ❤️ Heart -->
+                        <Border WidthRequest="46"
+                                HeightRequest="46"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="23" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ReactWithEmojiCommand}" CommandParameter="❤️" />
+                            </Border.GestureRecognizers>
+                            <Label Text="❤️" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- 👍 Thumbs Up -->
+                        <Border WidthRequest="46"
+                                HeightRequest="46"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="23" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ReactWithEmojiCommand}" CommandParameter="👍" />
+                            </Border.GestureRecognizers>
+                            <Label Text="👍" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- 😂 Laugh -->
+                        <Border WidthRequest="46"
+                                HeightRequest="46"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="23" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ReactWithEmojiCommand}" CommandParameter="😂" />
+                            </Border.GestureRecognizers>
+                            <Label Text="😂" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- 🔥 Fire -->
+                        <Border WidthRequest="46"
+                                HeightRequest="46"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="23" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ReactWithEmojiCommand}" CommandParameter="🔥" />
+                            </Border.GestureRecognizers>
+                            <Label Text="🔥" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- 😮 Wow -->
+                        <Border WidthRequest="46"
+                                HeightRequest="46"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="23" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ReactWithEmojiCommand}" CommandParameter="😮" />
+                            </Border.GestureRecognizers>
+                            <Label Text="😮" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+
+                        <!-- 😢 Sad -->
+                        <Border WidthRequest="46"
+                                HeightRequest="46"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="23" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ReactWithEmojiCommand}" CommandParameter="😢" />
+                            </Border.GestureRecognizers>
+                            <Label Text="😢" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
 
     </Grid>
 </ContentPage>

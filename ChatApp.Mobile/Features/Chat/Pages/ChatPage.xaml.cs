@@ -45,6 +45,15 @@ public partial class ChatPage : ContentPage
         }
     }
 
+    private void OnMessageInputEntryFocused(object? sender, FocusEventArgs e)
+    {
+        if (_viewModel != null)
+        {
+            _viewModel.IsAttachmentPanelVisible = false;
+            _viewModel.CloseReactionPicker();
+        }
+    }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();

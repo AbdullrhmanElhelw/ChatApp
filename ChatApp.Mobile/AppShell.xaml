@@ -6,6 +6,7 @@
     xmlns:auth="clr-namespace:ChatApp.Mobile.Features.Authentication.Pages"
     xmlns:conv="clr-namespace:ChatApp.Mobile.Features.Conversations.Pages"
     xmlns:common="clr-namespace:ChatApp.Mobile.Features.Common"
+    FlowDirection="RightToLeft"
     Title="ChatApp">
 
     <ShellContent

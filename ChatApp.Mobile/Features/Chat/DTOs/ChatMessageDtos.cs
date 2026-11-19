@@ -22,6 +22,27 @@ public record SendMessageRequestClientDto(
     [property: JsonPropertyName("stickerId")] Guid? StickerId = null
 );
 
+public record ReactionCountClientDto(
+    [property: JsonPropertyName("emoji")] string Emoji,
+    [property: JsonPropertyName("count")] int Count,
+    [property: JsonPropertyName("hasReacted")] bool HasReacted,
+    [property: JsonPropertyName("messageId")] Guid MessageId = default
+);
+
+public record MessageReactionUpdateClientDto(
+    [property: JsonPropertyName("messageId")] Guid MessageId,
+    [property: JsonPropertyName("conversationId")] Guid ConversationId,
+    [property: JsonPropertyName("userId")] Guid UserId,
+    [property: JsonPropertyName("userName")] string UserName,
+    [property: JsonPropertyName("emoji")] string Emoji,
+    [property: JsonPropertyName("added")] bool Added,
+    [property: JsonPropertyName("reactions")] List<ReactionCountClientDto> Reactions
+);
+
+public record ReactRequestClientDto(
+    [property: JsonPropertyName("emoji")] string Emoji
+);
+
 public record MessageClientDto(
     [property: JsonPropertyName("id")] Guid Id,
     [property: JsonPropertyName("conversationId")] Guid ConversationId,
@@ -43,7 +64,8 @@ public record MessageClientDto(
     [property: JsonPropertyName("mediaUrl")] string? MediaUrl = null,
     [property: JsonPropertyName("thumbnailUrl")] string? ThumbnailUrl = null,
     [property: JsonPropertyName("mediaSizeBytes")] long? MediaSizeBytes = null,
-    [property: JsonPropertyName("replyToSenderName")] string? ReplyToSenderName = null
+    [property: JsonPropertyName("replyToSenderName")] string? ReplyToSenderName = null,
+    [property: JsonPropertyName("reactions")] List<ReactionCountClientDto>? Reactions = null
 );
 
 public record MessageStatusUpdateClientDto(
@@ -91,6 +113,12 @@ public partial class ChatMessageItem : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StatusIcon))]
     public partial bool IsSending { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasReactions))]
+    public partial System.Collections.ObjectModel.ObservableCollection<ReactionCountClientDto> Reactions { get; set; } = new();
+
+    public bool HasReactions => Reactions != null && Reactions.Count > 0;
 
     public bool IsRead => Status == MessageDeliveryStatus.Read;
 
@@ -171,7 +199,11 @@ public partial class ChatMessageItem : ObservableObject
             IsSending = false,
             MediaUrl = dto.MediaUrl,
             ThumbnailUrl = dto.ThumbnailUrl,
-            MediaSizeBytes = dto.MediaSizeBytes
+            MediaSizeBytes = dto.MediaSizeBytes,
+            Reactions = dto.Reactions != null
+                ? new System.Collections.ObjectModel.ObservableCollection<ReactionCountClientDto>(
+                    dto.Reactions.Select(r => new ReactionCountClientDto(r.Emoji, r.Count, r.HasReacted, dto.Id)))
+                : new System.Collections.ObjectModel.ObservableCollection<ReactionCountClientDto>()
         };
     }
 }

@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="ChatApp.Mobile.csproj" />
+  <Project Path="ChatApp.Mobile.csproj">
+    <BuildType Project="Release" />
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>

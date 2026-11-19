@@ -33,7 +33,28 @@ public record MessageDto(
     string? MediaUrl = null,
     string? ThumbnailUrl = null,
     long? MediaSizeBytes = null,
-    string? ReplyToSenderName = null
+    string? ReplyToSenderName = null,
+    List<ReactionCountDto>? Reactions = null
+);
+
+public record ReactionCountDto(
+    string Emoji,
+    int Count,
+    bool HasReacted
+);
+
+public record MessageReactionUpdateDto(
+    Guid MessageId,
+    Guid ConversationId,
+    Guid UserId,
+    string UserName,
+    string Emoji,
+    bool Added,
+    List<ReactionCountDto> Reactions
+);
+
+public record ReactRequestDto(
+    string Emoji
 );
 
 public record MessageStatusUpdateDto(

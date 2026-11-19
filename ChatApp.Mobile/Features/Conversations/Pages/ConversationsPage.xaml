@@ -8,6 +8,7 @@
              x:DataType="vm:ConversationsViewModel"
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
+             FlowDirection="RightToLeft"
              BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12,16,0">

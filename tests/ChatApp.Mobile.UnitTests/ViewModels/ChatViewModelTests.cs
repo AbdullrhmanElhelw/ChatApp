@@ -232,4 +232,64 @@ public class ChatViewModelTests
         _sut.IsAttachmentPanelVisible.Should().BeFalse();
         _navigationMock.Verify(x => x.NavigateToAsync(AppRoutes.StickerStudio, null), Times.Once);
     }
+
+    [Fact]
+    public void OpenReactionPicker_ShouldSetTargetMessageAndShowPicker()
+    {
+        // Arrange
+        var message = new ChatMessageItem { Id = Guid.NewGuid(), Content = "Hello!" };
+
+        // Act
+        _sut.OpenReactionPickerCommand.Execute(message);
+
+        // Assert
+        _sut.ReactionTargetMessage.Should().Be(message);
+        _sut.IsReactionPickerVisible.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CloseReactionPicker_ShouldClearTargetMessage()
+    {
+        // Arrange
+        var message = new ChatMessageItem { Id = Guid.NewGuid(), Content = "Hello!" };
+        _sut.OpenReactionPickerCommand.Execute(message);
+
+        // Act
+        _sut.CloseReactionPickerCommand.Execute(null);
+
+        // Assert
+        _sut.ReactionTargetMessage.Should().BeNull();
+        _sut.IsReactionPickerVisible.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task ReactWithEmoji_ShouldInvokeHubAndClosePicker()
+    {
+        // Arrange
+        var msgId = Guid.NewGuid();
+        var message = new ChatMessageItem { Id = msgId, Content = "Great work!" };
+        _sut.OpenReactionPickerCommand.Execute(message);
+
+        // Act
+        await _sut.ReactWithEmojiCommand.ExecuteAsync("❤️");
+
+        // Assert
+        _sut.IsReactionPickerVisible.Should().BeFalse();
+        _sut.ReactionTargetMessage.Should().BeNull();
+        _chatHubMock.Verify(x => x.ReactToMessageAsync(msgId, "❤️"), Times.Once);
+    }
+
+    [Fact]
+    public async Task ToggleReactionPill_ShouldInvokeHubWithEmojiAndMessageId()
+    {
+        // Arrange
+        var msgId = Guid.NewGuid();
+        var reaction = new ReactionCountClientDto("🔥", 3, true, msgId);
+
+        // Act
+        await _sut.ToggleReactionPillCommand.ExecuteAsync(reaction);
+
+        // Assert
+        _chatHubMock.Verify(x => x.ReactToMessageAsync(msgId, "🔥"), Times.Once);
+    }
 }

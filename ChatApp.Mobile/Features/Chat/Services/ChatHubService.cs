@@ -15,6 +15,7 @@ public class ChatHubService : IChatHubService, IAsyncDisposable
     public event Action<MessageClientDto>? MessageReceived;
     public event Action<MessageClientDto>? MessageConfirmationReceived;
     public event Action<MessageStatusUpdateClientDto>? MessageStatusChanged;
+    public event Action<MessageReactionUpdateClientDto>? MessageReactionUpdated;
     public event Action<TypingIndicatorClientDto>? UserTyping;
     public event Action<Guid, bool, DateTime?>? UserPresenceChanged;
     public event Action<bool>? ConnectionStateChanged;
@@ -122,6 +123,14 @@ public class ChatHubService : IChatHubService, IAsyncDisposable
         }
     }
 
+    public async Task ReactToMessageAsync(Guid messageId, string emoji)
+    {
+        if (_hubConnection?.State == HubConnectionState.Connected)
+        {
+            await _hubConnection.InvokeAsync("ReactToMessage", messageId, emoji);
+        }
+    }
+
     private void RegisterHandlers()
     {
         if (_hubConnection == null) return;
@@ -139,6 +148,11 @@ public class ChatHubService : IChatHubService, IAsyncDisposable
         _hubConnection.On<MessageStatusUpdateClientDto>("MessageStatusChanged", update =>
         {
             MessageStatusChanged?.Invoke(update);
+        });
+
+        _hubConnection.On<MessageReactionUpdateClientDto>("MessageReactionUpdated", update =>
+        {
+            MessageReactionUpdated?.Invoke(update);
         });
 
         _hubConnection.On<TypingIndicatorClientDto>("UserTyping", indicator =>

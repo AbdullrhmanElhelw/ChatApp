@@ -96,6 +96,23 @@ public class MessagesController : ControllerBase
         return Ok(ApiResponse<List<MessageStatusUpdateDto>>.Ok(updates));
     }
 
+    [HttpPost("{messageId:guid}/reactions")]
+    [ProducesResponseType(typeof(ApiResponse<MessageReactionUpdateDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ToggleReaction(
+        [FromRoute] Guid conversationId,
+        [FromRoute] Guid messageId,
+        [FromBody] ReactRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        var currentUserId = GetCurrentUserId();
+        var update = await _messageService.ToggleReactionAsync(currentUserId, messageId, request.Emoji, cancellationToken);
+
+        var groupName = ChatHub.GetConversationGroupName(conversationId);
+        await _hubContext.Clients.Group(groupName).MessageReactionUpdated(update);
+
+        return Ok(ApiResponse<MessageReactionUpdateDto>.Ok(update));
+    }
+
     private Guid GetCurrentUserId()
     {
         var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ??

@@ -145,6 +145,27 @@ public class ChatHub : Hub<IChatClient>
         ));
     }
 
+    public async Task ReactToMessage(Guid messageId, string emoji)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty) return;
+
+        try
+        {
+            var update = await _messageService.ToggleReactionAsync(userId, messageId, emoji);
+            var groupName = GetConversationGroupName(update.ConversationId);
+            await Clients.Group(groupName).MessageReactionUpdated(update);
+
+            _logger.LogInformation("Reaction {Emoji} toggled on message {MessageId} by user {UserId}",
+                emoji, messageId, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to react to message {MessageId} for user {UserId}", messageId, userId);
+            throw;
+        }
+    }
+
     private Guid GetCurrentUserId()
     {
         var sub = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier) ??

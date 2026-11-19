@@ -40,6 +40,7 @@ public class MessageService : IMessageService
                 .ThenInclude(r => r!.Sender)
             .Include(m => m.Deliveries)
             .Include(m => m.MediaAttachments)
+            .Include(m => m.Reactions)
             .Where(m => m.ConversationId == conversationId && !m.IsDeleted);
 
         if (before.HasValue)
@@ -83,6 +84,7 @@ public class MessageService : IMessageService
                     .ThenInclude(r => r!.Sender)
                 .Include(m => m.Deliveries)
                 .Include(m => m.MediaAttachments)
+                .Include(m => m.Reactions)
                 .FirstOrDefaultAsync(m => m.ClientMessageId == request.ClientMessageId, cancellationToken);
 
             if (existingMessage != null)
@@ -294,6 +296,94 @@ public class MessageService : IMessageService
         return updates;
     }
 
+    public async Task<MessageReactionUpdateDto> ToggleReactionAsync(
+        Guid currentUserId,
+        Guid messageId,
+        string emoji,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(emoji))
+        {
+            throw new ValidationException("Emoji cannot be empty.");
+        }
+
+        emoji = emoji.Trim();
+
+        var message = await _dbContext.Messages
+            .Include(m => m.Reactions)
+            .FirstOrDefaultAsync(m => m.Id == messageId && !m.IsDeleted, cancellationToken);
+
+        if (message == null)
+        {
+            throw new NotFoundException("Message not found.");
+        }
+
+        // Verify caller is a participant in this conversation
+        var isParticipant = await _dbContext.ConversationParticipants
+            .AnyAsync(cp => cp.ConversationId == message.ConversationId && cp.UserId == currentUserId, cancellationToken);
+
+        if (!isParticipant)
+        {
+            throw new ForbiddenAccessException("You are not a participant in this conversation.");
+        }
+
+        var user = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == currentUserId, cancellationToken);
+        var userName = user?.FullName ?? user?.UserName ?? "مستخدم";
+
+        var existingReaction = message.Reactions.FirstOrDefault(r => r.UserId == currentUserId);
+        bool added;
+
+        if (existingReaction != null && existingReaction.Emoji == emoji)
+        {
+            // Same emoji tapped again: remove reaction (toggle off)
+            _dbContext.MessageReactions.Remove(existingReaction);
+            message.Reactions.Remove(existingReaction);
+            added = false;
+        }
+        else if (existingReaction != null)
+        {
+            // Different emoji: update to new emoji
+            existingReaction.Emoji = emoji;
+            added = true;
+        }
+        else
+        {
+            // New reaction
+            var newReaction = new MessageReaction
+            {
+                Id = Guid.NewGuid(),
+                MessageId = messageId,
+                UserId = currentUserId,
+                Emoji = emoji,
+                CreatedAt = DateTime.UtcNow
+            };
+            _dbContext.MessageReactions.Add(newReaction);
+            message.Reactions.Add(newReaction);
+            added = true;
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var reactionList = message.Reactions
+            .GroupBy(r => r.Emoji)
+            .Select(g => new ReactionCountDto(
+                g.Key,
+                g.Count(),
+                g.Any(r => r.UserId == currentUserId)
+            ))
+            .ToList();
+
+        return new MessageReactionUpdateDto(
+            message.Id,
+            message.ConversationId,
+            currentUserId,
+            userName,
+            emoji,
+            added,
+            reactionList
+        );
+    }
+
     private static MessageDto MapToDto(Message message, Guid currentUserId)
     {
         var isMine = message.SenderId == currentUserId;
@@ -351,6 +441,15 @@ public class MessageService : IMessageService
                 : (message.ReplyToMessage.Sender?.FullName ?? message.ReplyToMessage.Sender?.UserName ?? "مستخدم");
         }
 
+        var reactionList = message.Reactions?
+            .GroupBy(r => r.Emoji)
+            .Select(g => new ReactionCountDto(
+                g.Key,
+                g.Count(),
+                g.Any(r => r.UserId == currentUserId)
+            ))
+            .ToList() ?? new List<ReactionCountDto>();
+
         return new MessageDto(
             message.Id,
             message.ConversationId,
@@ -372,7 +471,8 @@ public class MessageService : IMessageService
             media?.FileUrl,
             media?.ThumbnailUrl,
             media?.FileSizeBytes,
-            replySenderName
+            replySenderName,
+            reactionList
         );
     }
 }

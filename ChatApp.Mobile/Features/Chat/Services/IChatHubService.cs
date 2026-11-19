@@ -14,10 +14,12 @@ public interface IChatHubService
     Task MarkAsDeliveredAsync(Guid messageId);
     Task MarkAsReadAsync(Guid conversationId, Guid? messageId = null);
     Task SendTypingIndicatorAsync(Guid conversationId, bool isTyping);
+    Task ReactToMessageAsync(Guid messageId, string emoji);
 
     event Action<MessageClientDto>? MessageReceived;
     event Action<MessageClientDto>? MessageConfirmationReceived;
     event Action<MessageStatusUpdateClientDto>? MessageStatusChanged;
+    event Action<MessageReactionUpdateClientDto>? MessageReactionUpdated;
     event Action<TypingIndicatorClientDto>? UserTyping;
     event Action<Guid, bool, DateTime?>? UserPresenceChanged;
     event Action<bool>? ConnectionStateChanged;

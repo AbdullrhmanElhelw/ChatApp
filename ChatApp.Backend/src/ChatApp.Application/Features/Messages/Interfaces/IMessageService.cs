@@ -26,4 +26,10 @@ public interface IMessageService
         Guid conversationId,
         Guid? upToMessageId = null,
         CancellationToken cancellationToken = default);
+
+    Task<MessageReactionUpdateDto> ToggleReactionAsync(
+        Guid currentUserId,
+        Guid messageId,
+        string emoji,
+        CancellationToken cancellationToken = default);
 }

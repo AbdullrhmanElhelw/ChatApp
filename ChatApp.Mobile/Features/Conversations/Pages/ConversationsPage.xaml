@@ -42,7 +42,7 @@
 
                 <!-- Center: BetweenUs Wordmark + Mood Pill -->
                 <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" Spacing="0">
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="0">
+                    <HorizontalStackLayout FlowDirection="LeftToRight" HorizontalOptions="Center" Spacing="0">
                         <Label Text="Between"
                                FontFamily="CairoBold"
                                FontSize="22"
@@ -515,6 +515,73 @@
                 </Grid>
             </Border>
 
+        </Grid>
+
+        <!-- 6. Premium Mood Check-in Bottom Sheet Overlay -->
+        <Grid IsVisible="{Binding IsMoodSheetVisible}"
+              BackgroundColor="#99090218">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseMoodSheetCommand}" />
+            </Grid.GestureRecognizers>
+
+            <Border VerticalOptions="End"
+                    StrokeThickness="1"
+                    Stroke="#4E2682"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D0A38}"
+                    Padding="20,16,20,28">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="28,28,0,0" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#FF4FB8" Offset="0,-4" Radius="24" Opacity="0.35" />
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer />
+                </Border.GestureRecognizers>
+
+                <VerticalStackLayout Spacing="14">
+                    <BoxView WidthRequest="44"
+                             HeightRequest="4"
+                             CornerRadius="2"
+                             Color="{AppThemeBinding Light={StaticResource Gray300}, Dark=#4E2682}"
+                             HorizontalOptions="Center" />
+
+                    <Label Text="مزاجك النهارده إيه؟ 💕"
+                           FontFamily="CairoBold"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                           HorizontalOptions="Center" />
+
+                    <FlexLayout Wrap="Wrap" JustifyContent="Center" AlignItems="Center">
+                        <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#2A114E}" Padding="14,10" Margin="5">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="🥰 سعيد ومبسوط" /></Border.GestureRecognizers>
+                            <Label Text="🥰 سعيد ومبسوط" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                        </Border>
+                        <Border StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="{AppThemeBinding Light=#FFF0FA, Dark=#3A0B6B}" Padding="14,10" Margin="5">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="💕 مشتاقلك" /></Border.GestureRecognizers>
+                            <Label Text="💕 مشتاقلك" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource BrandPrimary}, Dark=#FFD6F2}" />
+                        </Border>
+                        <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#2A114E}" Padding="14,10" Margin="5">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="✨ متحمس" /></Border.GestureRecognizers>
+                            <Label Text="✨ متحمس" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                        </Border>
+                        <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#2A114E}" Padding="14,10" Margin="5">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="🌙 هادئ" /></Border.GestureRecognizers>
+                            <Label Text="🌙 هادئ" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                        </Border>
+                        <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#2A114E}" Padding="14,10" Margin="5">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SelectMoodCommand}" CommandParameter="😴 تعبان" /></Border.GestureRecognizers>
+                            <Label Text="😴 تعبان" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                        </Border>
+                    </FlexLayout>
+                </VerticalStackLayout>
+            </Border>
         </Grid>
     </Grid>
 

@@ -9,6 +9,8 @@ using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Features.Conversations.Pages;
 using ChatApp.Mobile.Features.Conversations.Services;
 using ChatApp.Mobile.Features.Conversations.ViewModels;
+using ChatApp.Mobile.Features.Settings.Pages;
+using ChatApp.Mobile.Features.Settings.ViewModels;
 using ChatApp.Mobile.Features.Stickers.Pages;
 using ChatApp.Mobile.Features.Stickers.ViewModels;
 using ChatApp.Mobile.Navigation;
@@ -74,6 +76,7 @@ public static class MauiProgram
         builder.Services.AddTransient<UserSearchViewModel>();
         builder.Services.AddTransient<ChatViewModel>();
         builder.Services.AddTransient<StickerStudioViewModel>();
+        builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<DesignSystemViewModel>();
 
         // 4. Pages
@@ -86,6 +89,7 @@ public static class MauiProgram
         builder.Services.AddTransient<UserSearchPage>();
         builder.Services.AddTransient<ChatPage>();
         builder.Services.AddTransient<StickerStudioPage>();
+        builder.Services.AddTransient<SettingsPage>();
         builder.Services.AddTransient<DesignSystemPage>();
 
         // 5. Native Platform UI Tweaks: Strip default ugly Windows borders on Entry & Editor

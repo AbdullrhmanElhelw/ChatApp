@@ -12,5 +12,6 @@ public static class AppRoutes
     public const string UserSearch = "user-search";
     public const string Profile = "profile";
     public const string StickerStudio = "sticker-studio";
+    public const string Settings = "settings";
     public const string DesignSystem = "//design-system";
 }

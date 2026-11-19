@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Settings.ViewModels"
+             xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
+             x:Class="ChatApp.Mobile.Features.Settings.Pages.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False"
+             FlowDirection="RightToLeft"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource DarkBackground}}">
+
+    <Grid>
+        <!-- Cosmic Gradient Background -->
+        <BoxView InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="{AppThemeBinding Light=#FFF5FF, Dark=#14042B}" Offset="0.0" />
+                    <GradientStop Color="{AppThemeBinding Light=#FAF0FC, Dark=#1A0035}" Offset="0.55" />
+                    <GradientStop Color="{AppThemeBinding Light=#F3E4FA, Dark=#2E0854}" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="18,14,18,28" Spacing="18">
+
+                <!-- 1. Top Header -->
+                <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                    <Border Grid.Column="0"
+                            WidthRequest="38"
+                            HeightRequest="38"
+                            StrokeThickness="1"
+                            Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="19" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateBackCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconArrowRight}"
+                              Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark=#FFFFFF}"
+                              WidthRequest="18"
+                              HeightRequest="18"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
+
+                    <Label Grid.Column="1"
+                           Text="الإعدادات"
+                           FontFamily="CairoBold"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+
+                    <!-- Wordmark Badge (LTR so it always reads BetweenUs) -->
+                    <HorizontalStackLayout Grid.Column="2"
+                                           FlowDirection="LeftToRight"
+                                           Spacing="0"
+                                           VerticalOptions="Center">
+                        <Label Text="Between"
+                               FontFamily="CairoBold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                        <Label Text="Us"
+                               FontFamily="CairoBold"
+                               FontSize="14"
+                               TextColor="{StaticResource BrandNeonPink}" />
+                    </HorizontalStackLayout>
+                </Grid>
+
+                <!-- 2. Profile Hero Card -->
+                <Border StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#4E2682}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
+                        Padding="18">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="{AppThemeBinding Light=#10000000, Dark=#FF4FB8}" Offset="0,4" Radius="16" Opacity="0.22" />
+                    </Border.Shadow>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" VerticalOptions="Center">
+                        <controls:AvatarView Grid.Column="0"
+                                             FullName="{Binding CurrentUser.FullName}"
+                                             AvatarUrl="{Binding CurrentUser.AvatarUrl}"
+                                             Size="62"
+                                             IsOnline="True"
+                                             VerticalOptions="Center" />
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="{Binding CurrentUser.FullName, TargetNullValue='مستخدم BetweenUs'}"
+                                   FontFamily="CairoBold"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                                   LineBreakMode="TailTruncation" />
+                            <Label Text="{Binding CurrentUser.UserName, StringFormat='@{0}', TargetNullValue='@user'}"
+                                   FontFamily="CairoRegular"
+                                   FontSize="13"
+                                   TextColor="{StaticResource BrandNeonPink}" />
+                            <Label Text="{Binding CurrentMoodLabel}"
+                                   FontFamily="CairoRegular"
+                                   FontSize="12"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#C5AFE4}" />
+                        </VerticalStackLayout>
+
+                        <Border Grid.Column="2"
+                                StrokeThickness="0"
+                                Padding="14,8"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16" />
+                            </Border.StrokeShape>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="#FF4FB8" Offset="0.0" />
+                                    <GradientStop Color="#7B2DF3" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding EditProfileCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="تعديل"
+                                   FontFamily="CairoBold"
+                                   FontSize="12"
+                                   TextColor="#FFFFFF" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- 3. Section: BetweenUs Space -->
+                <Label Text="عالمكم وتفضيلاتكم"
+                       FontFamily="CairoBold"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#C5AFE4}"
+                       Margin="4,4,4,-8" />
+
+                <Border StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
+                        Padding="6">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20" />
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="2">
+                        <!-- Row: Edit Profile -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="12,12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding EditProfileCommand}" />
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38" StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#7B2DF3" Offset="0.0" />
+                                        <GradientStop Color="#9B4DDB" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Path Data="{StaticResource IconUser}"
+                                      Fill="#FFFFFF"
+                                      WidthRequest="18"
+                                      HeightRequest="18"
+                                      Aspect="Uniform"
+                                      HorizontalOptions="Center"
+                                      VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                <Label Text="تعديل الملف الشخصي"
+                                       FontFamily="CairoBold"
+                                       FontSize="14"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}" />
+                                <Label Text="الاسم، النبذة الشخصية، والصورة"
+                                       FontFamily="CairoRegular"
+                                       FontSize="11"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#9B86B8}" />
+                            </VerticalStackLayout>
+                            <Path Grid.Column="2"
+                                  Data="{StaticResource IconChevronLeft}"
+                                  Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark=#9B86B8}"
+                                  WidthRequest="18"
+                                  HeightRequest="18"
+                                  Aspect="Uniform"
+                                  VerticalOptions="Center" />
+                        </Grid>
+
+                        <BoxView HeightRequest="1" Margin="60,0,12,0" Color="{AppThemeBinding Light={StaticResource Gray100}, Dark=#34185B}" />
+
+                        <!-- Row: Sticker Studio -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="12,12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding OpenStickerStudioCommand}" />
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38" StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#FF4FB8" Offset="0.0" />
+                                        <GradientStop Color="#9B4DDB" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Path Data="{StaticResource IconSparkles}"
+                                      Fill="#FFFFFF"
+                                      WidthRequest="18"
+                                      HeightRequest="18"
+                                      Aspect="Uniform"
+                                      HorizontalOptions="Center"
+                                      VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                <Label Text="صانع الاستيكرات (Studio)"
+                                       FontFamily="CairoBold"
+                                       FontSize="14"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}" />
+                                <Label Text="صمّم ملصقاتك الخاصة وشاركها في الشات"
+                                       FontFamily="CairoRegular"
+                                       FontSize="11"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#9B86B8}" />
+                            </VerticalStackLayout>
+                            <Path Grid.Column="2"
+                                  Data="{StaticResource IconChevronLeft}"
+                                  Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark=#9B86B8}"
+                                  WidthRequest="18"
+                                  HeightRequest="18"
+                                  Aspect="Uniform"
+                                  VerticalOptions="Center" />
+                        </Grid>
+
+                        <BoxView HeightRequest="1" Margin="60,0,12,0" Color="{AppThemeBinding Light={StaticResource Gray100}, Dark=#34185B}" />
+
+                        <!-- Row: Dark Mode Toggle -->
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="12,12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleDarkModeCommand}" />
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38" StrokeThickness="0" BackgroundColor="#3A0B6B">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Path Data="{AppThemeBinding Light={StaticResource IconSun}, Dark={StaticResource IconMoon}}"
+                                      Fill="#FFD6F2"
+                                      WidthRequest="18"
+                                      HeightRequest="18"
+                                      Aspect="Uniform"
+                                      HorizontalOptions="Center"
+                                      VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                <Label Text="تبديل المظهر (ليلي / نهاري)"
+                                       FontFamily="CairoBold"
+                                       FontSize="14"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}" />
+                                <Label Text="اضغط للتبديل بين الوضع البنفسجي الداكن والفاتح"
+                                       FontFamily="CairoRegular"
+                                       FontSize="11"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#9B86B8}" />
+                            </VerticalStackLayout>
+                            <Border Grid.Column="2"
+                                    StrokeThickness="1"
+                                    Stroke="{StaticResource BrandNeonPink}"
+                                    BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#3A0B6B}"
+                                    Padding="10,4"
+                                    VerticalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Label Text="{AppThemeBinding Light='فاتح', Dark='داكن'}"
+                                       FontFamily="CairoBold"
+                                       FontSize="11"
+                                       TextColor="{AppThemeBinding Light={StaticResource BrandPrimary}, Dark={StaticResource BrandBlush}}" />
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- 4. Section: Account -->
+                <Border StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light=#FECACA, Dark=#6B1D4A}"
+                        BackgroundColor="{AppThemeBinding Light=#FFF5F5, Dark=#2A0D2E}"
+                        Padding="6">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20" />
+                    </Border.StrokeShape>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="12,12">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding LogoutCommand}" />
+                        </Grid.GestureRecognizers>
+                        <Border Grid.Column="0" WidthRequest="38" HeightRequest="38" StrokeThickness="0" BackgroundColor="#EF4444">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12" />
+                            </Border.StrokeShape>
+                            <Path Data="{StaticResource IconLogout}"
+                                  Fill="#FFFFFF"
+                                  WidthRequest="18"
+                                  HeightRequest="18"
+                                  Aspect="Uniform"
+                                  HorizontalOptions="Center"
+                                  VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                            <Label Text="تسجيل الخروج"
+                                   FontFamily="CairoBold"
+                                   FontSize="14"
+                                   TextColor="{AppThemeBinding Light=#DC2626, Dark=#FCA5A5}" />
+                            <Label Text="إنهاء الجلسة الحالية بأمان"
+                                   FontFamily="CairoRegular"
+                                   FontSize="11"
+                                   TextColor="{AppThemeBinding Light=#991B1B, Dark=#F87171}" />
+                        </VerticalStackLayout>
+                        <Path Grid.Column="2"
+                              Data="{StaticResource IconChevronLeft}"
+                              Fill="{AppThemeBinding Light=#DC2626, Dark=#FCA5A5}"
+                              WidthRequest="18"
+                              HeightRequest="18"
+                              Aspect="Uniform"
+                              VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- 5. Footer Brand Note -->
+                <VerticalStackLayout Spacing="2" HorizontalOptions="Center" Margin="0,12,0,0">
+                    <Label Text="BetweenUs • v1.0"
+                           FontFamily="CairoBold"
+                           FontSize="12"
+                           TextColor="{StaticResource BrandNeonPink}"
+                           HorizontalOptions="Center" />
+                    <Label Text="A little world, just for two 💜"
+                           FontFamily="CairoRegular"
+                           FontSize="11"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#9B86B8}"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

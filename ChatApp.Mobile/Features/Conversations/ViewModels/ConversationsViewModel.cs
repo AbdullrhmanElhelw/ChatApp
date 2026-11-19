@@ -52,6 +52,9 @@ public partial class ConversationsViewModel : BaseViewModel
     [ObservableProperty]
     public partial string CurrentMoodLabel { get; set; } = "💜 عالمكم الصغير";
 
+    [ObservableProperty]
+    public partial bool IsMoodSheetVisible { get; set; }
+
     public bool IsEmpty => FilteredConversations.Count == 0 && !IsBusy;
 
     public ConversationsViewModel(
@@ -168,49 +171,30 @@ public partial class ConversationsViewModel : BaseViewModel
     [RelayCommand]
     private async Task OpenSettingsMenuAsync()
     {
-        if (Shell.Current == null) return;
-
-        var choice = await Shell.Current.DisplayActionSheetAsync(
-            "إعدادات BetweenUs",
-            "إلغاء",
-            null,
-            "تعديل الملف الشخصي",
-            "تبديل المظهر (فاتح / داكن)",
-            "تسجيل الخروج");
-
-        switch (choice)
-        {
-            case "تعديل الملف الشخصي":
-                await OpenProfileSetupAsync();
-                break;
-            case "تبديل المظهر (فاتح / داكن)":
-                ToggleTheme();
-                break;
-            case "تسجيل الخروج":
-                await LogoutAsync();
-                break;
-        }
+        await _navigationService.NavigateToAsync(AppRoutes.Settings);
     }
 
     [RelayCommand]
-    private async Task OpenMoodCheckInAsync()
+    private void OpenMoodCheckIn()
     {
-        if (Shell.Current == null) return;
+        IsMoodSheetVisible = true;
+    }
 
-        var choice = await Shell.Current.DisplayActionSheetAsync(
-            "مزاجك النهارده إيه؟",
-            "إلغاء",
-            null,
-            "🥰 سعيد ومبسوط",
-            "💕 مشتاقلك",
-            "✨ متحمس",
-            "🌙 هادئ",
-            "😴 تعبان");
+    [RelayCommand]
+    private void CloseMoodSheet()
+    {
+        IsMoodSheetVisible = false;
+    }
 
-        if (!string.IsNullOrWhiteSpace(choice) && choice != "إلغاء")
+    [RelayCommand]
+    private void SelectMood(string? mood)
+    {
+        if (!string.IsNullOrWhiteSpace(mood))
         {
-            CurrentMoodLabel = choice;
+            CurrentMoodLabel = mood;
+            Preferences.Default.Set("betweenus_mood", mood);
         }
+        IsMoodSheetVisible = false;
     }
 
     [RelayCommand]

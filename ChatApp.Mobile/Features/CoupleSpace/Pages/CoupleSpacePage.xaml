@@ -422,7 +422,7 @@
                         </VerticalStackLayout>
                     </VerticalStackLayout>
 
-                    <!-- TAB 2: Our Memories -->
+                    <!-- TAB 2: Our Memories (Albums List -> Tap to open Timeline) -->
                     <VerticalStackLayout IsVisible="{Binding IsMemoriesTab}" Spacing="12">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0" Text="ألبوم ذكرياتنا" FontFamily="CairoBold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
@@ -441,64 +441,49 @@
                             </Border>
                         </Grid>
 
-                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Memories}" Spacing="0">
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Memories}" Spacing="12">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="models:MemoryItem">
-                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
-                                        <!-- Timeline Vertical Rail + Glowing Pink Heart Node -->
-                                        <Grid Grid.Column="0" WidthRequest="34" RowDefinitions="Auto,*">
-                                            <BoxView Grid.Row="0" Grid.RowSpan="2" WidthRequest="2" Color="#4E2682" HorizontalOptions="Center" VerticalOptions="Fill" />
-                                            <Border Grid.Row="0" WidthRequest="32" HeightRequest="32" StrokeThickness="1" Stroke="#FFD6F2" VerticalOptions="Start">
+                                    <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}" Padding="12">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="20" /></Border.StrokeShape>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference CoupleRoot}, Path=BindingContext.OpenMemoryCommand}" CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                                            <!-- Cover Thumbnail or Heart Badge -->
+                                            <Border Grid.Column="0" WidthRequest="68" HeightRequest="68" StrokeThickness="1" Stroke="#4E2682" BackgroundColor="#2F1359">
                                                 <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
-                                                <Border.Background>
-                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                        <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
-                                                    </LinearGradientBrush>
-                                                </Border.Background>
-                                                <Border.Shadow>
-                                                    <Shadow Brush="#FF4FB8" Offset="0,0" Radius="10" Opacity="0.6" />
-                                                </Border.Shadow>
-                                                <Path Data="{StaticResource IconHeart}" Fill="#FFFFFF" WidthRequest="15" HeightRequest="15" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                <Grid>
+                                                    <Path Data="{StaticResource IconHeart}" Fill="#FF4FB8" WidthRequest="24" HeightRequest="24" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                    <Image Source="{Binding CoverImage}" Aspect="AspectFill" IsVisible="{Binding HasImages}" />
+                                                </Grid>
                                             </Border>
-                                        </Grid>
 
-                                        <!-- Timeline Memory Card -->
-                                        <VerticalStackLayout Grid.Column="1" Spacing="8" Padding="0,0,0,22">
-                                            <Grid ColumnDefinitions="*,Auto">
-                                                <VerticalStackLayout Grid.Column="0" Spacing="1">
-                                                    <Label Text="{Binding FormattedDate}" FontFamily="CairoRegular" FontSize="11" TextColor="#B69AD8" />
-                                                    <Label Text="{Binding Title}" FontFamily="CairoBold" FontSize="17" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
-                                                    <Label Text="{Binding Note}" FontFamily="CairoRegular" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#D5C2F0}" LineBreakMode="WordWrap" />
-                                                </VerticalStackLayout>
-                                                <Border Grid.Column="1" WidthRequest="30" HeightRequest="30" StrokeThickness="0" BackgroundColor="Transparent" VerticalOptions="Start">
+                                            <!-- Title, Date, Note, Photo Count -->
+                                            <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                                <Label Text="{Binding Title}" FontFamily="CairoBold" FontSize="16" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" LineBreakMode="TailTruncation" />
+                                                <Label Text="{Binding Note}" FontFamily="CairoRegular" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#C5AFE4}" MaxLines="1" LineBreakMode="TailTruncation" />
+                                                <HorizontalStackLayout Spacing="8" Margin="0,2,0,0">
+                                                    <Label Text="{Binding FormattedDate}" FontFamily="CairoRegular" FontSize="11" TextColor="#9B86B8" VerticalOptions="Center" />
+                                                    <Border StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="#3A0B6B" Padding="8,2" IsVisible="{Binding HasImages}">
+                                                        <Border.StrokeShape><RoundRectangle CornerRadius="8" /></Border.StrokeShape>
+                                                        <Label Text="{Binding ImageCountBadge}" FontFamily="CairoBold" FontSize="10" TextColor="#FFD6F2" />
+                                                    </Border>
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+
+                                            <!-- Actions: Delete + Chevron -->
+                                            <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                                                <Border WidthRequest="30" HeightRequest="30" StrokeThickness="0" BackgroundColor="Transparent">
                                                     <Border.GestureRecognizers>
                                                         <TapGestureRecognizer Command="{Binding Source={x:Reference CoupleRoot}, Path=BindingContext.DeleteMemoryCommand}" CommandParameter="{Binding .}" />
                                                     </Border.GestureRecognizers>
                                                     <Path Data="{StaticResource IconTrash}" Fill="#9B86B8" WidthRequest="15" HeightRequest="15" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
                                                 </Border>
-                                            </Grid>
-
-                                            <!-- Multi-Photo Horizontal Gallery for this Memory -->
-                                            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never" IsVisible="{Binding HasImages}">
-                                                <HorizontalStackLayout BindableLayout.ItemsSource="{Binding DisplayImages}" Spacing="10">
-                                                    <BindableLayout.ItemTemplate>
-                                                        <DataTemplate x:DataType="x:String">
-                                                            <Border StrokeThickness="1" Stroke="#4E2682" WidthRequest="240" HeightRequest="160">
-                                                                <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
-                                                                <Grid>
-                                                                    <Image Source="{Binding .}" Aspect="AspectFill" />
-                                                                    <Border WidthRequest="30" HeightRequest="30" StrokeThickness="0" BackgroundColor="#AA240D47" HorizontalOptions="End" VerticalOptions="End" Margin="10">
-                                                                        <Border.StrokeShape><RoundRectangle CornerRadius="15" /></Border.StrokeShape>
-                                                                        <Path Data="{StaticResource IconHeart}" Fill="#FF4FB8" WidthRequest="14" HeightRequest="14" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
-                                                                    </Border>
-                                                                </Grid>
-                                                            </Border>
-                                                        </DataTemplate>
-                                                    </BindableLayout.ItemTemplate>
-                                                </HorizontalStackLayout>
-                                            </ScrollView>
-                                        </VerticalStackLayout>
-                                    </Grid>
+                                                <Path Data="{StaticResource IconChevronRight}" Fill="#FF4FB8" WidthRequest="16" HeightRequest="16" Aspect="Uniform" VerticalOptions="Center" />
+                                            </HorizontalStackLayout>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
                         </VerticalStackLayout>
@@ -560,6 +545,90 @@
                         </VerticalStackLayout>
                     </VerticalStackLayout>
 
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!-- MEMORY DETAIL TIMELINE OVERLAY (Inside Selected Memory) -->
+        <Grid IsVisible="{Binding IsMemoryDetailVisible}" RowDefinitions="Auto,*" BackgroundColor="{AppThemeBinding Light=#FDF8FF, Dark=#120626}">
+            <!-- Detail Top Header -->
+            <Grid Grid.Row="0" Padding="18,16,18,12" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Border Grid.Column="0" WidthRequest="38" HeightRequest="38" StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#240D47}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="19" /></Border.StrokeShape>
+                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding CloseMemoryDetailCommand}" /></Border.GestureRecognizers>
+                    <Path Data="{StaticResource IconArrowLeft}" Fill="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" WidthRequest="17" HeightRequest="17" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                    <Label Text="{Binding SelectedMemory.Title}" FontFamily="CairoBold" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" LineBreakMode="TailTruncation" />
+                    <Label Text="{Binding SelectedMemory.FormattedDate}" FontFamily="CairoRegular" FontSize="11" TextColor="#B69AD8" />
+                </VerticalStackLayout>
+
+                <Border Grid.Column="2" StrokeThickness="0" Padding="12,7" VerticalOptions="Center">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                            <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding AddPhotosToSelectedMemoryCommand}" /></Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconPlus}" Fill="#FFFFFF" WidthRequest="13" HeightRequest="13" Aspect="Uniform" VerticalOptions="Center" />
+                        <Label Text="إضافة صور" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Vertical Timeline Inside Memory -->
+            <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+                <VerticalStackLayout Padding="18,6,18,32" Spacing="16">
+                    <!-- Memory Note Banner -->
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}" Padding="14" IsVisible="{Binding SelectedMemory.Note, Converter={StaticResource StringNotEmptyConverter}}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                        <Label Text="{Binding SelectedMemory.Note}" FontFamily="CairoRegular" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#E5D7FA}" LineBreakMode="WordWrap" />
+                    </Border>
+
+                    <!-- Timeline Moments (Each Photo = Glowing Heart Node + Card) -->
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding SelectedMemory.DisplayMoments}" Spacing="0">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:MemoryMoment">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                                    <!-- Vertical Rail + Glowing Pink Heart Node -->
+                                    <Grid Grid.Column="0" WidthRequest="34" RowDefinitions="Auto,*">
+                                        <BoxView Grid.Row="0" Grid.RowSpan="2" WidthRequest="2" Color="#4E2682" HorizontalOptions="Center" VerticalOptions="Fill" />
+                                        <Border Grid.Row="0" WidthRequest="32" HeightRequest="32" StrokeThickness="1" Stroke="#FFD6F2" VerticalOptions="Start">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <Border.Shadow>
+                                                <Shadow Brush="#FF4FB8" Offset="0,0" Radius="10" Opacity="0.6" />
+                                            </Border.Shadow>
+                                            <Path Data="{StaticResource IconHeart}" Fill="#FFFFFF" WidthRequest="15" HeightRequest="15" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Moment Content + Large Photo -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="8" Padding="0,0,0,22">
+                                        <Label Text="{Binding FormattedDate}" FontFamily="CairoRegular" FontSize="12" TextColor="#B69AD8" />
+                                        <Label Text="{Binding Caption}" FontFamily="CairoRegular" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#E8DCFA}" IsVisible="{Binding HasCaption}" LineBreakMode="WordWrap" />
+                                        <Border StrokeThickness="1" Stroke="#4E2682" HeightRequest="200">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                                            <Grid>
+                                                <Image Source="{Binding ImagePath}" Aspect="AspectFill" />
+                                                <Border WidthRequest="34" HeightRequest="34" StrokeThickness="0" BackgroundColor="#AA240D47" HorizontalOptions="End" VerticalOptions="End" Margin="12">
+                                                    <Border.StrokeShape><RoundRectangle CornerRadius="17" /></Border.StrokeShape>
+                                                    <Path Data="{StaticResource IconHeart}" Fill="#FF4FB8" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
             </ScrollView>
         </Grid>

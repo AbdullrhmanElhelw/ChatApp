@@ -107,6 +107,12 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     public partial ObservableCollection<MemoryItem> Memories { get; set; } = new();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsMemoryDetailVisible))]
+    public partial MemoryItem? SelectedMemory { get; set; }
+
+    public bool IsMemoryDetailVisible => SelectedMemory != null;
+
+    [ObservableProperty]
     public partial ObservableCollection<LoveNoteItem> LoveNotes { get; set; } = new();
 
     // Modals
@@ -521,23 +527,99 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     private void SaveMemory()
     {
         if (string.IsNullOrWhiteSpace(NewMemoryTitle)) return;
+        var note = NewMemoryNote.Trim();
+        var paths = NewMemoryImagePaths.ToList();
+        var moments = paths
+            .Select((path, index) => new MemoryMoment(
+                Guid.NewGuid(),
+                index == 0 && !string.IsNullOrWhiteSpace(note) ? note : null,
+                DateTime.Today,
+                path))
+            .ToList();
+
         Memories.Insert(0, new MemoryItem(
             Guid.NewGuid(),
             NewMemoryTitle.Trim(),
-            NewMemoryNote.Trim(),
+            note,
             string.IsNullOrWhiteSpace(NewMemoryLocation) ? null : NewMemoryLocation.Trim(),
             DateTime.Today,
             NewMemoryImagePath,
-            NewMemoryImagePaths.ToList()));
+            paths,
+            moments));
         SaveList("couple_memories", Memories);
         IsAddMemorySheetVisible = false;
         _ = SyncToServerAsync();
     }
 
     [RelayCommand]
+    private void OpenMemory(MemoryItem? item)
+    {
+        if (item == null) return;
+        SelectedMemory = item;
+    }
+
+    [RelayCommand]
+    private void CloseMemoryDetail()
+    {
+        SelectedMemory = null;
+    }
+
+    [RelayCommand]
+    private async Task AddPhotosToSelectedMemoryAsync()
+    {
+        if (SelectedMemory == null) return;
+        try
+        {
+            var files = await FilePicker.Default.PickMultipleAsync(new PickOptions
+            {
+                PickerTitle = "أضف صوراً جديدة لهذه الذكرى",
+                FileTypes = FilePickerFileType.Images
+            });
+            if (files == null) return;
+
+            var newMoments = new List<MemoryMoment>(SelectedMemory.DisplayMoments);
+            var newPaths = new List<string>(SelectedMemory.DisplayImages);
+
+            foreach (var file in files)
+            {
+                if (file == null) continue;
+                var ext = Path.GetExtension(file.FileName);
+                if (string.IsNullOrWhiteSpace(ext)) ext = ".jpg";
+                var dest = Path.Combine(FileSystem.AppDataDirectory, $"memory_{Guid.NewGuid():N}{ext}");
+                await using var src = await file.OpenReadAsync();
+                await using var dst = File.Create(dest);
+                await src.CopyToAsync(dst);
+
+                newPaths.Add(dest);
+                newMoments.Add(new MemoryMoment(Guid.NewGuid(), null, DateTime.Today, dest));
+            }
+
+            if (newPaths.Count == 0) return;
+
+            var updated = SelectedMemory with
+            {
+                ImagePath = SelectedMemory.ImagePath ?? newPaths.FirstOrDefault(),
+                ImagePaths = newPaths,
+                Moments = newMoments
+            };
+
+            var idx = Memories.IndexOf(SelectedMemory);
+            if (idx >= 0)
+            {
+                Memories[idx] = updated;
+            }
+            SelectedMemory = updated;
+            SaveList("couple_memories", Memories);
+            _ = SyncToServerAsync();
+        }
+        catch { }
+    }
+
+    [RelayCommand]
     private void DeleteMemory(MemoryItem? item)
     {
         if (item == null) return;
+        if (SelectedMemory == item) SelectedMemory = null;
         Memories.Remove(item);
         SaveList("couple_memories", Memories);
         _ = SyncToServerAsync();

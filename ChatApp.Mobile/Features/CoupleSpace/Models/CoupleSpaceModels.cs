@@ -33,6 +33,17 @@ public record SpecialDateItem(
     }
 }
 
+public record MemoryMoment(
+    Guid Id,
+    string? Caption,
+    DateTime MomentDate,
+    string ImagePath
+)
+{
+    public string FormattedDate => MomentDate.ToString("MMM dd, yyyy");
+    public bool HasCaption => !string.IsNullOrWhiteSpace(Caption);
+}
+
 public record MemoryItem(
     Guid Id,
     string Title,
@@ -40,7 +51,8 @@ public record MemoryItem(
     string? Location,
     DateTime MemoryDate,
     string? ImagePath = null,
-    List<string>? ImagePaths = null
+    List<string>? ImagePaths = null,
+    List<MemoryMoment>? Moments = null
 )
 {
     public string FormattedDate => MemoryDate.ToString("MMM dd, yyyy");
@@ -50,7 +62,11 @@ public record MemoryItem(
         get
         {
             var list = new List<string>();
-            if (ImagePaths != null)
+            if (Moments != null)
+            {
+                list.AddRange(Moments.Select(m => m.ImagePath).Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p)));
+            }
+            if (list.Count == 0 && ImagePaths != null)
             {
                 list.AddRange(ImagePaths.Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p)));
             }
@@ -62,9 +78,30 @@ public record MemoryItem(
         }
     }
 
+    public List<MemoryMoment> DisplayMoments
+    {
+        get
+        {
+            if (Moments != null && Moments.Count > 0)
+            {
+                var valid = Moments.Where(m => !string.IsNullOrWhiteSpace(m.ImagePath) && File.Exists(m.ImagePath)).ToList();
+                if (valid.Count > 0) return valid;
+            }
+
+            return DisplayImages
+                .Select((path, index) => new MemoryMoment(
+                    Guid.NewGuid(),
+                    index == 0 && !string.IsNullOrWhiteSpace(Note) ? Note : null,
+                    MemoryDate,
+                    path))
+                .ToList();
+        }
+    }
+
+    public string? CoverImage => DisplayImages.FirstOrDefault();
     public bool HasImages => DisplayImages.Count > 0;
     public bool HasMultipleImages => DisplayImages.Count > 1;
-    public string ImageCountBadge => $"{DisplayImages.Count} صور";
+    public string ImageCountBadge => DisplayImages.Count == 1 ? "صورة واحدة" : $"{DisplayImages.Count} صور";
     public bool HasLocation => !string.IsNullOrWhiteSpace(Location);
 }
 

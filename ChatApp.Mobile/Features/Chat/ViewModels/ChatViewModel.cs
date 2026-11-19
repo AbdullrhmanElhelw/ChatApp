@@ -104,6 +104,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public partial string MessageText { get; set; } = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowPartnerPresence))]
     public partial bool IsPartnerTyping { get; set; }
 
     [ObservableProperty]
@@ -113,7 +114,10 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public partial bool IsPartnerOnline { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowPartnerPresence))]
     public partial string PartnerPresenceText { get; set; } = string.Empty;
+
+    public bool ShowPartnerPresence => !IsPartnerTyping && !string.IsNullOrWhiteSpace(PartnerPresenceText);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ConnectionStatusText))]

@@ -46,49 +46,52 @@ public partial class ChatPage : ContentPage
 
                 if (iconObj is not Microsoft.Maui.Controls.Shapes.Geometry heartGeo) return;
 
-                var offsets = new[] { -60.0, -25.0, 0.0, 30.0, 65.0 };
+                var offsets = new[] { -75.0, -35.0, 0.0, 35.0, 75.0 };
+                var targetYs = new[] { -420.0, -520.0, -580.0, -490.0, -440.0 };
                 var colors = new[] { "#FF4FB8", "#9B3BF9", "#FF4FB8", "#FFD6F2", "#7B2DF3" };
-                var tasks = new List<Task>();
 
                 for (var i = 0; i < offsets.Length; i++)
                 {
+                    var index = i;
                     var heart = new Microsoft.Maui.Controls.Shapes.Path
                     {
                         Data = heartGeo,
-                        Fill = new SolidColorBrush(Color.FromArgb(colors[i])),
-                        WidthRequest = 32,
-                        HeightRequest = 32,
+                        Fill = new SolidColorBrush(Color.FromArgb(colors[index])),
+                        WidthRequest = 38,
+                        HeightRequest = 38,
                         Aspect = Stretch.Uniform,
                         HorizontalOptions = LayoutOptions.Center,
                         VerticalOptions = LayoutOptions.End,
-                        TranslationX = offsets[i],
-                        TranslationY = -80,
-                        Scale = 0.4,
-                        Opacity = 0.95
+                        TranslationX = offsets[index],
+                        TranslationY = -70,
+                        Scale = 0.5,
+                        Opacity = 1.0
                     };
 
                     HeartOverlayGrid.Children.Add(heart);
 
-                    var delay = i * 80;
-                    var targetY = -360 - (i * 35);
-                    tasks.Add(Task.Run(async () =>
-                    {
-                        await Task.Delay(delay);
-                        await MainThread.InvokeOnMainThreadAsync(async () =>
-                        {
-                            await Task.WhenAll(
-                                heart.TranslateToAsync(offsets[i] * 1.4, targetY, 1100, Easing.CubicOut),
-                                heart.ScaleToAsync(1.5, 550, Easing.SpringOut),
-                                heart.FadeToAsync(0, 1100, Easing.CubicIn));
-                            HeartOverlayGrid.Children.Remove(heart);
-                        });
-                    }));
+                    _ = AnimateFloatingHeartAsync(heart, offsets[index], targetYs[index], index * 90);
                 }
-
-                await Task.WhenAll(tasks);
             }
             catch { }
         });
+    }
+
+    private async Task AnimateFloatingHeartAsync(Microsoft.Maui.Controls.Shapes.Path heart, double startX, double targetY, int delayMs)
+    {
+        try
+        {
+            await Task.Delay(30 + delayMs);
+            await heart.ScaleToAsync(1.6, 350, Easing.SpringOut);
+            await Task.WhenAll(
+                heart.TranslateToAsync(startX * 1.35, targetY, 1200, Easing.CubicOut),
+                heart.FadeToAsync(0, 1200, Easing.CubicIn));
+        }
+        catch { }
+        finally
+        {
+            HeartOverlayGrid?.Children.Remove(heart);
+        }
     }
 
     private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

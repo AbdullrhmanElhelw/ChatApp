@@ -184,8 +184,11 @@ public partial class ConversationsViewModel : BaseViewModel
             {
                 var fresh = result.Value.ToList();
                 SaveConversationsCache(userId, fresh);
-                Conversations = new ObservableCollection<ConversationSummaryDto>(fresh);
-                FilterConversations();
+                if (!AreConversationsEquivalent(Conversations, fresh))
+                {
+                    Conversations = new ObservableCollection<ConversationSummaryDto>(fresh);
+                    FilterConversations();
+                }
                 _ = EnsureHubConnectedAsync();
             }
             else if (Conversations.Count == 0)
@@ -207,6 +210,29 @@ public partial class ConversationsViewModel : BaseViewModel
             IsRefreshing = false;
             OnPropertyChanged(nameof(IsEmpty));
         }
+    }
+
+    private static bool AreConversationsEquivalent(
+        ObservableCollection<ConversationSummaryDto> current,
+        List<ConversationSummaryDto> fresh)
+    {
+        if (current.Count != fresh.Count) return false;
+        for (var i = 0; i < current.Count; i++)
+        {
+            var c = current[i];
+            var f = fresh[i];
+            if (c.Id != f.Id ||
+                c.UnreadCount != f.UnreadCount ||
+                c.LastMessage?.Id != f.LastMessage?.Id ||
+                c.LastMessage?.Content != f.LastMessage?.Content ||
+                c.LastActivityAt != f.LastActivityAt ||
+                c.IsOtherParticipantOnline != f.IsOtherParticipantOnline ||
+                c.Title != f.Title)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     [RelayCommand]

@@ -24,6 +24,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     private CancellationTokenSource? _playbackTimerCts;
     private ChatMessageItem? _currentlyPlayingAudioItem;
     private static readonly ConcurrentDictionary<Guid, List<MessageClientDto>> _messageCache = new();
+    private static List<StickerPackClientDto>? _stickerPacksCache;
 
     private static readonly IReadOnlyDictionary<string, string[]> EmojiCatalog = new Dictionary<string, string[]>
     {
@@ -1073,6 +1074,13 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     {
         try
         {
+            var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+            var cachedPacks = _stickerPacksCache;
+            if (cachedPacks != null && cachedPacks.Count > 0 && ActiveStickers.Count == 0)
+            {
+                ApplyStickerPacks(cachedPacks, currentUserId);
+            }
+
             var publicPacksTask = _stickerApi.GetPublicPacksAsync();
             var myPacksTask = _stickerApi.GetMyPacksAsync();
 
@@ -1098,18 +1106,30 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 }
             }
 
-            AvailableStickerPacks = new ObservableCollection<StickerPackClientDto>(combinedPacks.Values);
-
-            var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
-            var allStickers = combinedPacks.Values
-                .OrderByDescending(p => p.OwnerId == currentUserId)
-                .ThenByDescending(p => p.CreatedAt)
-                .SelectMany(p => p.Stickers)
-                .ToList();
-
-            ActiveStickers = new ObservableCollection<StickerClientDto>(allStickers);
+            var freshList = combinedPacks.Values.ToList();
+            var freshStickerCount = freshList.Sum(p => p.Stickers.Count);
+            if (_stickerPacksCache == null ||
+                _stickerPacksCache.Count != freshList.Count ||
+                ActiveStickers.Count != freshStickerCount)
+            {
+                _stickerPacksCache = freshList;
+                ApplyStickerPacks(freshList, currentUserId);
+            }
         }
         catch { }
+    }
+
+    private void ApplyStickerPacks(List<StickerPackClientDto> packs, Guid currentUserId)
+    {
+        AvailableStickerPacks = new ObservableCollection<StickerPackClientDto>(packs);
+
+        var allStickers = packs
+            .OrderByDescending(p => p.OwnerId == currentUserId)
+            .ThenByDescending(p => p.CreatedAt)
+            .SelectMany(p => p.Stickers)
+            .ToList();
+
+        ActiveStickers = new ObservableCollection<StickerClientDto>(allStickers);
     }
 
     [RelayCommand]

@@ -43,13 +43,9 @@ public class UserSearchViewModelTests
     }
 
     [Fact]
-    public async Task Search_WhenQueryIsEmpty_ShouldLoadInitialUsers()
+    public async Task Search_WhenQueryIsEmpty_ShouldClearResultsWithoutListingAllUsers()
     {
         // Arrange
-        _conversationServiceMock
-            .Setup(x => x.SearchUsersAsync(null, 1, 20))
-            .ReturnsAsync(ApiResult<List<UserProfileDto>>.Success(new List<UserProfileDto>()));
-
         _sut.SearchQuery = "   ";
         _conversationServiceMock.Invocations.Clear();
 
@@ -57,7 +53,8 @@ public class UserSearchViewModelTests
         await _sut.SearchCommand.ExecuteAsync(null);
 
         // Assert
-        _conversationServiceMock.Verify(x => x.SearchUsersAsync(null, 1, 20), Times.Once);
+        _conversationServiceMock.Verify(x => x.SearchUsersAsync(It.IsAny<string?>(), It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+        _sut.SearchResults.Should().BeEmpty();
     }
 
     [Fact]

@@ -19,7 +19,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task SearchUsers_ShouldExcludeCurrentUser()
+    public async Task SearchUsers_WhenQueryIsNull_ShouldReturnEmptyForPrivacy()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -35,12 +35,11 @@ public class UserServiceTests
 
         // Assert
         result.Success.Should().BeTrue();
-        result.Data.Should().HaveCount(1);
-        result.Data.First().Id.Should().Be(otherUser.Id);
+        result.Data.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task SearchUsers_WithMatchingQuery_ShouldFilterByNameOrUsername()
+    public async Task SearchUsers_WithExactUsername_ShouldReturnMatchingUser()
     {
         // Arrange
         using var db = CreateDbContext();
@@ -53,11 +52,12 @@ public class UserServiceTests
         var sut = new UserService(db);
 
         // Act
-        var result = await sut.SearchUsersAsync(currentUser.Id, query: "alex");
+        var result = await sut.SearchUsersAsync(currentUser.Id, query: "@alex_brown");
 
         // Assert
+        result.Success.Should().BeTrue();
         result.Data.Should().HaveCount(1);
-        result.Data.First().UserName.Should().Be("alex_brown");
+        result.Data.First().Id.Should().Be(user1.Id);
     }
 
     [Fact]

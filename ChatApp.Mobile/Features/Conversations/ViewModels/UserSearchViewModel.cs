@@ -73,34 +73,15 @@ public partial class UserSearchViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public async Task LoadInitialUsersAsync()
+    public Task LoadInitialUsersAsync()
     {
         ClearError();
-        IsSearching = true;
-        SectionTitle = "المستخدمون المسجلون";
-
-        try
-        {
-            var result = await _conversationService.SearchUsersAsync(null);
-            if (result.IsSuccess && result.Value != null)
-            {
-                SearchResults = new ObservableCollection<UserProfileDto>(result.Value);
-            }
-            else
-            {
-                SearchResults.Clear();
-            }
-        }
-        catch
-        {
-            SearchResults.Clear();
-        }
-        finally
-        {
-            IsSearching = false;
-            HasSearched = false;
-            OnPropertyChanged(nameof(IsEmpty));
-        }
+        IsSearching = false;
+        HasSearched = false;
+        SectionTitle = "ابحث باسم المستخدم الدقيق (@username) أو البريد";
+        SearchResults.Clear();
+        OnPropertyChanged(nameof(IsEmpty));
+        return Task.CompletedTask;
     }
 
     [RelayCommand]

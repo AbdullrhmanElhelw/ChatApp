@@ -85,7 +85,7 @@
                       VerticalOptions="Center" />
                 <Entry Grid.Column="1"
                        Text="{Binding SearchQuery, Mode=TwoWay}"
-                       Placeholder="ابحث بالاسم الكامل أو اسم المستخدم..."
+                       Placeholder="أدخل اسم المستخدم (@username) أو البريد..."
                        FontFamily="CairoRegular"
                        FontSize="14"
                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}"

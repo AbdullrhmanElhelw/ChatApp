@@ -104,18 +104,23 @@ public class UserService : IUserService
         if (pageIndex < 1) pageIndex = 1;
         if (pageSize < 1 || pageSize > 100) pageSize = 20;
 
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return PagedResponse<UserProfileDto>.Create(new List<UserProfileDto>(), pageIndex, pageSize, 0);
+        }
+
+        var trimmed = query.Trim().TrimStart('@');
+        if (trimmed.Length < 3)
+        {
+            return PagedResponse<UserProfileDto>.Create(new List<UserProfileDto>(), pageIndex, pageSize, 0);
+        }
+
+        var lower = trimmed.ToLowerInvariant();
         var baseQuery = _dbContext.Users
             .AsNoTracking()
-            .Where(u => u.Id != currentUserId);
-
-        if (!string.IsNullOrWhiteSpace(query))
-        {
-            var trimmed = query.Trim().TrimStart('@');
-            baseQuery = baseQuery.Where(u =>
-                (u.UserName != null && EF.Functions.Like(u.UserName, $"%{trimmed}%")) ||
-                EF.Functions.Like(u.FullName, $"%{trimmed}%") ||
-                (u.Email != null && EF.Functions.Like(u.Email, $"%{trimmed}%")));
-        }
+            .Where(u => u.Id != currentUserId &&
+                ((u.UserName != null && u.UserName.ToLower() == lower) ||
+                 (u.Email != null && u.Email.ToLower() == lower)));
 
         var totalCount = await baseQuery.CountAsync(cancellationToken);
 

@@ -32,7 +32,8 @@ public record MessageDto(
     bool IsMine,
     string? MediaUrl = null,
     string? ThumbnailUrl = null,
-    long? MediaSizeBytes = null
+    long? MediaSizeBytes = null,
+    string? ReplyToSenderName = null
 );
 
 public record MessageStatusUpdateDto(

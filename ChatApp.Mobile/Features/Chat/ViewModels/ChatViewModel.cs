@@ -63,6 +63,24 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     [ObservableProperty]
     public partial ObservableCollection<StickerClientDto> ActiveStickers { get; set; } = new();
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasReply))]
+    public partial ChatMessageItem? ReplyingToMessage { get; set; }
+
+    public bool HasReply => ReplyingToMessage != null;
+
+    [RelayCommand]
+    public void StartReply(ChatMessageItem message)
+    {
+        ReplyingToMessage = message;
+    }
+
+    [RelayCommand]
+    public void CancelReply()
+    {
+        ReplyingToMessage = null;
+    }
+
     public string ConnectionStatusText => IsConnected ? "متصل" : "جارٍ الاتصال...";
 
     public bool CanSend => !string.IsNullOrWhiteSpace(MessageText) && !IsBusy;
@@ -237,6 +255,11 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         var clientMessageId = Guid.NewGuid();
         var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
 
+        var replyToId = ReplyingToMessage?.Id;
+        var replyToContent = ReplyingToMessage?.Content ?? (ReplyingToMessage?.IsImage == true ? "📷 صورة" : ReplyingToMessage?.IsSticker == true ? "🎨 ملصق" : null);
+        var replyToSenderName = ReplyingToMessage?.IsMine == true ? "أنت" : ReplyingToMessage?.SenderFullName;
+        CancelReply();
+
         var optimisticItem = new ChatMessageItem
         {
             Id = Guid.Empty,
@@ -250,6 +273,9 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             MessageType = MessageType.Sticker,
             ClientMessageId = clientMessageId,
             SentAt = DateTime.UtcNow,
+            ReplyToMessageId = replyToId,
+            ReplyToContent = replyToContent,
+            ReplyToSenderName = replyToSenderName,
             IsMine = true,
             Status = MessageDeliveryStatus.Sent,
             IsSending = true
@@ -264,6 +290,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 sticker.ImageUrl,
                 MessageType.Sticker,
                 clientMessageId,
+                ReplyToMessageId: replyToId,
                 StickerId: sticker.Id
             );
 
@@ -313,6 +340,11 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             var clientMessageId = Guid.NewGuid();
             var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
 
+            var replyToId = ReplyingToMessage?.Id;
+            var replyToContent = ReplyingToMessage?.Content ?? (ReplyingToMessage?.IsImage == true ? "📷 صورة" : ReplyingToMessage?.IsSticker == true ? "🎨 ملصق" : null);
+            var replyToSenderName = ReplyingToMessage?.IsMine == true ? "أنت" : ReplyingToMessage?.SenderFullName;
+            CancelReply();
+
             var optimisticItem = new ChatMessageItem
             {
                 Id = Guid.Empty,
@@ -328,6 +360,9 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 MessageType = MessageType.Image,
                 ClientMessageId = clientMessageId,
                 SentAt = DateTime.UtcNow,
+                ReplyToMessageId = replyToId,
+                ReplyToContent = replyToContent,
+                ReplyToSenderName = replyToSenderName,
                 IsMine = true,
                 Status = MessageDeliveryStatus.Sent,
                 IsSending = true
@@ -340,6 +375,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 Content: null,
                 MessageType: MessageType.Image,
                 ClientMessageId: clientMessageId,
+                ReplyToMessageId: replyToId,
                 MediaAttachmentId: media.MediaId
             );
 
@@ -367,6 +403,11 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         var clientMessageId = Guid.NewGuid();
         var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
 
+        var replyToId = ReplyingToMessage?.Id;
+        var replyToContent = ReplyingToMessage?.Content ?? (ReplyingToMessage?.IsImage == true ? "📷 صورة" : ReplyingToMessage?.IsSticker == true ? "🎨 ملصق" : null);
+        var replyToSenderName = ReplyingToMessage?.IsMine == true ? "أنت" : ReplyingToMessage?.SenderFullName;
+        CancelReply();
+
         // Optimistic UI update: Show the message immediately with pending clock status
         var optimisticItem = new ChatMessageItem
         {
@@ -380,6 +421,9 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             MessageType = MessageType.Text,
             ClientMessageId = clientMessageId,
             SentAt = DateTime.UtcNow,
+            ReplyToMessageId = replyToId,
+            ReplyToContent = replyToContent,
+            ReplyToSenderName = replyToSenderName,
             IsMine = true,
             Status = MessageDeliveryStatus.Sent,
             IsSending = true
@@ -393,7 +437,8 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 ConversationId,
                 text,
                 MessageType.Text,
-                clientMessageId
+                clientMessageId,
+                ReplyToMessageId: replyToId
             );
 
             await _chatHub.SendMessageAsync(request);

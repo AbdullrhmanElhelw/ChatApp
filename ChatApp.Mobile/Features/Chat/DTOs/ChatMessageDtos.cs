@@ -42,7 +42,8 @@ public record MessageClientDto(
     [property: JsonPropertyName("isMine")] bool IsMine,
     [property: JsonPropertyName("mediaUrl")] string? MediaUrl = null,
     [property: JsonPropertyName("thumbnailUrl")] string? ThumbnailUrl = null,
-    [property: JsonPropertyName("mediaSizeBytes")] long? MediaSizeBytes = null
+    [property: JsonPropertyName("mediaSizeBytes")] long? MediaSizeBytes = null,
+    [property: JsonPropertyName("replyToSenderName")] string? ReplyToSenderName = null
 );
 
 public record MessageStatusUpdateClientDto(
@@ -74,6 +75,9 @@ public partial class ChatMessageItem : ObservableObject
     public DateTime? EditedAt { get; set; }
     public Guid? ReplyToMessageId { get; set; }
     public string? ReplyToContent { get; set; }
+    public string? ReplyToSenderName { get; set; }
+    public bool HasReplyTo => ReplyToMessageId.HasValue && !string.IsNullOrWhiteSpace(ReplyToContent);
+    public string DisplayReplySender => !string.IsNullOrWhiteSpace(ReplyToSenderName) ? ReplyToSenderName : "رسالة";
     public bool IsMine { get; set; }
     public string? MediaUrl { get; set; }
     public string? ThumbnailUrl { get; set; }
@@ -161,6 +165,7 @@ public partial class ChatMessageItem : ObservableObject
             EditedAt = dto.EditedAt,
             ReplyToMessageId = dto.ReplyToMessageId,
             ReplyToContent = dto.ReplyToContent,
+            ReplyToSenderName = dto.ReplyToSenderName,
             IsMine = dto.IsMine,
             Status = dto.DeliveryStatus,
             IsSending = false,

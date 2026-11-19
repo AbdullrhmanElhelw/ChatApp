@@ -37,6 +37,7 @@ public class MessageService : IMessageService
             .AsNoTracking()
             .Include(m => m.Sender)
             .Include(m => m.ReplyToMessage)
+                .ThenInclude(r => r!.Sender)
             .Include(m => m.Deliveries)
             .Include(m => m.MediaAttachments)
             .Where(m => m.ConversationId == conversationId && !m.IsDeleted);
@@ -79,6 +80,7 @@ public class MessageService : IMessageService
                 .AsNoTracking()
                 .Include(m => m.Sender)
                 .Include(m => m.ReplyToMessage)
+                    .ThenInclude(r => r!.Sender)
                 .Include(m => m.Deliveries)
                 .Include(m => m.MediaAttachments)
                 .FirstOrDefaultAsync(m => m.ClientMessageId == request.ClientMessageId, cancellationToken);
@@ -170,6 +172,7 @@ public class MessageService : IMessageService
         if (request.ReplyToMessageId.HasValue)
         {
             message.ReplyToMessage = await _dbContext.Messages.AsNoTracking()
+                .Include(m => m.Sender)
                 .FirstOrDefaultAsync(m => m.Id == request.ReplyToMessageId.Value, cancellationToken);
         }
 
@@ -329,6 +332,25 @@ public class MessageService : IMessageService
 
         var media = message.MediaAttachments?.FirstOrDefault();
 
+        string? replyContent = message.ReplyToMessage?.Content;
+        if (string.IsNullOrWhiteSpace(replyContent) && message.ReplyToMessage != null)
+        {
+            replyContent = message.ReplyToMessage.MessageType switch
+            {
+                MessageType.Image => "📷 صورة",
+                MessageType.Sticker => "🎨 ملصق",
+                _ => "رسالة"
+            };
+        }
+
+        string? replySenderName = null;
+        if (message.ReplyToMessage != null)
+        {
+            replySenderName = message.ReplyToMessage.SenderId == currentUserId
+                ? "أنت"
+                : (message.ReplyToMessage.Sender?.FullName ?? message.ReplyToMessage.Sender?.UserName ?? "مستخدم");
+        }
+
         return new MessageDto(
             message.Id,
             message.ConversationId,
@@ -342,14 +364,15 @@ public class MessageService : IMessageService
             message.SentAt,
             message.EditedAt,
             message.ReplyToMessageId,
-            message.ReplyToMessage?.Content,
+            replyContent,
             status,
             deliveredAt,
             readAt,
             isMine,
             media?.FileUrl,
             media?.ThumbnailUrl,
-            media?.FileSizeBytes
+            media?.FileSizeBytes,
+            replySenderName
         );
     }
 }

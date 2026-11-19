@@ -284,10 +284,6 @@ public partial class ChatPage : ContentPage
     {
         base.OnAppearing();
         ScrollToBottom(animate: false);
-        if (_viewModel != null)
-        {
-            _ = _viewModel.LoadStickerPacksAsync();
-        }
     }
 
     protected override void OnDisappearing()

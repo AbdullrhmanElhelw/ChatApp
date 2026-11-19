@@ -971,7 +971,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     {
         try
         {
-            var snapshot = messages.TakeLast(100).ToList();
+            var snapshot = messages.TakeLast(50).ToList();
             _messageCache[conversationId] = snapshot;
             var path = GetCachePath(conversationId);
             _ = Task.Run(() =>
@@ -988,10 +988,22 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         LoadChatCustomization(conversationId);
         ClearError();
 
+        // Let Shell navigation transition start immediately without blocking UI thread
+        await Task.Yield();
+
         var currentUserId = _authState.CurrentUser?.Id;
 
-        // 0. Show cached messages immediately (0ms) without showing loading spinner
-        var cached = TryGetCachedMessages(conversationId);
+        // 0. Show cached messages immediately without blocking UI thread on disk I/O
+        List<MessageClientDto>? cached = null;
+        if (_messageCache.TryGetValue(conversationId, out var memCached) && memCached.Count > 0)
+        {
+            cached = memCached;
+        }
+        else
+        {
+            cached = await Task.Run(() => TryGetCachedMessages(conversationId));
+        }
+
         var hasCached = cached != null && cached.Count > 0;
         if (hasCached)
         {
@@ -1008,7 +1020,6 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             // 1. Run SignalR connect/join and REST history fetch in parallel
             var hubTask = EnsureSignalRJoinedAsync(conversationId);
             var historyTask = _messageApi.GetMessagesAsync(conversationId);
-            var stickerTask = LoadStickerPacksAsync();
 
             await Task.WhenAll(hubTask, historyTask);
 
@@ -1031,7 +1042,8 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 ErrorMessage = historyResult.ErrorMessage;
             }
 
-            _ = stickerTask;
+            // Preload stickers gently after page transition settles
+            _ = Task.Delay(350).ContinueWith(_ => LoadStickerPacksAsync());
         }
         catch (Exception ex)
         {

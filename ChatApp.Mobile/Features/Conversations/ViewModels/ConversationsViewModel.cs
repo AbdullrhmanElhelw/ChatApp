@@ -29,6 +29,7 @@ public partial class ConversationsViewModel : BaseViewModel
     private readonly IChatHubService? _chatHubService;
     private readonly IAuthApiService? _authService;
     private readonly ICoupleApiService? _coupleApiService;
+    private readonly ILocalChatDatabase? _localDb;
 
     [ObservableProperty]
     public partial ObservableCollection<ConversationSummaryDto> Conversations { get; set; } = new();
@@ -84,7 +85,8 @@ public partial class ConversationsViewModel : BaseViewModel
         INavigationService navigationService,
         IChatHubService? chatHubService = null,
         IAuthApiService? authService = null,
-        ICoupleApiService? coupleApiService = null)
+        ICoupleApiService? coupleApiService = null,
+        ILocalChatDatabase? localDb = null)
     {
         _conversationService = conversationService;
         _authStateService = authStateService;
@@ -92,6 +94,7 @@ public partial class ConversationsViewModel : BaseViewModel
         _chatHubService = chatHubService;
         _authService = authService;
         _coupleApiService = coupleApiService;
+        _localDb = localDb;
 
         Title = "المحادثات";
         CurrentUser = _authStateService.CurrentUser;
@@ -182,11 +185,30 @@ public partial class ConversationsViewModel : BaseViewModel
 
             if (Conversations.Count == 0)
             {
-                var cached = TryGetCachedConversations(userId);
+                List<ConversationSummaryDto>? cached = null;
+                if (_memoryCacheUserId == userId && _memoryConversationsCache != null && _memoryConversationsCache.Count > 0)
+                {
+                    cached = _memoryConversationsCache;
+                }
+                else if (_localDb != null)
+                {
+                    cached = await _localDb.GetConversationsAsync(userId);
+                    if (cached.Count > 0)
+                    {
+                        _memoryCacheUserId = userId;
+                        _memoryConversationsCache = cached;
+                    }
+                }
+                else
+                {
+                    cached = TryGetCachedConversations(userId);
+                }
+
                 if (cached != null && cached.Count > 0)
                 {
                     Conversations = new ObservableCollection<ConversationSummaryDto>(cached);
                     FilterConversations();
+                    NotifyUnreadTotalsChanged();
                     OnPropertyChanged(nameof(IsEmpty));
                 }
             }
@@ -203,6 +225,10 @@ public partial class ConversationsViewModel : BaseViewModel
             {
                 var fresh = result.Value.ToList();
                 SaveConversationsCache(userId, fresh);
+                if (_localDb != null)
+                {
+                    _ = _localDb.SaveConversationsAsync(userId, fresh);
+                }
                 if (!AreConversationsEquivalent(Conversations, fresh))
                 {
                     Conversations = new ObservableCollection<ConversationSummaryDto>(fresh);
@@ -490,7 +516,14 @@ public partial class ConversationsViewModel : BaseViewModel
             Conversations.Insert(0, updated);
             FilterConversations();
             NotifyUnreadTotalsChanged();
-            SaveConversationsCache(CurrentUser?.Id ?? Guid.Empty, Conversations.ToList());
+            var uid = CurrentUser?.Id ?? Guid.Empty;
+            var convSnapshot = Conversations.ToList();
+            SaveConversationsCache(uid, convSnapshot);
+            if (_localDb != null)
+            {
+                _ = _localDb.SaveConversationsAsync(uid, convSnapshot);
+                _ = _localDb.UpsertMessageAsync(message);
+            }
 
             if (!isMine)
             {

@@ -20,6 +20,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     private readonly IAuthenticationStateService _authState;
     private readonly INavigationService _navigationService;
     private readonly IVoiceAudioService? _voiceAudioService;
+    private readonly ILocalChatDatabase? _localDb;
     private CancellationTokenSource? _recordingTimerCts;
     private CancellationTokenSource? _playbackTimerCts;
     private ChatMessageItem? _currentlyPlayingAudioItem;
@@ -463,7 +464,8 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         IStickerApiService stickerApi,
         IAuthenticationStateService authState,
         INavigationService navigationService,
-        IVoiceAudioService? voiceAudioService = null)
+        IVoiceAudioService? voiceAudioService = null,
+        ILocalChatDatabase? localDb = null)
     {
         _chatHub = chatHub;
         _messageApi = messageApi;
@@ -471,6 +473,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         _authState = authState;
         _navigationService = navigationService;
         _voiceAudioService = voiceAudioService;
+        _localDb = localDb;
 
         SubscribeToHubEvents();
     }
@@ -998,11 +1001,16 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 
         var currentUserId = _authState.CurrentUser?.Id;
 
-        // 0. Show cached messages immediately without blocking UI thread on disk I/O
+        // 0. Show cached messages immediately from Memory or SQLite
         List<MessageClientDto>? cached = null;
         if (_messageCache.TryGetValue(conversationId, out var memCached) && memCached.Count > 0)
         {
             cached = memCached;
+        }
+        else if (_localDb != null)
+        {
+            cached = await _localDb.GetRecentMessagesAsync(conversationId, 50);
+            if (cached.Count > 0) _messageCache[conversationId] = cached;
         }
         else
         {
@@ -1034,6 +1042,10 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             {
                 var freshDtos = historyResult.Value.ToList();
                 SaveMessagesToCache(conversationId, freshDtos);
+                if (_localDb != null)
+                {
+                    _ = _localDb.SaveMessagesAsync(conversationId, freshDtos);
+                }
 
                 var replaced = !hasCached || !AreMessagesEquivalent(Messages, freshDtos);
                 if (replaced)
@@ -1490,11 +1502,15 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 var item = ChatMessageItem.FromDto(dto, _authState.CurrentUser?.Id);
                 Messages.Add(item);
 
-                // Keep cache updated with incoming message
+                // Keep memory + SQLite cache updated with incoming message
                 if (_messageCache.TryGetValue(ConversationId, out var cachedList))
                 {
                     var updated = new List<MessageClientDto>(cachedList) { dto };
                     SaveMessagesToCache(ConversationId, updated);
+                }
+                if (_localDb != null)
+                {
+                    _ = _localDb.UpsertMessageAsync(dto);
                 }
 
                 // Auto mark incoming message as read

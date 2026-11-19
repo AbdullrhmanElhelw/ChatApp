@@ -201,6 +201,20 @@ public partial class ChatMessageItem : ObservableObject
     {
         get
         {
+            // Prefer lightweight ThumbnailUrl in message list; keep FullImageUrl for full-res view
+            var raw = MessageType == MessageType.Sticker
+                ? StickerUrl
+                : (!string.IsNullOrWhiteSpace(ThumbnailUrl) ? ThumbnailUrl : (MediaUrl ?? ""));
+            if (string.IsNullOrEmpty(raw)) return "";
+            if (raw.StartsWith("/")) return $"{ApiConfig.BaseUrl}{raw}";
+            return raw;
+        }
+    }
+
+    public string FullImageUrl
+    {
+        get
+        {
             var raw = MessageType == MessageType.Sticker ? StickerUrl : (MediaUrl ?? "");
             if (string.IsNullOrEmpty(raw)) return "";
             if (raw.StartsWith("/")) return $"{ApiConfig.BaseUrl}{raw}";

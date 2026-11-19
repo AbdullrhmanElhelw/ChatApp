@@ -56,6 +56,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<INavigationService, NavigationService>();
         builder.Services.AddSingleton<ISecureStorageService, SecureStorageService>();
         builder.Services.AddSingleton<IAuthenticationStateService, AuthenticationStateService>();
+        builder.Services.AddSingleton<ILocalChatDatabase, LocalChatDatabase>();
 
         // 2. HTTP & API Services
         builder.Services.AddSingleton(new HttpClient

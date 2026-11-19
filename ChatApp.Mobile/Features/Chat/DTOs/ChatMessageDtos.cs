@@ -226,8 +226,12 @@ public partial class ChatMessageItem : ObservableObject
         }
     }
 
-    public static ChatMessageItem FromDto(MessageClientDto dto)
+    public static ChatMessageItem FromDto(MessageClientDto dto, Guid? currentUserId = null)
     {
+        var isMine = currentUserId.HasValue && currentUserId.Value != Guid.Empty
+            ? dto.SenderId == currentUserId.Value
+            : dto.IsMine;
+
         return new ChatMessageItem
         {
             Id = dto.Id,
@@ -244,7 +248,7 @@ public partial class ChatMessageItem : ObservableObject
             ReplyToMessageId = dto.ReplyToMessageId,
             ReplyToContent = dto.ReplyToContent,
             ReplyToSenderName = dto.ReplyToSenderName,
-            IsMine = dto.IsMine,
+            IsMine = isMine,
             Status = dto.DeliveryStatus,
             IsSending = false,
             MediaUrl = dto.MediaUrl,

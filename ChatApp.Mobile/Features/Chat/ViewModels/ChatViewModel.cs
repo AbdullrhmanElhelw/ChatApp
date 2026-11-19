@@ -987,12 +987,14 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         LoadChatCustomization(conversationId);
         ClearError();
 
+        var currentUserId = _authState.CurrentUser?.Id;
+
         // 0. Show cached messages immediately (0ms) without showing loading spinner
         var cached = TryGetCachedMessages(conversationId);
         var hasCached = cached != null && cached.Count > 0;
         if (hasCached)
         {
-            Messages = new ObservableCollection<ChatMessageItem>(cached!.Select(ChatMessageItem.FromDto));
+            Messages = new ObservableCollection<ChatMessageItem>(cached!.Select(m => ChatMessageItem.FromDto(m, currentUserId)));
             IsBusy = false;
         }
         else
@@ -1018,7 +1020,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 if (!hasCached || !AreMessagesEquivalent(Messages, freshDtos))
                 {
                     Messages = new ObservableCollection<ChatMessageItem>(
-                        freshDtos.Select(ChatMessageItem.FromDto));
+                        freshDtos.Select(m => ChatMessageItem.FromDto(m, currentUserId)));
                 }
 
                 _ = _chatHub.MarkAsReadAsync(conversationId);
@@ -1436,11 +1438,21 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
             var existing = Messages.FirstOrDefault(m => m.Id == dto.Id || m.ClientMessageId == dto.ClientMessageId);
             if (existing == null)
             {
-                var item = ChatMessageItem.FromDto(dto);
+                var item = ChatMessageItem.FromDto(dto, _authState.CurrentUser?.Id);
                 Messages.Add(item);
 
+                // Keep cache updated with incoming message
+                if (_messageCache.TryGetValue(ConversationId, out var cachedList))
+                {
+                    var updated = new List<MessageClientDto>(cachedList) { dto };
+                    SaveMessagesToCache(ConversationId, updated);
+                }
+
                 // Auto mark incoming message as read
-                await _chatHub.MarkAsReadAsync(ConversationId, dto.Id);
+                if (!item.IsMine)
+                {
+                    await _chatHub.MarkAsReadAsync(ConversationId, dto.Id);
+                }
             }
         });
     }

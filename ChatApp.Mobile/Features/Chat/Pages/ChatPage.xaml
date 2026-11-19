@@ -270,9 +270,6 @@
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="20,20,4,20" />
                                 </Border.StrokeShape>
-                                <Border.Shadow>
-                                    <Shadow Brush="#8E30F5" Offset="0,3" Radius="10" Opacity="0.32" />
-                                </Border.Shadow>
                                 <Border.GestureRecognizers>
                                     <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
                                                               PointerReleased="OnMessageBubblePointerReleased"
@@ -558,9 +555,6 @@
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="20,20,20,4" />
                                 </Border.StrokeShape>
-                                <Border.Shadow>
-                                    <Shadow Brush="#08000000" Offset="0,1" Radius="3" Opacity="0.5" />
-                                </Border.Shadow>
                                 <Border.GestureRecognizers>
                                     <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
                                                               PointerReleased="OnMessageBubblePointerReleased"

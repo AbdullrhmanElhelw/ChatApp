@@ -160,6 +160,7 @@ public partial class ConversationsViewModel : BaseViewModel
         {
             CurrentUser = _authStateService.CurrentUser;
             var userId = CurrentUser?.Id ?? Guid.Empty;
+            _ = EnsureHubConnectedAsync();
 
             if (Conversations.Count == 0)
             {

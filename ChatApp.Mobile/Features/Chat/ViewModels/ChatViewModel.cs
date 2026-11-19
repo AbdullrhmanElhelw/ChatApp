@@ -180,7 +180,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     };
 
     [ObservableProperty]
-    public partial ObservableCollection<string> FilteredEmojis { get; set; } = new(EmojiCatalog["الوجوه"]);
+    public partial ObservableCollection<string> FilteredEmojis { get; set; } = new();
 
     [ObservableProperty]
     public partial string SelectedEmojiCategory { get; set; } = "الوجوه";
@@ -223,6 +223,10 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         if (IsEmojiPickerOpen)
         {
             IsAttachmentPanelVisible = false;
+            if (FilteredEmojis.Count == 0 && EmojiCatalog.TryGetValue(SelectedEmojiCategory, out var initial))
+            {
+                FilteredEmojis = new ObservableCollection<string>(initial);
+            }
         }
     }
 

@@ -64,7 +64,22 @@ public record ConversationSummaryDto(
         }
     }
 
-    public string LastMessagePreview => LastMessage?.Content ?? "لا توجد رسائل بعد";
+    public string LastMessagePreview
+    {
+        get
+        {
+            if (LastMessage is null) return "لا توجد رسائل بعد";
+            if (!string.IsNullOrWhiteSpace(LastMessage.Content)) return LastMessage.Content;
+            return LastMessage.MessageType switch
+            {
+                MessageType.Image => "📷 صورة",
+                MessageType.Video => "🎥 فيديو",
+                MessageType.Audio => "🎤 رسالة صوتية",
+                MessageType.Sticker => "✨ ملصق",
+                _ => "رسالة جديدة"
+            };
+        }
+    }
 }
 
 public record ConversationParticipantDto(

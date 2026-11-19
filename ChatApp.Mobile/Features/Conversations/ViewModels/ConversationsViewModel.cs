@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChatApp.Mobile.Features.Authentication.DTOs;
 using ChatApp.Mobile.Features.Authentication.Services;
+using ChatApp.Mobile.Features.Chat.DTOs;
+using ChatApp.Mobile.Features.Chat.Services;
 using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Features.Conversations.DTOs;
 using ChatApp.Mobile.Features.Conversations.Services;
@@ -22,6 +24,8 @@ public partial class ConversationsViewModel : BaseViewModel
     private readonly IConversationApiService _conversationService;
     private readonly IAuthenticationStateService _authStateService;
     private readonly INavigationService _navigationService;
+    private readonly IChatHubService? _chatHubService;
+    private readonly IAuthApiService? _authService;
 
     [ObservableProperty]
     public partial ObservableCollection<ConversationSummaryDto> Conversations { get; set; } = new();
@@ -50,15 +54,25 @@ public partial class ConversationsViewModel : BaseViewModel
     public ConversationsViewModel(
         IConversationApiService conversationService,
         IAuthenticationStateService authStateService,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        IChatHubService? chatHubService = null,
+        IAuthApiService? authService = null)
     {
         _conversationService = conversationService;
         _authStateService = authStateService;
         _navigationService = navigationService;
+        _chatHubService = chatHubService;
+        _authService = authService;
 
         Title = "المحادثات";
         CurrentUser = _authStateService.CurrentUser;
         UpdateThemeIcon();
+
+        if (_chatHubService != null)
+        {
+            _chatHubService.MessageReceived += OnRealtimeMessageReceived;
+            _chatHubService.UserPresenceChanged += OnUserPresenceChanged;
+        }
     }
 
     partial void OnSearchTextChanged(string value)
@@ -94,6 +108,7 @@ public partial class ConversationsViewModel : BaseViewModel
             {
                 Conversations = new ObservableCollection<ConversationSummaryDto>(result.Value);
                 FilterConversations();
+                _ = EnsureHubConnectedAsync();
             }
             else
             {
@@ -142,6 +157,12 @@ public partial class ConversationsViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task OpenProfileSetupAsync()
+    {
+        await _navigationService.NavigateToAsync(AppRoutes.ProfileSetup);
+    }
+
+    [RelayCommand]
     private void ToggleTheme()
     {
         ThemeManager.ToggleTheme();
@@ -151,8 +172,104 @@ public partial class ConversationsViewModel : BaseViewModel
     [RelayCommand]
     private async Task LogoutAsync()
     {
+        try
+        {
+            if (_chatHubService != null)
+            {
+                await _chatHubService.DisconnectAsync();
+            }
+
+            if (_authService != null)
+            {
+                await _authService.LogoutAsync();
+            }
+        }
+        catch
+        {
+            // Proceed with local sign-out even if network revocation fails
+        }
+
         _authStateService.SetUnauthenticated();
         await _navigationService.NavigateToAsync(AppRoutes.Welcome);
+    }
+
+    private async Task EnsureHubConnectedAsync()
+    {
+        if (_chatHubService == null || _chatHubService.IsConnected) return;
+        try
+        {
+            await _chatHubService.ConnectAsync();
+        }
+        catch
+        {
+            // Non-fatal: list already loaded via REST
+        }
+    }
+
+    private void OnRealtimeMessageReceived(MessageClientDto message)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var index = -1;
+            for (var i = 0; i < Conversations.Count; i++)
+            {
+                if (Conversations[i].Id == message.ConversationId)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index < 0)
+            {
+                _ = LoadConversationsAsync();
+                return;
+            }
+
+            var existing = Conversations[index];
+            var isMine = CurrentUser != null && message.SenderId == CurrentUser.Id;
+            var updated = existing with
+            {
+                LastMessage = new LastMessageDto(
+                    message.Id,
+                    message.Content,
+                    message.MessageType,
+                    message.SentAt,
+                    message.SenderId,
+                    message.SenderFullName),
+                LastActivityAt = message.SentAt,
+                UnreadCount = isMine ? existing.UnreadCount : existing.UnreadCount + 1
+            };
+
+            Conversations.RemoveAt(index);
+            Conversations.Insert(0, updated);
+            FilterConversations();
+        });
+    }
+
+    private void OnUserPresenceChanged(Guid userId, bool isOnline, DateTime? lastSeenAt)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var changed = false;
+            for (var i = 0; i < Conversations.Count; i++)
+            {
+                if (Conversations[i].OtherParticipantId == userId)
+                {
+                    Conversations[i] = Conversations[i] with
+                    {
+                        IsOtherParticipantOnline = isOnline,
+                        OtherParticipantLastSeenAt = lastSeenAt
+                    };
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                FilterConversations();
+            }
+        });
     }
 
     private void FilterConversations()

@@ -82,17 +82,20 @@ public partial class LoginViewModel : BaseViewModel
             if (result.IsSuccess && result.Value != null)
             {
                 var authData = result.Value;
-                var userProfile = new UserProfileDto(
-                    authData.UserId,
-                    authData.UserName,
-                    authData.Email,
-                    authData.FullName,
-                    null,
-                    null,
-                    true,
-                    DateTime.UtcNow,
-                    DateTime.UtcNow
-                );
+                var profileResult = await _authService.GetCurrentUserAsync(authData.AccessToken);
+                var userProfile = (profileResult is { IsSuccess: true, Value: not null })
+                    ? profileResult.Value
+                    : new UserProfileDto(
+                        authData.UserId,
+                        authData.UserName,
+                        authData.Email,
+                        authData.FullName,
+                        null,
+                        null,
+                        true,
+                        DateTime.UtcNow,
+                        DateTime.UtcNow
+                    );
 
                 _authStateService.SetAuthenticated(userProfile, authData.AccessToken, authData.RefreshToken);
                 await _navigationService.NavigateToAsync(AppRoutes.MainConversations);
@@ -109,6 +112,18 @@ public partial class LoginViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task ForgotPasswordAsync()
+    {
+        if (Shell.Current != null)
+        {
+            await Shell.Current.DisplayAlertAsync(
+                "استعادة كلمة المرور",
+                "ميزة استعادة كلمة المرور عبر البريد الإلكتروني قيد التطوير حاليًا. يمكنك إنشاء حساب جديد أو التواصل مع الدعم.",
+                "حسناً");
         }
     }
 

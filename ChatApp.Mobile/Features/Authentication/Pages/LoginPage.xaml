@@ -99,6 +99,7 @@
                     <controls:ChatEntry LabelText="اسم المستخدم أو البريد الإلكتروني"
                                         Placeholder="اسم المستخدم أو example@email.com"
                                         Text="{Binding UserNameOrEmail, Mode=TwoWay}"
+                                        Keyboard="Email"
                                         ErrorMessage="{Binding UserNameOrEmailError}" />
 
                     <controls:ChatEntry LabelText="كلمة المرور"
@@ -106,6 +107,14 @@
                                         Text="{Binding Password, Mode=TwoWay}"
                                         IsPassword="True"
                                         ErrorMessage="{Binding PasswordError}" />
+
+                    <Button Text="نسيت كلمة المرور؟"
+                            Command="{Binding ForgotPasswordCommand}"
+                            Style="{StaticResource ChatGhostButton}"
+                            HorizontalOptions="End"
+                            Padding="4,0"
+                            HeightRequest="32"
+                            FontSize="13" />
                 </VerticalStackLayout>
 
                 <!-- Submit Button -->

@@ -9,7 +9,7 @@
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
              FlowDirection="RightToLeft"
-             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12,16,0">
 
@@ -20,7 +20,11 @@
                 <controls:AvatarView FullName="{Binding CurrentUser.FullName}"
                                      AvatarUrl="{Binding CurrentUser.AvatarUrl}"
                                      Size="42"
-                                     IsOnline="True" />
+                                     IsOnline="True">
+                    <controls:AvatarView.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenProfileSetupCommand}" />
+                    </controls:AvatarView.GestureRecognizers>
+                </controls:AvatarView>
                 <Border WidthRequest="30"
                         HeightRequest="30"
                         StrokeThickness="0"

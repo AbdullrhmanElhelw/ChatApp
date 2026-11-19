@@ -75,11 +75,13 @@
 
                 <!-- Connection Indicator (Top Right) -->
                 <Border Grid.Column="3"
-                        StrokeShape="RoundRectangle 12"
                         StrokeThickness="0"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
                         Padding="8,4"
                         VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
                     <Label Text="{Binding ConnectionStatusText}"
                            FontSize="11"
                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
@@ -99,10 +101,12 @@
 
             <CollectionView.Header>
                 <VerticalStackLayout Padding="16,12" Spacing="4" HorizontalOptions="Center">
-                    <Border StrokeShape="RoundRectangle 12"
-                            StrokeThickness="0"
+                    <Border StrokeThickness="0"
                             BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
                             Padding="12,6">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
                         <Label Text="🔒 الرسائل مشفرة ومؤمنة في ChatApp"
                                FontSize="11"
                                TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
@@ -218,11 +222,13 @@
 
                 <!-- Text Input Box -->
                 <Border Grid.Column="1"
-                        StrokeShape="RoundRectangle 22"
                         StrokeThickness="1"
                         Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray800}}"
                         Padding="14,2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
                     <Entry Text="{Binding MessageText, Mode=TwoWay}"
                            Placeholder="اكتب رسالة..."
                            PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"

@@ -14,12 +14,14 @@
                IsVisible="{Binding HasLabel, Source={x:Reference ThisEntry}}" />
 
         <!-- Input Box Border -->
-        <Border StrokeShape="RoundRectangle 12"
-                StrokeThickness="1"
+        <Border StrokeThickness="1"
                 Stroke="{Binding BorderStroke, Source={x:Reference ThisEntry}}"
                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
                 Padding="14,0"
                 HeightRequest="50">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
 
             <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
                 <Entry Grid.Column="0"

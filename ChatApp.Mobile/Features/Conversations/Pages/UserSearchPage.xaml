@@ -4,11 +4,18 @@
              xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Conversations.ViewModels"
              xmlns:authDtos="clr-namespace:ChatApp.Mobile.Features.Authentication.DTOs"
              xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
+             xmlns:converters="clr-namespace:ChatApp.Mobile.Converters"
              x:Class="ChatApp.Mobile.Features.Conversations.Pages.UserSearchPage"
              x:DataType="vm:UserSearchViewModel"
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
              BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12,16,0">
 
@@ -61,13 +68,15 @@
 
         <!-- Error / Info Banner -->
         <Border Grid.Row="2"
-                StrokeShape="RoundRectangle 12"
                 StrokeThickness="1"
                 Stroke="{StaticResource StatusWarning}"
                 BackgroundColor="{AppThemeBinding Light=#FEF3C7, Dark=#78350F}"
                 Padding="12,8"
                 Margin="0,0,0,12"
                 IsVisible="{Binding HasError}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
             <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                 <Label Text="⚠️" FontSize="16" VerticalOptions="Center" />
                 <Label Text="{Binding ErrorMessage}"

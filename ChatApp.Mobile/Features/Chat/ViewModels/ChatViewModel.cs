@@ -10,9 +10,6 @@ using ChatApp.Mobile.Navigation;
 
 namespace ChatApp.Mobile.Features.Chat.ViewModels;
 
-[QueryProperty(nameof(ConversationId), "ConversationId")]
-[QueryProperty(nameof(ChatTitle), "Title")]
-[QueryProperty(nameof(AvatarUrl), "AvatarUrl")]
 public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposable
 {
     private readonly IChatHubService _chatHub;

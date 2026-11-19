@@ -133,4 +133,46 @@ public class ChatViewModelTests
         _chatHubMock.Verify(x => x.LeaveConversationAsync(convId), Times.Once);
         _navigationMock.Verify(x => x.GoBackAsync(), Times.Once);
     }
+
+    [Fact]
+    public void ApplyQueryAttributes_WhenGivenValidQuery_ShouldSetProperties()
+    {
+        // Arrange
+        var convId = Guid.NewGuid();
+        var query = new Dictionary<string, object>
+        {
+            { "ConversationId", convId },
+            { "Title", "Momo" },
+            { "AvatarUrl", "https://example.com/avatar.png" }
+        };
+
+        // Act
+        _sut.ApplyQueryAttributes(query);
+
+        // Assert
+        _sut.ConversationId.Should().Be(convId);
+        _sut.ChatTitle.Should().Be("Momo");
+        _sut.AvatarUrl.Should().Be("https://example.com/avatar.png");
+    }
+
+    [Fact]
+    public void ApplyQueryAttributes_WhenGivenStringGuid_ShouldParseAndSetConversationId()
+    {
+        // Arrange
+        var convId = Guid.NewGuid();
+        var query = new Dictionary<string, object>
+        {
+            { "ConversationId", convId.ToString() },
+            { "Title", "Walid" },
+            { "AvatarUrl", "" }
+        };
+
+        // Act
+        _sut.ApplyQueryAttributes(query);
+
+        // Assert
+        _sut.ConversationId.Should().Be(convId);
+        _sut.ChatTitle.Should().Be("Walid");
+        _sut.AvatarUrl.Should().BeEmpty();
+    }
 }

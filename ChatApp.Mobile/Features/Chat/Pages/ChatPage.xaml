@@ -393,6 +393,9 @@
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="12" />
                                         </Border.StrokeShape>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OpenImagePreviewCommand}" CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
                                         <Image Source="{Binding DisplayImageUrl}"
                                                Aspect="AspectFill" />
                                     </Border>
@@ -669,6 +672,9 @@
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="12" />
                                         </Border.StrokeShape>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference ChatPageRoot}, Path=BindingContext.OpenImagePreviewCommand}" CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
                                         <Image Source="{Binding DisplayImageUrl}"
                                                Aspect="AspectFill" />
                                     </Border>
@@ -2103,6 +2109,34 @@
         <Grid x:Name="HeartOverlayGrid"
               Grid.RowSpan="6"
               InputTransparent="True" />
+
+        <!-- Full-Screen Image Viewer (Original Quality FullImageUrl) -->
+        <Grid Grid.RowSpan="6"
+              IsVisible="{Binding IsImageViewerVisible}"
+              BackgroundColor="#F2080214"
+              Padding="16">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseImagePreviewCommand}" />
+            </Grid.GestureRecognizers>
+            <Image Source="{Binding PreviewImageUrl}"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Fill" />
+            <Border WidthRequest="42"
+                    HeightRequest="42"
+                    StrokeThickness="1"
+                    Stroke="#4E2682"
+                    BackgroundColor="#CC240D47"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    Margin="6,12">
+                <Border.StrokeShape><RoundRectangle CornerRadius="21" /></Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CloseImagePreviewCommand}" />
+                </Border.GestureRecognizers>
+                <Path Data="{StaticResource IconClose}" Fill="#FFFFFF" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+        </Grid>
 
     </Grid>
 </ContentPage>

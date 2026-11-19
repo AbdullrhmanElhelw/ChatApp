@@ -617,6 +617,9 @@
                                         <Label Text="{Binding Caption}" FontFamily="CairoRegular" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#E8DCFA}" IsVisible="{Binding HasCaption}" LineBreakMode="WordWrap" />
                                         <Border StrokeThickness="1" Stroke="#4E2682" HeightRequest="200" IsVisible="{Binding HasImage}">
                                             <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference CoupleRoot}, Path=BindingContext.OpenMemoryImagePreviewCommand}" CommandParameter="{Binding DisplayImageUrl}" />
+                                            </Border.GestureRecognizers>
                                             <Grid>
                                                 <Image Source="{Binding DisplayImageUrl}" Aspect="AspectFill" />
                                                 <Border WidthRequest="34" HeightRequest="34" StrokeThickness="0" BackgroundColor="#AA240D47" HorizontalOptions="End" VerticalOptions="End" Margin="12">
@@ -780,6 +783,33 @@
                         <Label Text="إغلاق الرسالة وحفظها" FontFamily="CairoBold" FontSize="15" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
                 </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Full-Screen Memory Image Viewer -->
+        <Grid IsVisible="{Binding IsMemoryImageViewerVisible}"
+              BackgroundColor="#F2080214"
+              Padding="16">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseMemoryImagePreviewCommand}" />
+            </Grid.GestureRecognizers>
+            <Image Source="{Binding PreviewMemoryImageUrl}"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Fill" />
+            <Border WidthRequest="42"
+                    HeightRequest="42"
+                    StrokeThickness="1"
+                    Stroke="#4E2682"
+                    BackgroundColor="#CC240D47"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    Margin="6,12">
+                <Border.StrokeShape><RoundRectangle CornerRadius="21" /></Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CloseMemoryImagePreviewCommand}" />
+                </Border.GestureRecognizers>
+                <Path Data="{StaticResource IconClose}" Fill="#FFFFFF" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
             </Border>
         </Grid>
 

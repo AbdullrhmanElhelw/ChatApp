@@ -204,6 +204,22 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 
     public bool IsReactionPickerVisible => ReactionTargetMessage != null;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsImageViewerVisible))]
+    public partial string? PreviewImageUrl { get; set; }
+
+    public bool IsImageViewerVisible => !string.IsNullOrWhiteSpace(PreviewImageUrl);
+
+    [RelayCommand]
+    public void OpenImagePreview(ChatMessageItem? item)
+    {
+        if (item == null || string.IsNullOrWhiteSpace(item.FullImageUrl)) return;
+        PreviewImageUrl = item.FullImageUrl;
+    }
+
+    [RelayCommand]
+    public void CloseImagePreview() => PreviewImageUrl = null;
+
     partial void OnSelectedEmojiCategoryChanged(string value)
     {
         if (EmojiCatalog.TryGetValue(value, out var emojis))

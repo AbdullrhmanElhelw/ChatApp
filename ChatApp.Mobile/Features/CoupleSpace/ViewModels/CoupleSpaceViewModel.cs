@@ -118,6 +118,22 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     public bool IsMemoryDetailVisible => SelectedMemory != null;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsMemoryImageViewerVisible))]
+    public partial string? PreviewMemoryImageUrl { get; set; }
+
+    public bool IsMemoryImageViewerVisible => !string.IsNullOrWhiteSpace(PreviewMemoryImageUrl);
+
+    [RelayCommand]
+    private void OpenMemoryImagePreview(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return;
+        PreviewMemoryImageUrl = url;
+    }
+
+    [RelayCommand]
+    private void CloseMemoryImagePreview() => PreviewMemoryImageUrl = null;
+
+    [ObservableProperty]
     public partial ObservableCollection<LoveNoteItem> LoveNotes { get; set; } = new();
 
     // Modals

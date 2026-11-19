@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChatApp.Mobile.Features.Common;
@@ -5,17 +6,50 @@ using ChatApp.Mobile.Navigation;
 
 namespace ChatApp.Mobile.Features.Authentication.ViewModels;
 
+public record OnboardingSlide(
+    string TitleLine1,
+    string TitleLine2,
+    string Subtitle,
+    string ImageSource,
+    bool IsLogoSlide
+);
+
 public partial class WelcomeViewModel : BaseViewModel
 {
     private readonly INavigationService _navigationService;
 
     [ObservableProperty]
-    public partial string CurrentThemeName { get; set; } = "الوضع الفاتح";
+    public partial string CurrentThemeName { get; set; } = "الوضع الداكن";
+
+    [ObservableProperty]
+    public partial int CurrentSlideIndex { get; set; }
+
+    public ObservableCollection<OnboardingSlide> Slides { get; } = new()
+    {
+        new OnboardingSlide(
+            "عالمكم الصغير،",
+            "معاً.",
+            "مساحة خاصة ومحادثات فورية تجمعكم أنتم الاتنين في مكان واحد.",
+            "betweenus_logo.png",
+            true),
+        new OnboardingSlide(
+            "خلّي لحظاتكم",
+            "قريبة.",
+            "سجّلوا تواريخكم الخاصة، ألبوم ذكرياتكم، ورسائل الحب المؤجلة.",
+            "betweenus_splash.png",
+            false),
+        new OnboardingSlide(
+            "تواصلوا بالصوت،",
+            "القلب والمزاج.",
+            "رسائل صوتية، نبضات حب متحركة، وتخصيص كامل لكل تفاصيل شاتكم.",
+            "betweenus_logo.png",
+            true)
+    };
 
     public WelcomeViewModel(INavigationService navigationService)
     {
         _navigationService = navigationService;
-        Title = "مرحباً بك في ChatApp";
+        Title = "BetweenUs";
         UpdateThemeName();
     }
 
@@ -40,6 +74,6 @@ public partial class WelcomeViewModel : BaseViewModel
 
     private void UpdateThemeName()
     {
-        CurrentThemeName = ThemeManager.IsDarkMode ? "الوضع الداكن 🌙" : "الوضع الفاتح ☀️";
+        CurrentThemeName = ThemeManager.IsDarkMode ? "داكن" : "فاتح";
     }
 }

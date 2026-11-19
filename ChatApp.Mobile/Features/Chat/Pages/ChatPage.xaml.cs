@@ -45,9 +45,24 @@ public partial class ChatPage : ContentPage
         }
     }
 
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (_viewModel != null)
+        {
+            _ = _viewModel.LoadStickerPacksAsync();
+        }
+    }
+
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        // If navigating to a child page (like Sticker Studio), don't dispose the chat view model
+        if (Navigation?.NavigationStack?.Count > 1)
+        {
+            return;
+        }
+
         if (_viewModel?.Messages != null)
         {
             _viewModel.Messages.CollectionChanged -= OnMessagesCollectionChanged;

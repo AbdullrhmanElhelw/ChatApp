@@ -171,13 +171,41 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     {
         try
         {
-            var packsResult = await _stickerApi.GetPublicPacksAsync();
-            if (packsResult.IsSuccess && packsResult.Value != null)
+            var publicPacksTask = _stickerApi.GetPublicPacksAsync();
+            var myPacksTask = _stickerApi.GetMyPacksAsync();
+
+            await Task.WhenAll(publicPacksTask, myPacksTask);
+
+            var combinedPacks = new Dictionary<Guid, StickerPackClientDto>();
+
+            var publicResult = await publicPacksTask;
+            if (publicResult.IsSuccess && publicResult.Value != null)
             {
-                AvailableStickerPacks = new ObservableCollection<StickerPackClientDto>(packsResult.Value);
-                var allStickers = packsResult.Value.SelectMany(p => p.Stickers).ToList();
-                ActiveStickers = new ObservableCollection<StickerClientDto>(allStickers);
+                foreach (var pack in publicResult.Value)
+                {
+                    combinedPacks[pack.Id] = pack;
+                }
             }
+
+            var myResult = await myPacksTask;
+            if (myResult.IsSuccess && myResult.Value != null)
+            {
+                foreach (var pack in myResult.Value)
+                {
+                    combinedPacks[pack.Id] = pack;
+                }
+            }
+
+            AvailableStickerPacks = new ObservableCollection<StickerPackClientDto>(combinedPacks.Values);
+
+            var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+            var allStickers = combinedPacks.Values
+                .OrderByDescending(p => p.OwnerId == currentUserId)
+                .ThenByDescending(p => p.CreatedAt)
+                .SelectMany(p => p.Stickers)
+                .ToList();
+
+            ActiveStickers = new ObservableCollection<StickerClientDto>(allStickers);
         }
         catch { }
     }
@@ -186,7 +214,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     public void ToggleAttachmentPanel()
     {
         IsAttachmentPanelVisible = !IsAttachmentPanelVisible;
-        if (IsAttachmentPanelVisible && AvailableStickerPacks.Count == 0)
+        if (IsAttachmentPanelVisible)
         {
             _ = LoadStickerPacksAsync();
         }

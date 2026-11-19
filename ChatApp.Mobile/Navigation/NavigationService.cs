@@ -63,9 +63,39 @@ public class NavigationService : INavigationService
         return MainThread.InvokeOnMainThreadAsync(ExecuteGoBackAsync);
     }
 
-    private Task ExecuteGoBackAsync()
+    private async Task ExecuteGoBackAsync()
     {
-        if (Shell.Current == null) return Task.CompletedTask;
-        return Shell.Current.GoToAsync("..");
+        if (Shell.Current == null) return;
+
+        try
+        {
+            if (Shell.Current.Navigation != null)
+            {
+                if (Shell.Current.Navigation.ModalStack.Count > 0)
+                {
+                    await Shell.Current.Navigation.PopModalAsync();
+                    return;
+                }
+
+                if (Shell.Current.Navigation.NavigationStack.Count > 1)
+                {
+                    await Shell.Current.Navigation.PopAsync();
+                    return;
+                }
+            }
+
+            await Shell.Current.GoToAsync("..");
+        }
+        catch
+        {
+            if (Shell.Current.Navigation?.NavigationStack.Count > 1)
+            {
+                await Shell.Current.Navigation.PopAsync();
+            }
+            else
+            {
+                await Shell.Current.GoToAsync("..");
+            }
+        }
     }
 }

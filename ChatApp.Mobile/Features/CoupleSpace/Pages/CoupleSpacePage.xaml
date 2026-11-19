@@ -24,9 +24,9 @@
             </BoxView.Background>
         </BoxView>
 
-        <Grid RowDefinitions="Auto,*">
+        <Grid RowDefinitions="Auto,Auto,*">
             <!-- 1. Top Header -->
-            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="18,14,18,10" VerticalOptions="Center">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="18,14,18,8" VerticalOptions="Center">
                 <Border Grid.Column="0"
                         WidthRequest="38"
                         HeightRequest="38"
@@ -55,9 +55,91 @@
                 </HorizontalStackLayout>
             </Grid>
 
-            <!-- 2. Scrollable Content -->
-            <ScrollView Grid.Row="1">
-                <VerticalStackLayout Padding="18,6,18,32" Spacing="16">
+            <!-- 2. Fixed Top Segmented Tabs: مساحتنا | تواريخنا | ذكرياتنا | رسائل حب -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" ColumnSpacing="6" Padding="18,4,18,10">
+                <Border Grid.Column="0" HeightRequest="40" StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsHomeTab}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                            <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.Home}" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconHeart}" Fill="#FFD6F2" WidthRequest="12" HeightRequest="12" Aspect="Uniform" VerticalOptions="Center" />
+                        <Label Text="مساحتنا" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Border Grid.Column="1" HeightRequest="40" StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsDatesTab}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                            <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.Dates}" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconCalendar}" Fill="#FFD6F2" WidthRequest="12" HeightRequest="12" Aspect="Uniform" VerticalOptions="Center" />
+                        <Label Text="تواريخنا" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Border Grid.Column="2" HeightRequest="40" StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsMemoriesTab}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                            <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.Memories}" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconImage}" Fill="#FFD6F2" WidthRequest="12" HeightRequest="12" Aspect="Uniform" VerticalOptions="Center" />
+                        <Label Text="ذكرياتنا" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Border Grid.Column="3" HeightRequest="40" StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding IsLoveNotesTab}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                            <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.LoveNotes}" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Path Data="{StaticResource IconMail}" Fill="#FFD6F2" WidthRequest="12" HeightRequest="12" Aspect="Uniform" VerticalOptions="Center" />
+                        <Label Text="رسائل حب" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- 3. Scrollable Tab Content -->
+            <ScrollView Grid.Row="2">
+                <VerticalStackLayout Padding="18,4,18,32" Spacing="16">
+
+                    <!-- TAB 0: Home (Pairing + Daily Question) -->
+                    <VerticalStackLayout IsVisible="{Binding IsHomeTab}" Spacing="16">
 
                     <!-- 2a. Couple Pairing Card (Not Paired Yet) -->
                     <Border IsVisible="{Binding IsNotPaired}"
@@ -106,8 +188,8 @@
                                 </Grid>
                             </Border>
 
-                            <!-- Generate Code Button -->
-                            <Border HeightRequest="44" StrokeThickness="0">
+                            <!-- Generate Code Button (Hidden once code is generated) -->
+                            <Border IsVisible="{Binding NeedsInviteGeneration}" HeightRequest="44" StrokeThickness="0">
                                 <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
@@ -241,65 +323,7 @@
                         </VerticalStackLayout>
                     </Border>
 
-                    <!-- Segmented Tabs: Dates | Memories | Love Notes -->
-                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
-                        <Border Grid.Column="0" HeightRequest="42" StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
-                                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
-                            <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding IsDatesTab}" Value="True">
-                                    <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
-                                    <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
-                                </DataTrigger>
-                            </Border.Triggers>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.Dates}" />
-                            </Border.GestureRecognizers>
-                            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
-                                <Path Data="{StaticResource IconCalendar}" Fill="#FFD6F2" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
-                                <Label Text="تواريخنا" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                        </Border>
-
-                        <Border Grid.Column="1" HeightRequest="42" StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
-                                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
-                            <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding IsMemoriesTab}" Value="True">
-                                    <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
-                                    <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
-                                </DataTrigger>
-                            </Border.Triggers>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.Memories}" />
-                            </Border.GestureRecognizers>
-                            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
-                                <Path Data="{StaticResource IconImage}" Fill="#FFD6F2" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
-                                <Label Text="ذكرياتنا" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                        </Border>
-
-                        <Border Grid.Column="2" HeightRequest="42" StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
-                                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
-                            <Border.Triggers>
-                                <DataTrigger TargetType="Border" Binding="{Binding IsLoveNotesTab}" Value="True">
-                                    <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
-                                    <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
-                                </DataTrigger>
-                            </Border.Triggers>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.LoveNotes}" />
-                            </Border.GestureRecognizers>
-                            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
-                                <Path Data="{StaticResource IconMail}" Fill="#FFD6F2" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
-                                <Label Text="رسائل حب" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
-                            </HorizontalStackLayout>
-                        </Border>
-                    </Grid>
+                    </VerticalStackLayout>
 
                     <!-- TAB 1: Special Dates -->
                     <VerticalStackLayout IsVisible="{Binding IsDatesTab}" Spacing="12">

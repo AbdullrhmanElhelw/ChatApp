@@ -12,6 +12,7 @@ namespace ChatApp.Mobile.Features.CoupleSpace.ViewModels;
 
 public enum CoupleTab
 {
+    Home,
     Dates,
     Memories,
     LoveNotes
@@ -34,11 +35,13 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     ];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsHomeTab))]
     [NotifyPropertyChangedFor(nameof(IsDatesTab))]
     [NotifyPropertyChangedFor(nameof(IsMemoriesTab))]
     [NotifyPropertyChangedFor(nameof(IsLoveNotesTab))]
-    public partial CoupleTab ActiveTab { get; set; } = CoupleTab.Dates;
+    public partial CoupleTab ActiveTab { get; set; } = CoupleTab.Home;
 
+    public bool IsHomeTab => ActiveTab == CoupleTab.Home;
     public bool IsDatesTab => ActiveTab == CoupleTab.Dates;
     public bool IsMemoriesTab => ActiveTab == CoupleTab.Memories;
     public bool IsLoveNotesTab => ActiveTab == CoupleTab.LoveNotes;
@@ -52,9 +55,11 @@ public partial class CoupleSpaceViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasInviteCode))]
+    [NotifyPropertyChangedFor(nameof(NeedsInviteGeneration))]
     public partial string InviteCode { get; set; } = string.Empty;
 
     public bool HasInviteCode => !string.IsNullOrWhiteSpace(InviteCode);
+    public bool NeedsInviteGeneration => !HasInviteCode;
 
     [ObservableProperty]
     public partial string JoinCodeInput { get; set; } = string.Empty;

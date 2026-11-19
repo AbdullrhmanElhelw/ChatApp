@@ -42,7 +42,7 @@ public static class MauiProgram
         builder.Services.AddSingleton(new HttpClient
         {
             BaseAddress = new Uri(ApiConfig.BaseUrl),
-            Timeout = TimeSpan.FromSeconds(15)
+            Timeout = TimeSpan.FromSeconds(30)
         });
         builder.Services.AddSingleton<IAuthApiService, AuthApiService>();
         builder.Services.AddSingleton<IConversationApiService, ConversationApiService>();

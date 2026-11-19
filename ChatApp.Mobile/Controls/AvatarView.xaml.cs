@@ -1,3 +1,5 @@
+using ChatApp.Mobile.Features.Authentication.Services;
+
 namespace ChatApp.Mobile.Controls;
 
 public partial class AvatarView : ContentView
@@ -45,6 +47,16 @@ public partial class AvatarView : ContentView
     public double BadgeSize => Math.Max(12.0, Size * 0.28);
     public bool HasAvatarUrl => !string.IsNullOrWhiteSpace(AvatarUrl);
 
+    public string? ResolvedAvatarUrl
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(AvatarUrl)) return null;
+            if (AvatarUrl.StartsWith("/")) return $"{ApiConfig.BaseUrl}{AvatarUrl}";
+            return AvatarUrl;
+        }
+    }
+
     public AvatarView()
     {
         InitializeComponent();
@@ -53,6 +65,7 @@ public partial class AvatarView : ContentView
     private void OnAvatarUrlChanged()
     {
         OnPropertyChanged(nameof(HasAvatarUrl));
+        OnPropertyChanged(nameof(ResolvedAvatarUrl));
     }
 
     private void OnSizeChanged()

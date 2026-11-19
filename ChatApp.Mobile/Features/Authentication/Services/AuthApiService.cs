@@ -24,7 +24,7 @@ public class AuthApiService : IAuthApiService
         {
             _httpClient.BaseAddress = new Uri(ApiConfig.BaseUrl);
         }
-        _httpClient.Timeout = TimeSpan.FromSeconds(15);
+        _httpClient.Timeout = TimeSpan.FromSeconds(30);
     }
 
     public async Task<ApiResult<AuthResponseDto>> RegisterAsync(RegisterRequestDto request)

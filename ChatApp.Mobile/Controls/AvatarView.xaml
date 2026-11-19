@@ -40,7 +40,7 @@
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="{Binding Radius, Source={x:Reference ThisControl}}" />
             </Border.StrokeShape>
-            <Image Source="{Binding AvatarUrl, Source={x:Reference ThisControl}}"
+            <Image Source="{Binding ResolvedAvatarUrl, Source={x:Reference ThisControl}}"
                    Aspect="AspectFill"
                    WidthRequest="{Binding Size, Source={x:Reference ThisControl}}"
                    HeightRequest="{Binding Size, Source={x:Reference ThisControl}}" />

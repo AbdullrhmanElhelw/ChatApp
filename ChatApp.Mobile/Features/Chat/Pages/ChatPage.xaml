@@ -194,11 +194,6 @@
                                 <Border.Shadow>
                                     <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,2" Radius="4" Opacity="0.3" />
                                 </Border.Shadow>
-                                <Border.Behaviors>
-                                    <toolkit:TouchBehavior LongPressCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
-                                                           LongPressCommandParameter="{Binding .}"
-                                                           LongPressDuration="360" />
-                                </Border.Behaviors>
                                 <Border.GestureRecognizers>
                                     <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
                                                               PointerReleased="OnMessageBubblePointerReleased"
@@ -212,6 +207,9 @@
                                                             Threshold="35"
                                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
                                                             CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          CommandParameter="{Binding .}" />
                                     <TapGestureRecognizer Buttons="Secondary"
                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
                                                           CommandParameter="{Binding .}" />
@@ -350,11 +348,6 @@
                                     </Border>
 
                                     <Grid>
-                                        <Grid.Behaviors>
-                                            <toolkit:TouchBehavior LongPressCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
-                                                                   LongPressCommandParameter="{Binding .}"
-                                                                   LongPressDuration="360" />
-                                        </Grid.Behaviors>
                                         <Grid.GestureRecognizers>
                                             <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
                                                                       PointerReleased="OnMessageBubblePointerReleased"
@@ -368,6 +361,9 @@
                                                                     Threshold="35"
                                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
                                                                     CommandParameter="{Binding .}" />
+                                            <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                  CommandParameter="{Binding .}" />
                                             <TapGestureRecognizer Buttons="Secondary"
                                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
                                                                   CommandParameter="{Binding .}" />
@@ -453,11 +449,6 @@
                                 <Border.Shadow>
                                     <Shadow Brush="#08000000" Offset="0,1" Radius="3" Opacity="0.5" />
                                 </Border.Shadow>
-                                <Border.Behaviors>
-                                    <toolkit:TouchBehavior LongPressCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
-                                                           LongPressCommandParameter="{Binding .}"
-                                                           LongPressDuration="360" />
-                                </Border.Behaviors>
                                 <Border.GestureRecognizers>
                                     <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
                                                               PointerReleased="OnMessageBubblePointerReleased"
@@ -471,6 +462,9 @@
                                                             Threshold="35"
                                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
                                                             CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          CommandParameter="{Binding .}" />
                                     <TapGestureRecognizer Buttons="Secondary"
                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
                                                           CommandParameter="{Binding .}" />
@@ -605,11 +599,6 @@
                                     </Border>
 
                                     <Grid>
-                                        <Grid.Behaviors>
-                                            <toolkit:TouchBehavior LongPressCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
-                                                                   LongPressCommandParameter="{Binding .}"
-                                                                   LongPressDuration="360" />
-                                        </Grid.Behaviors>
                                         <Grid.GestureRecognizers>
                                             <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
                                                                       PointerReleased="OnMessageBubblePointerReleased"
@@ -623,6 +612,9 @@
                                                                     Threshold="35"
                                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
                                                                     CommandParameter="{Binding .}" />
+                                            <TapGestureRecognizer NumberOfTapsRequired="2"
+                                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                  CommandParameter="{Binding .}" />
                                             <TapGestureRecognizer Buttons="Secondary"
                                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
                                                                   CommandParameter="{Binding .}" />

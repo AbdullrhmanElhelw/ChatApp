@@ -69,14 +69,20 @@ public record ConversationSummaryDto(
         get
         {
             if (LastMessage is null) return "لا توجد رسائل بعد";
-            if (!string.IsNullOrWhiteSpace(LastMessage.Content)) return LastMessage.Content;
+            var content = LastMessage.Content?.Trim();
+            var isMediaPath = !string.IsNullOrEmpty(content) &&
+                              (content.StartsWith("/uploads/", StringComparison.OrdinalIgnoreCase) ||
+                               content.StartsWith("/media/", StringComparison.OrdinalIgnoreCase));
+
             return LastMessage.MessageType switch
             {
-                MessageType.Image => "📷 صورة",
-                MessageType.Video => "🎥 فيديو",
-                MessageType.Audio => "🎤 رسالة صوتية",
                 MessageType.Sticker => "✨ ملصق",
-                _ => "رسالة جديدة"
+                MessageType.Image => isMediaPath || string.IsNullOrWhiteSpace(content) ? "📷 صورة" : $"📷 {content}",
+                MessageType.Video => isMediaPath || string.IsNullOrWhiteSpace(content) ? "🎥 فيديو" : $"🎥 {content}",
+                MessageType.Audio => "🎤 رسالة صوتية",
+                _ => isMediaPath && content!.Contains("stickers", StringComparison.OrdinalIgnoreCase)
+                    ? "✨ ملصق"
+                    : !string.IsNullOrWhiteSpace(content) ? content : "رسالة جديدة"
             };
         }
     }

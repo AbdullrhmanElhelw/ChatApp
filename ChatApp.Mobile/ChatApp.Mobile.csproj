@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0-android;net10.0-windows10.0.19041.0</TargetFrameworks>
 		<TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('windows'))">net10.0-android</TargetFrameworks>
 		<MSBuildEnableWorkloadResolver>false</MSBuildEnableWorkloadResolver>
 		<Platform Condition="'$(Platform)' == ''">x64</Platform>

@@ -1,0 +1,38 @@
+<Project>
+  <ImportGroup Condition=" ('$(TargetPlatformIdentifier)' == 'android' or '$(TargetPlatformIdentifier)' == 'Android') and $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '10.0')) ">
+    <Import Project="C:\Program Files\dotnet\packs\Microsoft.NET.Runtime.MonoTargets.Sdk\10.0.15\Sdk\Sdk.props"
+            Condition="Exists('C:\Program Files\dotnet\packs\Microsoft.NET.Runtime.MonoTargets.Sdk\10.0.15\Sdk\Sdk.props')" />
+    <Import Project="C:\Program Files\dotnet\packs\Microsoft.NET.Runtime.MonoTargets.Sdk\10.0.15\Sdk\Sdk.targets"
+            Condition="Exists('C:\Program Files\dotnet\packs\Microsoft.NET.Runtime.MonoTargets.Sdk\10.0.15\Sdk\Sdk.targets')" />
+  </ImportGroup>
+
+  <ImportGroup Condition=" '$(TargetPlatformIdentifier)' == 'android' or '$(TargetPlatformIdentifier)' == 'Android' ">
+    <Import Project="C:\Program Files\dotnet\packs\Microsoft.Android.Sdk.Windows\37.2.29\Sdk\Sdk.targets"
+            Condition=" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '11.0')) and Exists('C:\Program Files\dotnet\packs\Microsoft.Android.Sdk.Windows\37.2.29\Sdk\Sdk.targets') " />
+    <Import Project="C:\Program Files\dotnet\packs\Microsoft.Android.Sdk.Windows\36.1.118\Sdk\Sdk.targets"
+            Condition=" $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '10.0')) and Exists('C:\Program Files\dotnet\packs\Microsoft.Android.Sdk.Windows\36.1.118\Sdk\Sdk.targets') " />
+  </ImportGroup>
+
+  <ItemGroup Condition=" ('$(TargetPlatformIdentifier)' == 'android' or '$(TargetPlatformIdentifier)' == 'Android') and $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '10.0')) ">
+    <KnownFrameworkReference
+        Update="Microsoft.Android;Microsoft.Android.Runtimes"
+        LatestRuntimeFrameworkVersion="36.1.118"
+        TargetingPackVersion="36.1.118"
+    />
+    <KnownRuntimePack Update="@(KnownRuntimePack)">
+      <LatestRuntimeFrameworkVersion Condition="'%(KnownRuntimePack.TargetFramework)' == 'net10.0' and '%(KnownRuntimePack.RuntimePackLabels)' == 'Mono'">10.0.15</LatestRuntimeFrameworkVersion>
+    </KnownRuntimePack>
+    <KnownFrameworkReference Update="Microsoft.NETCore.App">
+      <TargetingPackVersion Condition="'%(KnownFrameworkReference.TargetFramework)' == 'net10.0'">10.0.15</TargetingPackVersion>
+    </KnownFrameworkReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and $([MSBuild]::VersionGreaterThanOrEquals($(TargetFrameworkVersion), '10.0')) ">
+    <SdkSupportedTargetPlatformIdentifier Include="android" DisplayName="Android" />
+  </ItemGroup>
+
+  <Import
+      Condition=" ('$(UseMaui)' == 'true' or '$(UseMauiCore)' == 'true' or '$(UseMauiEssentials)' == 'true' or '$(UseMauiAssets)' == 'true') and ($([MSBuild]::VersionEquals($(TargetFrameworkVersion), '10.0'))) and ('$(SkipMauiWorkloadManifest)' != 'true') and Exists('C:\Program Files\dotnet\packs\Microsoft.Maui.Sdk\10.0.110\Sdk\Sdk.targets') "
+      Project="C:\Program Files\dotnet\packs\Microsoft.Maui.Sdk\10.0.110\Sdk\Sdk.targets"
+  />
+</Project>

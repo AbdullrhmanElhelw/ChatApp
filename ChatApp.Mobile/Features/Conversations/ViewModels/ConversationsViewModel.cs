@@ -169,6 +169,12 @@ public partial class ConversationsViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task OpenCoupleSpaceAsync()
+    {
+        await _navigationService.NavigateToAsync(AppRoutes.CoupleSpace);
+    }
+
+    [RelayCommand]
     private async Task OpenSettingsMenuAsync()
     {
         await _navigationService.NavigateToAsync(AppRoutes.Settings);

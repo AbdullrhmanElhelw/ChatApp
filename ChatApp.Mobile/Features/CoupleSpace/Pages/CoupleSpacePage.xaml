@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChatApp.Mobile.Features.CoupleSpace.ViewModels"
+             xmlns:models="clr-namespace:ChatApp.Mobile.Features.CoupleSpace.Models"
+             x:Class="ChatApp.Mobile.Features.CoupleSpace.Pages.CoupleSpacePage"
+             x:Name="CoupleRoot"
+             x:DataType="vm:CoupleSpaceViewModel"
+             Title="{Binding Title}"
+             Shell.NavBarIsVisible="False"
+             FlowDirection="RightToLeft"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource DarkBackground}}">
+
+    <Grid>
+        <!-- Cosmic Gradient Background -->
+        <BoxView InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="{AppThemeBinding Light=#FFF5FF, Dark=#14042B}" Offset="0.0" />
+                    <GradientStop Color="{AppThemeBinding Light=#FAF0FC, Dark=#1A0035}" Offset="0.55" />
+                    <GradientStop Color="{AppThemeBinding Light=#F3E4FA, Dark=#2E0854}" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+
+        <Grid RowDefinitions="Auto,*">
+            <!-- 1. Top Header -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="18,14,18,10" VerticalOptions="Center">
+                <Border Grid.Column="0"
+                        WidthRequest="38"
+                        HeightRequest="38"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="19" /></Border.StrokeShape>
+                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding NavigateBackCommand}" /></Border.GestureRecognizers>
+                    <Path Data="{StaticResource IconArrowRight}"
+                          Fill="{AppThemeBinding Light={StaticResource Gray700}, Dark=#FFFFFF}"
+                          WidthRequest="18" HeightRequest="18" Aspect="Uniform"
+                          HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                    <Path Data="{StaticResource IconHeart}" Fill="{StaticResource BrandNeonPink}" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                    <Label Text="عالمنا الخاص"
+                           FontFamily="CairoBold" FontSize="20" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <HorizontalStackLayout Grid.Column="2" FlowDirection="LeftToRight" Spacing="0" VerticalOptions="Center">
+                    <Label Text="Between" FontFamily="CairoBold" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                    <Label Text="Us" FontFamily="CairoBold" FontSize="13" TextColor="{StaticResource BrandNeonPink}" />
+                </HorizontalStackLayout>
+            </Grid>
+
+            <!-- 2. Scrollable Content -->
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Padding="18,6,18,32" Spacing="16">
+
+                    <!-- Daily Question Hero Card -->
+                    <Border StrokeThickness="1"
+                            Stroke="#5B2699"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#240E45}"
+                            Padding="18">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="22" /></Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="#FF4FB8" Offset="0,4" Radius="16" Opacity="0.22" />
+                        </Border.Shadow>
+
+                        <VerticalStackLayout Spacing="10">
+                            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                <Border WidthRequest="30" HeightRequest="30" StrokeThickness="0">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="10" /></Border.StrokeShape>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#FF4FB8" Offset="0.0" />
+                                            <GradientStop Color="#7B2DF3" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Path Data="{StaticResource IconSparkles}" Fill="#FFFFFF" WidthRequest="15" HeightRequest="15" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <Label Text="سؤال اليوم بينكما"
+                                       FontFamily="CairoBold" FontSize="13"
+                                       TextColor="{StaticResource BrandNeonPink}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
+                            <Label Text="{Binding TodayQuestion}"
+                                   FontFamily="CairoBold" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                                   LineBreakMode="WordWrap" />
+
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Border Grid.Column="0"
+                                        StrokeThickness="1"
+                                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3D1E6D}"
+                                        BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#180930}"
+                                        Padding="12,0"
+                                        HeightRequest="42">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                    <Entry Text="{Binding TodayAnswer, Mode=TwoWay}"
+                                           Placeholder="اكتب إجابتك هنا..."
+                                           FontFamily="CairoRegular" FontSize="13"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}"
+                                           PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark=#8C7FA6}"
+                                           BackgroundColor="Transparent"
+                                           VerticalOptions="Center" />
+                                </Border>
+
+                                <Border Grid.Column="1" StrokeThickness="0" Padding="16,0" HeightRequest="42">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                            <GradientStop Color="#FF4FB8" Offset="0.0" />
+                                            <GradientStop Color="#7B2DF3" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SaveDailyAnswerCommand}" /></Border.GestureRecognizers>
+                                    <Label Text="حفظ" FontFamily="CairoBold" FontSize="13" TextColor="#FFFFFF" VerticalOptions="Center" />
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Segmented Tabs: Dates | Memories | Love Notes -->
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                        <Border Grid.Column="0" HeightRequest="42" StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsDatesTab}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                                    <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.Dates}" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconCalendar}" Fill="#FFD6F2" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="تواريخنا" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="1" HeightRequest="42" StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsMemoriesTab}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                                    <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.Memories}" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconImage}" Fill="#FFD6F2" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="ذكرياتنا" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="2" HeightRequest="42" StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
+                                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsLoveNotesTab}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource BrandNeonViolet}" />
+                                    <Setter Property="Stroke" Value="{StaticResource BrandNeonPink}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="{x:Static vm:CoupleTab.LoveNotes}" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconMail}" Fill="#FFD6F2" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="رسائل حب" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <!-- TAB 1: Special Dates -->
+                    <VerticalStackLayout IsVisible="{Binding IsDatesTab}" Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="مناسباتنا الخاصة" FontFamily="CairoBold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            <Border Grid.Column="1" StrokeThickness="0" Padding="14,7">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenAddDateSheetCommand}" /></Border.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                    <Path Data="{StaticResource IconPlus}" Fill="#FFFFFF" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
+                                    <Label Text="مناسبة جديدة" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </Grid>
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding SpecialDates}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:SpecialDateItem">
+                                    <Border StrokeThickness="1" Stroke="#3A1D63" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}" Padding="14">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                                            <Border Grid.Column="0" WidthRequest="42" HeightRequest="42" StrokeThickness="0">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="13" /></Border.StrokeShape>
+                                                <Border.Background>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                        <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                                                    </LinearGradientBrush>
+                                                </Border.Background>
+                                                <Path Data="{StaticResource IconCalendar}" Fill="#FFFFFF" WidthRequest="18" HeightRequest="18" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                                <Label Text="{Binding Title}" FontFamily="CairoBold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                                                <Label Text="{Binding FormattedDate}" FontFamily="CairoRegular" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#9B86B8}" />
+                                            </VerticalStackLayout>
+                                            <Border Grid.Column="2" StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="#3A0B6B" Padding="10,5" VerticalOptions="Center">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                                                <Label Text="{Binding CountdownBadge}" FontFamily="CairoBold" FontSize="11" TextColor="#FFD6F2" />
+                                            </Border>
+                                            <Border Grid.Column="3" WidthRequest="32" HeightRequest="32" StrokeThickness="0" BackgroundColor="Transparent" VerticalOptions="Center">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference CoupleRoot}, Path=BindingContext.DeleteSpecialDateCommand}" CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Path Data="{StaticResource IconTrash}" Fill="#9B86B8" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- TAB 2: Our Memories -->
+                    <VerticalStackLayout IsVisible="{Binding IsMemoriesTab}" Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="ألبوم ذكرياتنا" FontFamily="CairoBold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            <Border Grid.Column="1" StrokeThickness="0" Padding="14,7">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenAddMemorySheetCommand}" /></Border.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                    <Path Data="{StaticResource IconPlus}" Fill="#FFFFFF" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
+                                    <Label Text="ذكرى جديدة" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </Grid>
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Memories}" Spacing="12">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:MemoryItem">
+                                    <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}" Padding="14">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="20" /></Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="10">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                                    <Label Text="{Binding FormattedDate}" FontFamily="CairoRegular" FontSize="11" TextColor="{StaticResource BrandNeonPink}" />
+                                                    <Label Text="{Binding Title}" FontFamily="CairoBold" FontSize="16" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                                                </VerticalStackLayout>
+                                                <Border Grid.Column="1" WidthRequest="32" HeightRequest="32" StrokeThickness="0" BackgroundColor="Transparent">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={x:Reference CoupleRoot}, Path=BindingContext.DeleteMemoryCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Path Data="{StaticResource IconTrash}" Fill="#9B86B8" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                </Border>
+                                            </Grid>
+
+                                            <Border IsVisible="{Binding HasImage}" StrokeThickness="0" HeightRequest="170">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                                <Image Source="{Binding ImagePath}" Aspect="AspectFill" />
+                                            </Border>
+
+                                            <Label Text="{Binding Note}" FontFamily="CairoRegular" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#D5C2F0}" LineBreakMode="WordWrap" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- TAB 3: Love Notes -->
+                    <VerticalStackLayout IsVisible="{Binding IsLoveNotesTab}" Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="رسائل الحب المؤجلة" FontFamily="CairoBold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                            <Border Grid.Column="1" StrokeThickness="0" Padding="14,7">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenAddNoteSheetCommand}" /></Border.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                    <Path Data="{StaticResource IconPlus}" Fill="#FFFFFF" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
+                                    <Label Text="رسالة حب" FontFamily="CairoBold" FontSize="12" TextColor="#FFFFFF" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </Grid>
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding LoveNotes}" Spacing="10">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:LoveNoteItem">
+                                    <Border StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}" Padding="16">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                                        <VerticalStackLayout Spacing="8">
+                                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                                <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeThickness="0" BackgroundColor="#3A0B6B">
+                                                    <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                                                    <Path Data="{StaticResource IconMail}" Fill="#FFD6F2" WidthRequest="17" HeightRequest="17" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center">
+                                                        <Path.Triggers>
+                                                            <DataTrigger TargetType="Path" Binding="{Binding IsLocked}" Value="True">
+                                                                <Setter Property="Data" Value="{StaticResource IconLock}" />
+                                                                <Setter Property="Fill" Value="#FF4FB8" />
+                                                            </DataTrigger>
+                                                        </Path.Triggers>
+                                                    </Path>
+                                                </Border>
+                                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                    <Label Text="{Binding Title}" FontFamily="CairoBold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                                                    <Label Text="{Binding StatusLabel}" FontFamily="CairoRegular" FontSize="11" TextColor="{StaticResource BrandNeonPink}" />
+                                                </VerticalStackLayout>
+                                                <Border Grid.Column="2" WidthRequest="32" HeightRequest="32" StrokeThickness="0" BackgroundColor="Transparent">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={x:Reference CoupleRoot}, Path=BindingContext.DeleteLoveNoteCommand}" CommandParameter="{Binding .}" />
+                                                    </Border.GestureRecognizers>
+                                                    <Path Data="{StaticResource IconTrash}" Fill="#9B86B8" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                </Border>
+                                            </Grid>
+                                            <Label Text="{Binding DisplayPreview}" FontFamily="CairoRegular" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#D5C2F0}" LineBreakMode="WordWrap" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!-- MODAL 1: Add Special Date -->
+        <Grid IsVisible="{Binding IsAddDateSheetVisible}" BackgroundColor="#99090218">
+            <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding CloseAllSheetsCommand}" /></Grid.GestureRecognizers>
+            <Border VerticalOptions="End" StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D0A38}" Padding="20,18,20,28">
+                <Border.StrokeShape><RoundRectangle CornerRadius="28,28,0,0" /></Border.StrokeShape>
+                <Border.GestureRecognizers><TapGestureRecognizer /></Border.GestureRecognizers>
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="إضافة مناسبة خاصة" FontFamily="CairoBold" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" HorizontalOptions="Center" />
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="#220E3F" Padding="14,0" HeightRequest="48">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Entry Text="{Binding NewDateTitle, Mode=TwoWay}" Placeholder="اسم المناسبة (مثلاً: عيد ميلادنا)" FontFamily="CairoRegular" FontSize="14" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
+                    </Border>
+                    <DatePicker Date="{Binding NewDateValue, Mode=TwoWay}" TextColor="#FFFFFF" FontFamily="CairoRegular" />
+                    <Border HeightRequest="48" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SaveSpecialDateCommand}" /></Border.GestureRecognizers>
+                        <Label Text="حفظ المناسبة" FontFamily="CairoBold" FontSize="15" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- MODAL 2: Add Memory -->
+        <Grid IsVisible="{Binding IsAddMemorySheetVisible}" BackgroundColor="#99090218">
+            <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding CloseAllSheetsCommand}" /></Grid.GestureRecognizers>
+            <Border VerticalOptions="End" StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D0A38}" Padding="20,18,20,28">
+                <Border.StrokeShape><RoundRectangle CornerRadius="28,28,0,0" /></Border.StrokeShape>
+                <Border.GestureRecognizers><TapGestureRecognizer /></Border.GestureRecognizers>
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="إضافة ذكرى جديدة" FontFamily="CairoBold" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" HorizontalOptions="Center" />
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="#220E3F" Padding="14,0" HeightRequest="46">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Entry Text="{Binding NewMemoryTitle, Mode=TwoWay}" Placeholder="عنوان الذكرى" FontFamily="CairoRegular" FontSize="14" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
+                    </Border>
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="#220E3F" Padding="14,6" HeightRequest="80">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Editor Text="{Binding NewMemoryNote, Mode=TwoWay}" Placeholder="اكتب تفاصيل اللحظة..." FontFamily="CairoRegular" FontSize="13" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
+                    </Border>
+                    <Border HeightRequest="44" StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="#2A114E">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding PickMemoryPhotoCommand}" /></Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Path Data="{StaticResource IconImage}" Fill="#FFD6F2" WidthRequest="16" HeightRequest="16" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Text="اختيار صورة للذكرى" FontFamily="CairoBold" FontSize="13" TextColor="#FFD6F2" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                    <Border HeightRequest="48" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SaveMemoryCommand}" /></Border.GestureRecognizers>
+                        <Label Text="حفظ الذكرى" FontFamily="CairoBold" FontSize="15" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- MODAL 3: Add Love Note -->
+        <Grid IsVisible="{Binding IsAddNoteSheetVisible}" BackgroundColor="#99090218">
+            <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding CloseAllSheetsCommand}" /></Grid.GestureRecognizers>
+            <Border VerticalOptions="End" StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D0A38}" Padding="20,18,20,28">
+                <Border.StrokeShape><RoundRectangle CornerRadius="28,28,0,0" /></Border.StrokeShape>
+                <Border.GestureRecognizers><TapGestureRecognizer /></Border.GestureRecognizers>
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="كتابة رسالة حب مؤجلة" FontFamily="CairoBold" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" HorizontalOptions="Center" />
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="#220E3F" Padding="14,0" HeightRequest="46">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Entry Text="{Binding NewNoteTitle, Mode=TwoWay}" Placeholder="عنوان الرسالة" FontFamily="CairoRegular" FontSize="14" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
+                    </Border>
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="#220E3F" Padding="14,6" HeightRequest="90">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Editor Text="{Binding NewNoteMessage, Mode=TwoWay}" Placeholder="اكتب رسالتك من القلب..." FontFamily="CairoRegular" FontSize="13" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
+                    </Border>
+                    <Label Text="تاريخ فتح الرسالة:" FontFamily="CairoBold" FontSize="12" TextColor="#C5AFE4" />
+                    <DatePicker Date="{Binding NewNoteUnlockDate, Mode=TwoWay}" TextColor="#FFFFFF" FontFamily="CairoRegular" />
+                    <Border HeightRequest="48" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SaveLoveNoteCommand}" /></Border.GestureRecognizers>
+                        <Label Text="إغلاق الرسالة وحفظها" FontFamily="CairoBold" FontSize="15" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

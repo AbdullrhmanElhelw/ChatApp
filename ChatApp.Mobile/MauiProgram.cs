@@ -9,6 +9,8 @@ using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Features.Conversations.Pages;
 using ChatApp.Mobile.Features.Conversations.Services;
 using ChatApp.Mobile.Features.Conversations.ViewModels;
+using ChatApp.Mobile.Features.CoupleSpace.Pages;
+using ChatApp.Mobile.Features.CoupleSpace.ViewModels;
 using ChatApp.Mobile.Features.Settings.Pages;
 using ChatApp.Mobile.Features.Settings.ViewModels;
 using ChatApp.Mobile.Features.Stickers.Pages;
@@ -77,6 +79,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ChatViewModel>();
         builder.Services.AddTransient<StickerStudioViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<CoupleSpaceViewModel>();
         builder.Services.AddTransient<DesignSystemViewModel>();
 
         // 4. Pages
@@ -90,6 +93,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ChatPage>();
         builder.Services.AddTransient<StickerStudioPage>();
         builder.Services.AddTransient<SettingsPage>();
+        builder.Services.AddTransient<CoupleSpacePage>();
         builder.Services.AddTransient<DesignSystemPage>();
 
         // 5. Native Platform UI Tweaks: Strip default ugly Windows borders on Entry & Editor

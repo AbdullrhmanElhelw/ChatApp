@@ -480,7 +480,7 @@
                             <Shadow Brush="#FF4FB8" Offset="0,0" Radius="14" Opacity="0.65" />
                         </Border.Shadow>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
+                            <TapGestureRecognizer Command="{Binding OpenCoupleSpaceCommand}" />
                         </Border.GestureRecognizers>
                         <Path Data="{StaticResource IconHeart}"
                               Fill="#FFFFFF"

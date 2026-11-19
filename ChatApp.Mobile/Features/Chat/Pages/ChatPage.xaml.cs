@@ -24,6 +24,71 @@ public partial class ChatPage : ContentPage
         {
             _viewModel.Messages.CollectionChanged += OnMessagesCollectionChanged;
         }
+
+        if (_viewModel != null)
+        {
+            _viewModel.HeartPulseTriggered += OnHeartPulseTriggered;
+        }
+    }
+
+    private void OnHeartPulseTriggered()
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            try
+            {
+                if (HeartOverlayGrid == null) return;
+                if (!Resources.TryGetValue("IconHeart", out var iconObj) &&
+                    Application.Current?.Resources.TryGetValue("IconHeart", out iconObj) != true)
+                {
+                    return;
+                }
+
+                if (iconObj is not Microsoft.Maui.Controls.Shapes.Geometry heartGeo) return;
+
+                var offsets = new[] { -60.0, -25.0, 0.0, 30.0, 65.0 };
+                var colors = new[] { "#FF4FB8", "#9B3BF9", "#FF4FB8", "#FFD6F2", "#7B2DF3" };
+                var tasks = new List<Task>();
+
+                for (var i = 0; i < offsets.Length; i++)
+                {
+                    var heart = new Microsoft.Maui.Controls.Shapes.Path
+                    {
+                        Data = heartGeo,
+                        Fill = new SolidColorBrush(Color.FromArgb(colors[i])),
+                        WidthRequest = 32,
+                        HeightRequest = 32,
+                        Aspect = Stretch.Uniform,
+                        HorizontalOptions = LayoutOptions.Center,
+                        VerticalOptions = LayoutOptions.End,
+                        TranslationX = offsets[i],
+                        TranslationY = -80,
+                        Scale = 0.4,
+                        Opacity = 0.95
+                    };
+
+                    HeartOverlayGrid.Children.Add(heart);
+
+                    var delay = i * 80;
+                    var targetY = -360 - (i * 35);
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        await Task.Delay(delay);
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
+                        {
+                            await Task.WhenAll(
+                                heart.TranslateToAsync(offsets[i] * 1.4, targetY, 1100, Easing.CubicOut),
+                                heart.ScaleToAsync(1.5, 550, Easing.SpringOut),
+                                heart.FadeToAsync(0, 1100, Easing.CubicIn));
+                            HeartOverlayGrid.Children.Remove(heart);
+                        });
+                    }));
+                }
+
+                await Task.WhenAll(tasks);
+            }
+            catch { }
+        });
     }
 
     private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

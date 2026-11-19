@@ -13,5 +13,6 @@ public static class AppRoutes
     public const string Profile = "profile";
     public const string StickerStudio = "sticker-studio";
     public const string Settings = "settings";
+    public const string CoupleSpace = "couple-space";
     public const string DesignSystem = "//design-system";
 }

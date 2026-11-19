@@ -454,6 +454,55 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         }
     }
 
+    public event Action? HeartPulseTriggered;
+
+    [RelayCommand]
+    public async Task SendHeartPulseAsync()
+    {
+        if (ConversationId == Guid.Empty) return;
+
+        HeartPulseTriggered?.Invoke();
+
+        var clientMessageId = Guid.NewGuid();
+        var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+        const string pulseText = "نبضة حب بينكما";
+
+        var optimisticItem = new ChatMessageItem
+        {
+            Id = Guid.Empty,
+            ConversationId = ConversationId,
+            SenderId = currentUserId,
+            SenderUserName = _authState.CurrentUser?.UserName ?? "",
+            SenderFullName = _authState.CurrentUser?.FullName ?? "",
+            SenderAvatarUrl = _authState.CurrentUser?.AvatarUrl,
+            Content = pulseText,
+            MessageType = MessageType.Text,
+            ClientMessageId = clientMessageId,
+            SentAt = DateTime.UtcNow,
+            IsMine = true,
+            Status = MessageDeliveryStatus.Sent,
+            IsSending = true
+        };
+
+        Messages.Add(optimisticItem);
+
+        try
+        {
+            var request = new SendMessageRequestClientDto(
+                ConversationId,
+                pulseText,
+                MessageType.Text,
+                clientMessageId);
+
+            await _chatHub.SendMessageAsync(request);
+        }
+        catch (Exception ex)
+        {
+            optimisticItem.IsSending = false;
+            ErrorMessage = $"تعذر إرسال نبضة الحب: {ex.Message}";
+        }
+    }
+
     [RelayCommand]
     public void OpenCustomizeSheet()
     {

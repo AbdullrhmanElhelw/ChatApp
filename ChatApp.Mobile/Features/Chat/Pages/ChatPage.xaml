@@ -883,7 +883,7 @@
                     <RoundRectangle CornerRadius="24" />
                 </Border.StrokeShape>
 
-                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" VerticalOptions="Center">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="6" VerticalOptions="Center">
                     <Entry x:Name="MessageInputEntry"
                            Grid.Column="0"
                            Text="{Binding MessageText, Mode=TwoWay}"
@@ -898,8 +898,28 @@
                            VerticalOptions="Center"
                            ReturnCommand="{Binding SendMessageCommand}" />
 
-                    <!-- Emoji Toggle -->
+                    <!-- Send Heart Pulse / Hug Button -->
                     <Border Grid.Column="1"
+                            WidthRequest="34"
+                            HeightRequest="34"
+                            StrokeThickness="0"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="17" /></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SendHeartPulseCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Data="{StaticResource IconHeart}"
+                              Fill="{StaticResource BrandNeonPink}"
+                              WidthRequest="19"
+                              HeightRequest="19"
+                              Aspect="Uniform"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
+                    </Border>
+
+                    <!-- Emoji Toggle -->
+                    <Border Grid.Column="2"
                             WidthRequest="34"
                             HeightRequest="34"
                             StrokeThickness="0"
@@ -926,7 +946,7 @@
                     </Border>
 
                     <!-- Circular Violet Send Button -->
-                    <Border Grid.Column="2"
+                    <Border Grid.Column="3"
                             WidthRequest="38"
                             HeightRequest="38"
                             StrokeThickness="0"
@@ -1849,6 +1869,11 @@
                 </VerticalStackLayout>
             </Border>
         </Grid>
+
+        <!-- Floating Heart Pulse Animation Layer -->
+        <Grid x:Name="HeartOverlayGrid"
+              Grid.RowSpan="6"
+              InputTransparent="True" />
 
     </Grid>
 </ContentPage>

@@ -8,9 +8,21 @@
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
              FlowDirection="RightToLeft"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource DarkBackground}}">
 
-    <ScrollView>
+    <Grid>
+        <!-- Cosmic Ambient Gradient Background -->
+        <BoxView InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="{AppThemeBinding Light=#FFF5FF, Dark=#14042B}" Offset="0.0" />
+                    <GradientStop Color="{AppThemeBinding Light=#FAF0FC, Dark=#1A0035}" Offset="0.55" />
+                    <GradientStop Color="{AppThemeBinding Light=#F3E4FA, Dark=#2E0854}" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+
+        <ScrollView>
         <Grid RowDefinitions="Auto,*,Auto" Padding="24" MinimumHeightRequest="650">
 
             <!-- 1. Header Step Indicator -->
@@ -126,5 +138,6 @@
 
         </Grid>
     </ScrollView>
+    </Grid>
 
 </ContentPage>

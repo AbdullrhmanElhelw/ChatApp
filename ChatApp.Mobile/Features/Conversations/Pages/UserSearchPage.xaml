@@ -10,7 +10,7 @@
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
              FlowDirection="RightToLeft"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource DarkBackground}}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -18,7 +18,19 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12,16,0">
+    <Grid>
+        <!-- Cosmic Ambient Gradient Background -->
+        <BoxView InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="{AppThemeBinding Light=#FFF5FF, Dark=#14042B}" Offset="0.0" />
+                    <GradientStop Color="{AppThemeBinding Light=#FAF0FC, Dark=#1A0035}" Offset="0.55" />
+                    <GradientStop Color="{AppThemeBinding Light=#F3E4FA, Dark=#2E0854}" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+
+        <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,14,16,0">
 
         <!-- 1. Top Bar with Back Button & Title -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,4,0,14" VerticalOptions="Center">
@@ -52,21 +64,21 @@
                    Margin="12,0,0,0" />
         </Grid>
 
-        <!-- 2. Search Input Box & Submit Button -->
+        <!-- 2. Glassy Search Input Box & Gradient Submit Button -->
         <Border Grid.Row="1"
                 StrokeThickness="1"
-                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3D1E6D}"
+                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
                 Padding="16,0,6,0"
-                HeightRequest="46"
+                HeightRequest="48"
                 Margin="0,0,0,12">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="23" />
+                <RoundRectangle CornerRadius="24" />
             </Border.StrokeShape>
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
                 <Path Grid.Column="0"
                       Data="{StaticResource IconSearch}"
-                      Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                      Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark=#B69AD8}"
                       WidthRequest="16"
                       HeightRequest="16"
                       Aspect="Uniform"
@@ -76,26 +88,31 @@
                        Placeholder="ابحث بالاسم الكامل أو اسم المستخدم..."
                        FontFamily="CairoRegular"
                        FontSize="14"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
-                       PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}"
+                       PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark=#9B86B8}"
                        ReturnCommand="{Binding SearchCommand}"
                        BackgroundColor="Transparent"
                        VerticalOptions="Center" />
 
                 <Border Grid.Column="2"
-                        BackgroundColor="{StaticResource BrandPrimary}"
                         StrokeThickness="0"
-                        Padding="16,8">
+                        Padding="18,8">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="17" />
+                        <RoundRectangle CornerRadius="18" />
                     </Border.StrokeShape>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                            <GradientStop Color="#FF4FB8" Offset="0.0" />
+                            <GradientStop Color="#7B2DF3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.Background>
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding SearchCommand}" />
                     </Border.GestureRecognizers>
                     <Label Text="بحث"
                            FontFamily="CairoBold"
                            FontSize="13"
-                           TextColor="{StaticResource White}"
+                           TextColor="#FFFFFF"
                            VerticalOptions="Center" />
                 </Border>
             </Grid>
@@ -199,12 +216,12 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="authDtos:UserProfileDto">
                         <Border Margin="0,0,0,10"
-                                Padding="14,10"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                Padding="14,11"
+                                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#3A1D63}"
                                 StrokeThickness="1">
                             <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="16" />
+                                <RoundRectangle CornerRadius="18" />
                             </Border.StrokeShape>
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:UserSearchViewModel}}, Path=StartConversationCommand}"
@@ -228,27 +245,32 @@
                                            FontFamily="CairoBold"
                                            FontSize="15"
                                            FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}"
                                            LineBreakMode="TailTruncation"
                                            MaxLines="1" />
 
                                     <Label Text="{Binding UserName, StringFormat='@{0}'}"
                                            FontFamily="CairoRegular"
                                            FontSize="13"
-                                           TextColor="{StaticResource BrandPrimary}"
+                                           TextColor="{StaticResource BrandNeonPink}"
                                            LineBreakMode="TailTruncation"
                                            MaxLines="1" />
                                 </VerticalStackLayout>
 
                                 <!-- Message Button Action -->
                                 <Border Grid.Column="2"
-                                        BackgroundColor="{StaticResource BrandPrimary}"
                                         StrokeThickness="0"
-                                        Padding="14,8"
+                                        Padding="16,8"
                                         VerticalOptions="Center">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="14" />
                                     </Border.StrokeShape>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                            <GradientStop Color="#FF4FB8" Offset="0.0" />
+                                            <GradientStop Color="#7B2DF3" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:UserSearchViewModel}}, Path=StartConversationCommand}"
                                                               CommandParameter="{Binding .}" />
@@ -256,7 +278,7 @@
                                     <Label Text="مراسلة"
                                            FontFamily="CairoBold"
                                            FontSize="12"
-                                           TextColor="{StaticResource White}"
+                                           TextColor="#FFFFFF"
                                            VerticalOptions="Center" />
                                 </Border>
                             </Grid>
@@ -267,6 +289,7 @@
 
         </Grid>
 
+        </Grid>
     </Grid>
 
 </ContentPage>

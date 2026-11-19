@@ -8,9 +8,21 @@
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
              FlowDirection="RightToLeft"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource DarkBackground}}">
 
-    <ScrollView>
+    <Grid>
+        <!-- Cosmic Ambient Gradient Background -->
+        <BoxView InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="{AppThemeBinding Light=#FFF5FF, Dark=#14042B}" Offset="0.0" />
+                    <GradientStop Color="{AppThemeBinding Light=#FAF0FC, Dark=#1A0035}" Offset="0.55" />
+                    <GradientStop Color="{AppThemeBinding Light=#F3E4FA, Dark=#2E0854}" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+
+        <ScrollView>
         <Grid RowDefinitions="Auto,*,Auto" Padding="24" MinimumHeightRequest="600">
 
             <!-- 1. Top Bar with Back Button -->
@@ -34,23 +46,18 @@
                           HorizontalOptions="Center"
                           VerticalOptions="Center" />
                 </Border>
-                <HorizontalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
-                    <Border WidthRequest="34"
-                            HeightRequest="34"
-                            StrokeThickness="0"
-                            VerticalOptions="Center">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10" />
-                        </Border.StrokeShape>
-                        <Image Source="betweenus_logo.png"
-                               WidthRequest="34"
-                               HeightRequest="34"
-                               Aspect="AspectFill" />
-                    </Border>
-                    <Label Text="BetweenUs"
+                <HorizontalStackLayout Grid.Column="2" FlowDirection="LeftToRight" Spacing="0" VerticalOptions="Center">
+                    <Label Text="Between"
                            FontFamily="CairoBold"
-                           FontSize="17"
-                           TextColor="#F044A5"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                           VerticalOptions="Center" />
+                    <Label Text="Us"
+                           FontFamily="CairoBold"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource BrandNeonPink}"
                            VerticalOptions="Center" />
                 </HorizontalStackLayout>
             </Grid>
@@ -146,5 +153,6 @@
 
         </Grid>
     </ScrollView>
+    </Grid>
 
 </ContentPage>

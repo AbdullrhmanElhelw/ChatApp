@@ -7,9 +7,21 @@
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
              FlowDirection="RightToLeft"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource DarkBackground}}">
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="16,12,16,16">
+    <Grid>
+        <!-- Cosmic Ambient Gradient Background -->
+        <BoxView InputTransparent="True">
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="{AppThemeBinding Light=#FFF5FF, Dark=#14042B}" Offset="0.0" />
+                    <GradientStop Color="{AppThemeBinding Light=#FAF0FC, Dark=#1A0035}" Offset="0.55" />
+                    <GradientStop Color="{AppThemeBinding Light=#F3E4FA, Dark=#2E0854}" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+
+        <Grid RowDefinitions="Auto,*,Auto" Padding="16,14,16,16">
 
         <!-- 1. Top Header -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,14" VerticalOptions="Center">
@@ -52,14 +64,19 @@
 
             <!-- Save Action Button -->
             <Border Grid.Column="2"
-                    BackgroundColor="{StaticResource BrandPrimary}"
                     StrokeThickness="0"
                     Padding="16,9">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="16" />
                 </Border.StrokeShape>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                        <GradientStop Color="#FF4FB8" Offset="0.0" />
+                        <GradientStop Color="#7B2DF3" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Background>
                 <Border.Shadow>
-                    <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,2" Radius="6" Opacity="0.35" />
+                    <Shadow Brush="#FF4FB8" Offset="0,2" Radius="8" Opacity="0.4" />
                 </Border.Shadow>
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding SaveStickerCommand}" />
@@ -86,8 +103,8 @@
 
                 <!-- Preview Box -->
                 <Border StrokeThickness="1"
-                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#4E2682}"
+                        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
                         WidthRequest="320"
                         HeightRequest="320"
                         HorizontalOptions="Center"
@@ -363,6 +380,7 @@
                            WidthRequest="48"
                            HeightRequest="48" />
 
+        </Grid>
     </Grid>
 
 </ContentPage>

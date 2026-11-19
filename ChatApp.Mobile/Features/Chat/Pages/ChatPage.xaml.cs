@@ -40,6 +40,34 @@ public partial class ChatPage : ContentPage
         {
             MainThread.BeginInvokeOnMainThread(DismissKeyboard);
         }
+        else if (e.PropertyName == nameof(ChatViewModel.Messages) ||
+                 e.PropertyName == nameof(ChatViewModel.DisplayedMessages))
+        {
+            if (e.PropertyName == nameof(ChatViewModel.Messages) && _viewModel.Messages != null)
+            {
+                _viewModel.Messages.CollectionChanged -= OnMessagesCollectionChanged;
+                _viewModel.Messages.CollectionChanged += OnMessagesCollectionChanged;
+            }
+            ScrollToBottom(animate: false);
+        }
+    }
+
+    private void ScrollToBottom(bool animate)
+    {
+        if (_viewModel?.DisplayedMessages == null || _viewModel.DisplayedMessages.Count == 0) return;
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            try
+            {
+                await Task.Delay(60);
+                var count = _viewModel?.DisplayedMessages?.Count ?? 0;
+                if (count > 0 && MessagesList != null)
+                {
+                    MessagesList.ScrollTo(count - 1, position: ScrollToPosition.End, animate: animate);
+                }
+            }
+            catch { }
+        });
     }
 
     private void DismissKeyboard()
@@ -126,23 +154,9 @@ public partial class ChatPage : ContentPage
 
     private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.Action == NotifyCollectionChangedAction.Add && _viewModel?.Messages?.Count > 0)
+        if (e.Action == NotifyCollectionChangedAction.Add && _viewModel?.DisplayedMessages?.Count > 0)
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                try
-                {
-                    await Task.Delay(100);
-                    if (_viewModel?.Messages?.Count > 0 && MessagesList != null)
-                    {
-                        MessagesList.ScrollTo(_viewModel.Messages.Count - 1, position: ScrollToPosition.End, animate: false);
-                    }
-                }
-                catch
-                {
-                    // Catch WinUI CollectionView scroll measurement race conditions
-                }
-            });
+            ScrollToBottom(animate: false);
         }
     }
 
@@ -269,6 +283,7 @@ public partial class ChatPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        ScrollToBottom(animate: false);
         if (_viewModel != null)
         {
             _ = _viewModel.LoadStickerPacksAsync();

@@ -95,9 +95,22 @@ public class ChatHubService : IChatHubService, IAsyncDisposable
 
     public async Task SendMessageAsync(SendMessageRequestClientDto request)
     {
+        if (_hubConnection?.State != HubConnectionState.Connected)
+        {
+            await ConnectAsync();
+            if (_hubConnection?.State == HubConnectionState.Connected)
+            {
+                await JoinConversationAsync(request.ConversationId);
+            }
+        }
+
         if (_hubConnection?.State == HubConnectionState.Connected)
         {
             await _hubConnection.InvokeAsync("SendMessage", request);
+        }
+        else
+        {
+            throw new InvalidOperationException("غير متصل بالخادم حالياً.");
         }
     }
 

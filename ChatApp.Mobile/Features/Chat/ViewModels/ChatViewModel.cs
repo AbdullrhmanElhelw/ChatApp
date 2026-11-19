@@ -1382,22 +1382,30 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 
         Messages.Add(optimisticItem);
 
+        var request = new SendMessageRequestClientDto(
+            ConversationId,
+            text,
+            MessageType.Text,
+            clientMessageId,
+            ReplyToMessageId: replyToId
+        );
+
+        _ = DispatchTextMessageAsync(request, optimisticItem);
+    }
+
+    private async Task DispatchTextMessageAsync(SendMessageRequestClientDto request, ChatMessageItem optimisticItem)
+    {
         try
         {
-            var request = new SendMessageRequestClientDto(
-                ConversationId,
-                text,
-                MessageType.Text,
-                clientMessageId,
-                ReplyToMessageId: replyToId
-            );
-
             await _chatHub.SendMessageAsync(request);
         }
         catch (Exception ex)
         {
-            optimisticItem.IsSending = false;
-            ErrorMessage = $"فشل إرسال الرسالة: {ex.Message}";
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                optimisticItem.IsSending = false;
+                ErrorMessage = $"فشل إرسال الرسالة: {ex.Message}";
+            });
         }
     }
 

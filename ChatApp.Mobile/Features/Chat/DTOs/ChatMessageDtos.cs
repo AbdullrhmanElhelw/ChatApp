@@ -81,7 +81,7 @@ public partial class ChatMessageItem : ObservableObject
 
     public bool IsRead => Status == MessageDeliveryStatus.Read;
 
-    public string StatusColor => IsRead ? "#38BDF8" : "#E0F2FE";
+    public Color StatusColor => IsRead ? Color.FromArgb("#38BDF8") : Color.FromArgb("#E0F2FE");
 
     public string FormattedTime => SentAt.ToLocalTime().ToString("hh:mm tt");
 

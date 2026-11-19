@@ -13,7 +13,7 @@ namespace ChatApp.Mobile.Features.Chat.ViewModels;
 [QueryProperty(nameof(ConversationId), "ConversationId")]
 [QueryProperty(nameof(ChatTitle), "Title")]
 [QueryProperty(nameof(AvatarUrl), "AvatarUrl")]
-public partial class ChatViewModel : BaseViewModel, IDisposable
+public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposable
 {
     private readonly IChatHubService _chatHub;
     private readonly IMessageApiService _messageApi;
@@ -72,6 +72,31 @@ public partial class ChatViewModel : BaseViewModel, IDisposable
         _navigationService = navigationService;
 
         SubscribeToHubEvents();
+    }
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue("ConversationId", out var convIdObj))
+        {
+            if (convIdObj is Guid guid && guid != Guid.Empty)
+            {
+                ConversationId = guid;
+            }
+            else if (convIdObj is string str && Guid.TryParse(str, out var parsedGuid))
+            {
+                ConversationId = parsedGuid;
+            }
+        }
+
+        if (query.TryGetValue("Title", out var titleObj) && titleObj is string title)
+        {
+            ChatTitle = title;
+        }
+
+        if (query.TryGetValue("AvatarUrl", out var avatarObj) && avatarObj is string avatar)
+        {
+            AvatarUrl = avatar;
+        }
     }
 
     partial void OnConversationIdChanged(Guid value)

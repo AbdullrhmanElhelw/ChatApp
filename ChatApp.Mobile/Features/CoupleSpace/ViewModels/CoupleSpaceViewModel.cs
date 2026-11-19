@@ -3,6 +3,7 @@ using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChatApp.Mobile.Features.Common;
+using ChatApp.Mobile.Features.Conversations.Services;
 using ChatApp.Mobile.Features.CoupleSpace.DTOs;
 using ChatApp.Mobile.Features.CoupleSpace.Models;
 using ChatApp.Mobile.Features.CoupleSpace.Services;
@@ -22,6 +23,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
 {
     private readonly INavigationService _navigationService;
     private readonly ICoupleApiService? _coupleApi;
+    private readonly IConversationApiService? _conversationApi;
 
     private static readonly string[] DailyQuestions =
     [
@@ -63,6 +65,9 @@ public partial class CoupleSpaceViewModel : BaseViewModel
 
     [ObservableProperty]
     public partial string JoinCodeInput { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial Guid? PartnerId { get; set; }
 
     [ObservableProperty]
     public partial string PartnerName { get; set; } = string.Empty;
@@ -130,6 +135,14 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     public partial string? NewMemoryImagePath { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SelectedMemoryPhotosLabel))]
+    public partial List<string> NewMemoryImagePaths { get; set; } = new();
+
+    public string SelectedMemoryPhotosLabel => NewMemoryImagePaths.Count > 0
+        ? $"تم اختيار {NewMemoryImagePaths.Count} صور للذكرى"
+        : "اختيار صورة أو أكثر للذكرى";
+
+    [ObservableProperty]
     public partial bool IsAddNoteSheetVisible { get; set; }
 
     [ObservableProperty]
@@ -141,10 +154,14 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     [ObservableProperty]
     public partial DateTime NewNoteUnlockDate { get; set; } = DateTime.Today.AddDays(7);
 
-    public CoupleSpaceViewModel(INavigationService navigationService, ICoupleApiService? coupleApi = null)
+    public CoupleSpaceViewModel(
+        INavigationService navigationService,
+        ICoupleApiService? coupleApi = null,
+        IConversationApiService? conversationApi = null)
     {
         _navigationService = navigationService;
         _coupleApi = coupleApi;
+        _conversationApi = conversationApi;
         Title = "عالمنا الخاص";
         LoadLocal();
     }
@@ -170,6 +187,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
 
         if (dto.Partner != null)
         {
+            PartnerId = dto.Partner.Id;
             PartnerName = dto.Partner.FullName;
             PartnerUserName = dto.Partner.UserName;
             PartnerAvatarUrl = dto.Partner.AvatarUrl;
@@ -178,6 +196,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         }
         else
         {
+            PartnerId = null;
             PartnerName = string.Empty;
             PartnerUserName = string.Empty;
             PartnerAvatarUrl = null;
@@ -376,6 +395,31 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task OpenPartnerChatAsync()
+    {
+        if (_conversationApi == null || PartnerId == null || PartnerId == Guid.Empty) return;
+        IsBusy = true;
+        try
+        {
+            var res = await _conversationApi.GetOrCreateDirectConversationAsync(PartnerId.Value);
+            if (res.IsSuccess && res.Value != null)
+            {
+                var parameters = new Dictionary<string, object>
+                {
+                    { "ConversationId", res.Value.Id },
+                    { "Title", PartnerName },
+                    { "AvatarUrl", PartnerAvatarUrl ?? string.Empty }
+                };
+                await _navigationService.NavigateToAsync(AppRoutes.Chat, parameters);
+            }
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
     private async Task NavigateBackAsync() => await _navigationService.GoBackAsync();
 
     [RelayCommand]
@@ -436,6 +480,8 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         NewMemoryNote = string.Empty;
         NewMemoryLocation = string.Empty;
         NewMemoryImagePath = null;
+        NewMemoryImagePaths = new List<string>();
+        OnPropertyChanged(nameof(SelectedMemoryPhotosLabel));
         IsAddMemorySheetVisible = true;
     }
 
@@ -444,20 +490,29 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     {
         try
         {
-            var file = await FilePicker.Default.PickAsync(new PickOptions
+            var files = await FilePicker.Default.PickMultipleAsync(new PickOptions
             {
-                PickerTitle = "اختر صورة للذكرى",
+                PickerTitle = "اختر صورة أو أكثر للذكرى",
                 FileTypes = FilePickerFileType.Images
             });
-            if (file == null) return;
+            if (files == null) return;
 
-            var ext = Path.GetExtension(file.FileName);
-            if (string.IsNullOrWhiteSpace(ext)) ext = ".jpg";
-            var dest = Path.Combine(FileSystem.AppDataDirectory, $"memory_{Guid.NewGuid():N}{ext}");
-            await using var src = await file.OpenReadAsync();
-            await using var dst = File.Create(dest);
-            await src.CopyToAsync(dst);
-            NewMemoryImagePath = dest;
+            var savedPaths = new List<string>(NewMemoryImagePaths);
+            foreach (var file in files)
+            {
+                if (file == null) continue;
+                var ext = Path.GetExtension(file.FileName);
+                if (string.IsNullOrWhiteSpace(ext)) ext = ".jpg";
+                var dest = Path.Combine(FileSystem.AppDataDirectory, $"memory_{Guid.NewGuid():N}{ext}");
+                await using var src = await file.OpenReadAsync();
+                await using var dst = File.Create(dest);
+                await src.CopyToAsync(dst);
+                savedPaths.Add(dest);
+            }
+
+            NewMemoryImagePaths = savedPaths;
+            NewMemoryImagePath = savedPaths.FirstOrDefault();
+            OnPropertyChanged(nameof(SelectedMemoryPhotosLabel));
         }
         catch { }
     }
@@ -472,7 +527,8 @@ public partial class CoupleSpaceViewModel : BaseViewModel
             NewMemoryNote.Trim(),
             string.IsNullOrWhiteSpace(NewMemoryLocation) ? null : NewMemoryLocation.Trim(),
             DateTime.Today,
-            NewMemoryImagePath));
+            NewMemoryImagePath,
+            NewMemoryImagePaths.ToList()));
         SaveList("couple_memories", Memories);
         IsAddMemorySheetVisible = false;
         _ = SyncToServerAsync();

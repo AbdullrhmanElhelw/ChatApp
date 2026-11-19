@@ -39,11 +39,32 @@ public record MemoryItem(
     string Note,
     string? Location,
     DateTime MemoryDate,
-    string? ImagePath
+    string? ImagePath = null,
+    List<string>? ImagePaths = null
 )
 {
-    public string FormattedDate => MemoryDate.ToString("dd MMM yyyy");
-    public bool HasImage => !string.IsNullOrWhiteSpace(ImagePath) && File.Exists(ImagePath);
+    public string FormattedDate => MemoryDate.ToString("MMM dd, yyyy");
+
+    public List<string> DisplayImages
+    {
+        get
+        {
+            var list = new List<string>();
+            if (ImagePaths != null)
+            {
+                list.AddRange(ImagePaths.Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p)));
+            }
+            if (list.Count == 0 && !string.IsNullOrWhiteSpace(ImagePath) && File.Exists(ImagePath))
+            {
+                list.Add(ImagePath);
+            }
+            return list;
+        }
+    }
+
+    public bool HasImages => DisplayImages.Count > 0;
+    public bool HasMultipleImages => DisplayImages.Count > 1;
+    public string ImageCountBadge => $"{DisplayImages.Count} صور";
     public bool HasLocation => !string.IsNullOrWhiteSpace(Location);
 }
 

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ChatApp.Mobile.Features.Authentication.Services;
 using ChatApp.Mobile.Features.Chat.DTOs;
 using ChatApp.Mobile.Features.Chat.Services;
 using ChatApp.Mobile.Features.Common;
@@ -13,6 +14,7 @@ public partial class StickerStudioViewModel : BaseViewModel
 {
     private readonly IStickerApiService _stickerApi;
     private readonly INavigationService _navigationService;
+    private readonly IAuthenticationStateService _authState;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasImage))]
@@ -41,10 +43,12 @@ public partial class StickerStudioViewModel : BaseViewModel
 
     public StickerStudioViewModel(
         IStickerApiService stickerApi,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        IAuthenticationStateService authState)
     {
         _stickerApi = stickerApi;
         _navigationService = navigationService;
+        _authState = authState;
         Title = "صانع الاستيكرات (Sticker Studio)";
     }
 
@@ -121,11 +125,13 @@ public partial class StickerStudioViewModel : BaseViewModel
 
         try
         {
-            // 1. Ensure user has a sticker pack
-            var targetPack = SelectedPack;
+            var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+
+            // 1. Ensure user has their own custom sticker pack
+            var targetPack = StickerPacks.FirstOrDefault(p => p.OwnerId == currentUserId);
             if (targetPack == null)
             {
-                var createResult = await _stickerApi.CreatePackAsync("استيكراتي المخصصة 🎨", "استيكرات صنعتها بنفسي", "https://api.iconify.design/noto:artist-palette.svg");
+                var createResult = await _stickerApi.CreatePackAsync("استيكراتي المخصصة 🎨", "استيكرات صنعتها بنفسي", "/uploads/stickers/sparkles.png");
                 if (!createResult.IsSuccess || createResult.Value == null)
                 {
                     ErrorMessage = createResult.ErrorMessage ?? "فشل إنشاء حزمة الاستيكرات.";
@@ -144,6 +150,7 @@ public partial class StickerStudioViewModel : BaseViewModel
             {
                 ".png" => "image/png",
                 ".webp" => "image/webp",
+                ".gif" => "image/gif",
                 _ => "image/jpeg"
             };
 

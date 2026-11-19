@@ -183,6 +183,76 @@ public class StickerApiService : IStickerApiService
             }
         }
 
+        // Extract detailed error messages from JSON response if present
+        if (!string.IsNullOrWhiteSpace(content))
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(content);
+                var root = doc.RootElement;
+
+                // Validation errors: { "errors": { "file": ["message"] } }
+                if (root.TryGetProperty("errors", out var errorsProp) && errorsProp.ValueKind == JsonValueKind.Object)
+                {
+                    var errors = new List<string>();
+                    foreach (var prop in errorsProp.EnumerateObject())
+                    {
+                        if (prop.Value.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var item in prop.Value.EnumerateArray())
+                            {
+                                var msg = item.GetString();
+                                if (!string.IsNullOrWhiteSpace(msg)) errors.Add(msg);
+                            }
+                        }
+                        else if (prop.Value.ValueKind == JsonValueKind.String)
+                        {
+                            var msg = prop.Value.GetString();
+                            if (!string.IsNullOrWhiteSpace(msg)) errors.Add(msg);
+                        }
+                    }
+                    if (errors.Count > 0)
+                    {
+                        return ApiResult<T>.Failure(string.Join(" | ", errors), (int)response.StatusCode);
+                    }
+                }
+
+                // ProblemDetails detail
+                if (root.TryGetProperty("detail", out var detailProp) && detailProp.ValueKind == JsonValueKind.String)
+                {
+                    var detail = detailProp.GetString();
+                    if (!string.IsNullOrWhiteSpace(detail))
+                    {
+                        return ApiResult<T>.Failure(detail, (int)response.StatusCode);
+                    }
+                }
+
+                // ApiResponse message
+                if (root.TryGetProperty("message", out var messageProp) && messageProp.ValueKind == JsonValueKind.String)
+                {
+                    var message = messageProp.GetString();
+                    if (!string.IsNullOrWhiteSpace(message))
+                    {
+                        return ApiResult<T>.Failure(message, (int)response.StatusCode);
+                    }
+                }
+
+                // ProblemDetails title
+                if (root.TryGetProperty("title", out var titleProp) && titleProp.ValueKind == JsonValueKind.String)
+                {
+                    var title = titleProp.GetString();
+                    if (!string.IsNullOrWhiteSpace(title))
+                    {
+                        return ApiResult<T>.Failure(title, (int)response.StatusCode);
+                    }
+                }
+            }
+            catch
+            {
+                // Fall back to response.ReasonPhrase
+            }
+        }
+
         return ApiResult<T>.Failure($"فشل الطلب: {response.ReasonPhrase}", (int)response.StatusCode);
     }
 }

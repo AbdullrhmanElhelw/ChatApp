@@ -6,7 +6,7 @@ public partial class StickerStudioPage : ContentPage
 {
     private readonly StickerStudioViewModel _viewModel;
 
-    public StickerStudioPage() : this(IPlatformApplication.Current?.Services?.GetService<StickerStudioViewModel>() ?? new StickerStudioViewModel(null!, null!))
+    public StickerStudioPage() : this(IPlatformApplication.Current?.Services?.GetService<StickerStudioViewModel>() ?? new StickerStudioViewModel(null!, null!, null!))
     {
     }
 

@@ -31,7 +31,7 @@ public class MediaService : IMediaService
 
     private static readonly HashSet<string> AllowedStickerExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".webp", ".png"
+        ".webp", ".png", ".jpg", ".jpeg", ".gif"
     };
 
     public MediaService(AppDbContext context, IStorageService storageService)
@@ -129,7 +129,7 @@ public class MediaService : IMediaService
         const long maxImageSize = 20 * 1024 * 1024; // 20 MB
         const long maxVideoSize = 50 * 1024 * 1024; // 50 MB
         const long maxAudioSize = 30 * 1024 * 1024; // 30 MB
-        const long maxStickerSize = 5 * 1024 * 1024; // 5 MB
+        const long maxStickerSize = 25 * 1024 * 1024; // 25 MB
 
         switch (mediaType)
         {
@@ -156,9 +156,9 @@ public class MediaService : IMediaService
 
             case MessageType.Sticker:
                 if (!AllowedStickerExtensions.Contains(extension))
-                    throw new ValidationException($"صيغة الملصق غير مدعومة ({extension}). الصيغ المتاحة: webp, png.");
+                    throw new ValidationException($"صيغة الملصق غير مدعومة ({extension}). الصيغ المتاحة: png, webp, jpg, jpeg, gif.");
                 if (sizeBytes > maxStickerSize)
-                    throw new ValidationException("حجم الملصق يتجاوز الحد الأقصى المسموح (5 ميجابايت).");
+                    throw new ValidationException("حجم الملصق يتجاوز الحد الأقصى المسموح (25 ميجابايت).");
                 break;
 
             default:

@@ -14,14 +14,16 @@ public class StickerStudioViewModelTests
 {
     private readonly Mock<IStickerApiService> _stickerApiMock;
     private readonly Mock<INavigationService> _navigationMock;
+    private readonly Mock<IAuthenticationStateService> _authStateMock;
     private readonly StickerStudioViewModel _sut;
 
     public StickerStudioViewModelTests()
     {
         _stickerApiMock = new Mock<IStickerApiService>();
         _navigationMock = new Mock<INavigationService>();
+        _authStateMock = new Mock<IAuthenticationStateService>();
 
-        _sut = new StickerStudioViewModel(_stickerApiMock.Object, _navigationMock.Object);
+        _sut = new StickerStudioViewModel(_stickerApiMock.Object, _navigationMock.Object, _authStateMock.Object);
     }
 
     [Fact]

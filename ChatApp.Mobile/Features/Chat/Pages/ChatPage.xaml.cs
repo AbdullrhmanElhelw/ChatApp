@@ -28,7 +28,37 @@ public partial class ChatPage : ContentPage
         if (_viewModel != null)
         {
             _viewModel.HeartPulseTriggered += OnHeartPulseTriggered;
+            _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         }
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (_viewModel == null) return;
+        if ((e.PropertyName == nameof(ChatViewModel.IsAttachmentPanelVisible) && _viewModel.IsAttachmentPanelVisible) ||
+            (e.PropertyName == nameof(ChatViewModel.IsEmojiPickerVisible) && _viewModel.IsEmojiPickerVisible))
+        {
+            MainThread.BeginInvokeOnMainThread(DismissKeyboard);
+        }
+    }
+
+    private void DismissKeyboard()
+    {
+        try
+        {
+            MessageInputEntry?.Unfocus();
+#if ANDROID
+            var activity = Platform.CurrentActivity;
+            var token = (MessageInputEntry?.Handler?.PlatformView as Android.Views.View)?.WindowToken
+                        ?? activity?.CurrentFocus?.WindowToken;
+            if (activity != null && token != null)
+            {
+                var imm = (Android.Views.InputMethods.InputMethodManager?)activity.GetSystemService(Android.Content.Context.InputMethodService);
+                imm?.HideSoftInputFromWindow(token, Android.Views.InputMethods.HideSoftInputFlags.None);
+            }
+#endif
+        }
+        catch { }
     }
 
     private void OnHeartPulseTriggered()
@@ -121,6 +151,7 @@ public partial class ChatPage : ContentPage
         if (_viewModel != null)
         {
             _viewModel.IsAttachmentPanelVisible = false;
+            _viewModel.IsEmojiPickerOpen = false;
             _viewModel.CloseReactionPicker();
         }
     }

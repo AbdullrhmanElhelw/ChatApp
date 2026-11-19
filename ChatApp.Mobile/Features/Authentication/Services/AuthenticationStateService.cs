@@ -23,6 +23,7 @@ public class AuthenticationStateService : IAuthenticationStateService
         AccessToken = accessToken;
         _ = _storageService.SaveTokensAsync(accessToken, refreshToken);
         _ = _storageService.SaveUserDataAsync(user.Id, user.UserName, user.Email, user.FullName);
+        CachedProfileStore.Save(user);
         AuthenticationStateChanged?.Invoke(true);
     }
 
@@ -30,6 +31,7 @@ public class AuthenticationStateService : IAuthenticationStateService
     {
         CurrentUser = user;
         _ = _storageService.SaveUserDataAsync(user.Id, user.UserName, user.Email, user.FullName);
+        CachedProfileStore.Save(user);
     }
 
     public void SetUnauthenticated()
@@ -37,6 +39,7 @@ public class AuthenticationStateService : IAuthenticationStateService
         CurrentUser = null;
         AccessToken = null;
         _ = _storageService.ClearAllAsync();
+        CachedProfileStore.Clear();
         AuthenticationStateChanged?.Invoke(false);
     }
 

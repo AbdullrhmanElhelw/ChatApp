@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using ChatApp.Mobile.Features.Chat.DTOs;
 using ChatApp.Mobile.Features.Chat.ViewModels;
+using ChatApp.Mobile.Features.Common;
 
 namespace ChatApp.Mobile.Features.Chat.Pages;
 
@@ -16,7 +17,9 @@ public partial class ChatPage : ContentPage
 
     public ChatPage(ChatViewModel viewModel)
     {
+        var perfStart = PerfLog.Start();
         InitializeComponent();
+        PerfLog.Since("ChatPage.InitializeComponent", perfStart);
         _viewModel = viewModel;
         BindingContext = _viewModel;
 

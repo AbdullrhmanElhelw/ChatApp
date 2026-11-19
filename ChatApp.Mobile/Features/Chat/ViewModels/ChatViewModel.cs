@@ -989,6 +989,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
 
     public async Task InitializeConversationAsync(Guid conversationId)
     {
+        var perfStart = PerfLog.Start();
         LoadChatCustomization(conversationId);
         ClearError();
 
@@ -1011,9 +1012,12 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
         var hasCached = cached != null && cached.Count > 0;
         if (hasCached)
         {
+            // Show the full cached page (same size the server returns) so that when nothing changed
+            // the fresh response matches and we skip a second full re-render of the list.
             Messages = new ObservableCollection<ChatMessageItem>(
-                cached!.TakeLast(30).Select(m => ChatMessageItem.FromDto(m, currentUserId)));
+                cached!.Select(m => ChatMessageItem.FromDto(m, currentUserId)));
             IsBusy = false;
+            PerfLog.Since("chat.cachedShown", perfStart, $"{cached!.Count} msgs");
         }
         else
         {
@@ -1031,12 +1035,14 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 var freshDtos = historyResult.Value.ToList();
                 SaveMessagesToCache(conversationId, freshDtos);
 
-                if (!hasCached || !AreMessagesEquivalent(Messages, freshDtos))
+                var replaced = !hasCached || !AreMessagesEquivalent(Messages, freshDtos);
+                if (replaced)
                 {
                     Messages = new ObservableCollection<ChatMessageItem>(
                         freshDtos.Select(m => ChatMessageItem.FromDto(m, currentUserId)));
                 }
 
+                PerfLog.Since("chat.freshLoaded", perfStart, $"{freshDtos.Count} msgs, listReplaced={replaced}");
                 _ = _chatHub.MarkAsReadAsync(conversationId);
             }
             else if (!hasCached)
@@ -1044,8 +1050,9 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 ErrorMessage = historyResult.ErrorMessage;
             }
 
-            // Preload stickers gently after page transition settles
-            _ = Task.Delay(350).ContinueWith(_ => LoadStickerPacksAsync());
+            // Sticker packs are NOT preloaded here any more: the sticker grid is a non-virtualized
+            // layout, so loading it eagerly built dozens of image views while the chat was opening.
+            // They load when the user opens the "+" panel (ToggleAttachmentPanel) and are cached in memory.
         }
         catch (Exception ex)
         {

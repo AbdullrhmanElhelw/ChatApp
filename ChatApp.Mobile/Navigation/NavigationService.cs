@@ -20,6 +20,7 @@ public class NavigationService : INavigationService
     {
         if (Shell.Current == null || _isNavigating) return;
         _isNavigating = true;
+        var perfStart = Features.Common.PerfLog.Start();
 
         try
         {
@@ -31,6 +32,7 @@ public class NavigationService : INavigationService
             {
                 await Shell.Current.GoToAsync(route, animate: false);
             }
+            Features.Common.PerfLog.Since($"nav {route}", perfStart);
         }
         catch
         {

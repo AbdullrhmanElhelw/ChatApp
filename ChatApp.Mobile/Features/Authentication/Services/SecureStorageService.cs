@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Maui.Storage;
 
 namespace ChatApp.Mobile.Features.Authentication.Services;
@@ -11,8 +12,9 @@ public class SecureStorageService : ISecureStorageService
     private const string EmailKey = "chat_user_email";
     private const string FullNameKey = "chat_user_fullname";
 
-    // In-memory fallback if platform secure storage is restricted or throws
-    private readonly Dictionary<string, string> _memoryFallback = new();
+    // In-memory cache + fallback. Reads hit this first so we don't decrypt from the Android Keystore
+    // on every single API call / SignalR request. ConcurrentDictionary: many requests read tokens in parallel.
+    private readonly ConcurrentDictionary<string, string> _memoryFallback = new();
 
     public async Task<string?> GetAccessTokenAsync() => await SafeGetAsync(AccessTokenKey);
 
@@ -64,20 +66,26 @@ public class SecureStorageService : ISecureStorageService
 
     private async Task<string?> SafeGetAsync(string key)
     {
+        if (_memoryFallback.TryGetValue(key, out var cached) && !string.IsNullOrEmpty(cached))
+        {
+            return cached;
+        }
+
         try
         {
             var value = await SecureStorage.Default.GetAsync(key);
             if (!string.IsNullOrEmpty(value))
             {
+                _memoryFallback[key] = value;
                 return value;
             }
         }
         catch
         {
-            // Platform storage read issue - check memory fallback
+            // Platform storage read issue - nothing cached either
         }
 
-        return _memoryFallback.TryGetValue(key, out var memVal) ? memVal : null;
+        return null;
     }
 
     private async Task SafeSetAsync(string key, string value)

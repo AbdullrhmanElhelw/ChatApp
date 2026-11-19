@@ -1,3 +1,4 @@
+using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Features.Conversations.ViewModels;
 
 namespace ChatApp.Mobile.Features.Conversations.Pages;
@@ -12,7 +13,9 @@ public partial class ConversationsPage : ContentPage
 
     public ConversationsPage(ConversationsViewModel viewModel)
     {
+        var perfStart = PerfLog.Start();
         InitializeComponent();
+        PerfLog.Since("ConversationsPage.InitializeComponent", perfStart);
         BindingContext = _viewModel = viewModel;
     }
 

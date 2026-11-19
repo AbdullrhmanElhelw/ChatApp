@@ -39,6 +39,12 @@ public static class MauiProgram
             handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
             handler.PlatformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
         });
+
+        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("BetweenUsBorderlessEditor", (handler, view) =>
+        {
+            handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+            handler.PlatformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+        });
 #endif
 
         // 1. Navigation & Core Infrastructure Services

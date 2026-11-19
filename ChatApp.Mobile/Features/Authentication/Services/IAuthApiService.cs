@@ -23,4 +23,5 @@ public interface IAuthApiService
     Task<ApiResult<AuthResponseDto>> RefreshTokenAsync(string refreshToken);
     Task<ApiResult<bool>> LogoutAsync();
     Task<ApiResult<UserProfileDto>> GetCurrentUserAsync(string? accessToken = null);
+    Task<ApiResult<UserProfileDto>> UpdateProfileAsync(UpdateProfileRequestDto request);
 }

@@ -11,3 +11,9 @@ public record UserProfileDto(
     DateTime? LastSeenAt,
     DateTime CreatedAt
 );
+
+public record UpdateUserProfileRequestDto(
+    string FullName,
+    string? Bio,
+    string? AvatarUrl
+);

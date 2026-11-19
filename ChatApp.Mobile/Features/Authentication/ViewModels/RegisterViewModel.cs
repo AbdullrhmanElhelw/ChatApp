@@ -28,7 +28,43 @@ public partial class RegisterViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanSubmit))]
+    [NotifyPropertyChangedFor(nameof(HasPasswordInput))]
+    [NotifyPropertyChangedFor(nameof(PasswordStrengthProgress))]
+    [NotifyPropertyChangedFor(nameof(PasswordStrengthText))]
+    [NotifyPropertyChangedFor(nameof(PasswordStrengthColor))]
     public partial string Password { get; set; } = string.Empty;
+
+    public bool HasPasswordInput => !string.IsNullOrEmpty(Password);
+
+    public double PasswordStrengthProgress
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Password)) return 0;
+            int score = 0;
+            if (Password.Length >= 8) score++;
+            if (Regex.IsMatch(Password, @"[A-Z]")) score++;
+            if (Regex.IsMatch(Password, @"[a-z]")) score++;
+            if (Regex.IsMatch(Password, @"[0-9]")) score++;
+            if (Regex.IsMatch(Password, @"[^a-zA-Z0-9]")) score++;
+            return score / 5.0;
+        }
+    }
+
+    public string PasswordStrengthText => PasswordStrengthProgress switch
+    {
+        <= 0 => string.Empty,
+        <= 0.4 => "كلمة مرور ضعيفة — أضف 8 أحرف، حرف كبير، رقم ورمز",
+        <= 0.8 => "كلمة مرور متوسطة — اقتربت من القوة الكاملة",
+        _ => "كلمة مرور قوية ومؤمنة ✓"
+    };
+
+    public Color PasswordStrengthColor => PasswordStrengthProgress switch
+    {
+        <= 0.4 => Color.FromArgb("#EF4444"),
+        <= 0.8 => Color.FromArgb("#F59E0B"),
+        _ => Color.FromArgb("#10B981")
+    };
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanSubmit))]
@@ -106,9 +142,9 @@ public partial class RegisterViewModel : BaseViewModel
             UserNameError = "اسم المستخدم يجب ألا يقل عن 3 أحرف";
             hasError = true;
         }
-        else if (!Regex.IsMatch(UserName.Trim(), @"^[a-zA-Z0-9_]+$"))
+        else if (!Regex.IsMatch(UserName.Trim(), @"^[a-zA-Z0-9_.]+$"))
         {
-            UserNameError = "اسم المستخدم يقبل فقط الحروف الإنجليزية والأرقام وعلامة _";
+            UserNameError = "اسم المستخدم يقبل فقط الحروف الإنجليزية والأرقام وعلامتي _ و .";
             hasError = true;
         }
 
@@ -123,9 +159,14 @@ public partial class RegisterViewModel : BaseViewModel
             hasError = true;
         }
 
-        if (string.IsNullOrWhiteSpace(Password) || Password.Length < 6)
+        if (string.IsNullOrWhiteSpace(Password) ||
+            Password.Length < 8 ||
+            !Regex.IsMatch(Password, @"[A-Z]") ||
+            !Regex.IsMatch(Password, @"[a-z]") ||
+            !Regex.IsMatch(Password, @"[0-9]") ||
+            !Regex.IsMatch(Password, @"[^a-zA-Z0-9]"))
         {
-            PasswordError = "كلمة المرور يجب أن تكون 6 خانات على الأقل وبها حرف كبير ورقم ورمز";
+            PasswordError = "كلمة المرور يجب أن تكون 8 أحرف على الأقل وتحتوي على حرف كبير وصغير ورقم ورمز خاص";
             hasError = true;
         }
 

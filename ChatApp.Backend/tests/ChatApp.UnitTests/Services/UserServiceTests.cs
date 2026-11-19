@@ -73,4 +73,55 @@ public class UserServiceTests
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();
     }
+
+    [Fact]
+    public async Task UpdateCurrentUserProfile_WhenValid_ShouldPersistFullNameBioAndAvatar()
+    {
+        // Arrange
+        using var db = CreateDbContext();
+        var userId = Guid.NewGuid();
+        db.Users.Add(new AppUser
+        {
+            Id = userId,
+            UserName = "khaled",
+            FullName = "Old Name",
+            Email = "khaled@test.com"
+        });
+        await db.SaveChangesAsync();
+
+        var sut = new UserService(db);
+        var req = new ChatApp.Application.Features.Users.DTOs.UpdateUserProfileRequestDto(
+            "Khaled Hassan",
+            "BetweenUs 💜",
+            "/uploads/images/avatar.png");
+
+        // Act
+        var result = await sut.UpdateCurrentUserProfileAsync(userId, req);
+
+        // Assert
+        result.Success.Should().BeTrue();
+        result.Data!.FullName.Should().Be("Khaled Hassan");
+        result.Data.Bio.Should().Be("BetweenUs 💜");
+        result.Data.AvatarUrl.Should().Be("/uploads/images/avatar.png");
+
+        var saved = await db.Users.FindAsync(userId);
+        saved!.FullName.Should().Be("Khaled Hassan");
+        saved.Bio.Should().Be("BetweenUs 💜");
+        saved.AvatarUrl.Should().Be("/uploads/images/avatar.png");
+    }
+
+    [Fact]
+    public async Task UpdateCurrentUserProfile_WhenFullNameTooShort_ShouldThrowValidationException()
+    {
+        // Arrange
+        using var db = CreateDbContext();
+        var sut = new UserService(db);
+        var req = new ChatApp.Application.Features.Users.DTOs.UpdateUserProfileRequestDto("A", null, null);
+
+        // Act
+        var act = () => sut.UpdateCurrentUserProfileAsync(Guid.NewGuid(), req);
+
+        // Assert
+        await act.Should().ThrowAsync<ValidationException>();
+    }
 }

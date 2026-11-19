@@ -64,7 +64,7 @@
                            Style="{StaticResource TypographyH1}"
                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
 
-                    <Label Text="أنشئ حسابك وابدأ محادثاتك وشارك ملصقاتك مع أصدقائك."
+                    <Label Text="أنشئ حسابك وابدأ عالمكما الخاص في BetweenUs."
                            Style="{StaticResource TypographyBody}"
                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
                 </VerticalStackLayout>
@@ -108,6 +108,7 @@
 
                     <controls:ChatEntry LabelText="البريد الإلكتروني"
                                         Placeholder="ahmed@example.com"
+                                        Keyboard="Email"
                                         Text="{Binding Email, Mode=TwoWay}"
                                         ErrorMessage="{Binding EmailError}" />
 
@@ -116,6 +117,17 @@
                                         Text="{Binding Password, Mode=TwoWay}"
                                         IsPassword="True"
                                         ErrorMessage="{Binding PasswordError}" />
+
+                    <!-- Live Password Strength Indicator -->
+                    <VerticalStackLayout Spacing="4" IsVisible="{Binding HasPasswordInput}">
+                        <ProgressBar Progress="{Binding PasswordStrengthProgress}"
+                                     ProgressColor="{Binding PasswordStrengthColor}"
+                                     HeightRequest="6" />
+                        <Label Text="{Binding PasswordStrengthText}"
+                               FontFamily="CairoRegular"
+                               FontSize="11"
+                               TextColor="{Binding PasswordStrengthColor}" />
+                    </VerticalStackLayout>
 
                     <controls:ChatEntry LabelText="تأكيد كلمة المرور"
                                         Placeholder="••••••••"

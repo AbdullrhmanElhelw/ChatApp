@@ -41,6 +41,12 @@ public record UserProfileDto(
     DateTime CreatedAt
 );
 
+public record UpdateProfileRequestDto(
+    string FullName,
+    string? Bio,
+    string? AvatarUrl
+);
+
 public class ApiResponse<T>
 {
     [JsonPropertyName("success")]

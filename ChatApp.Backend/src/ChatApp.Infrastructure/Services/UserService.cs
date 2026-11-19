@@ -23,6 +23,49 @@ public class UserService : IUserService
         return await GetUserByIdAsync(userId, cancellationToken);
     }
 
+    public async Task<ApiResponse<UserProfileDto>> UpdateCurrentUserProfileAsync(
+        Guid userId,
+        UpdateUserProfileRequestDto request,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.FullName) || request.FullName.Trim().Length < 2)
+        {
+            throw new ValidationException("Full name must be at least 2 characters.");
+        }
+
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user == null)
+        {
+            throw new NotFoundException("User", userId);
+        }
+
+        user.FullName = request.FullName.Trim()[..Math.Min(request.FullName.Trim().Length, 100)];
+        user.Bio = string.IsNullOrWhiteSpace(request.Bio)
+            ? null
+            : request.Bio.Trim()[..Math.Min(request.Bio.Trim().Length, 300)];
+
+        if (!string.IsNullOrWhiteSpace(request.AvatarUrl))
+        {
+            user.AvatarUrl = request.AvatarUrl.Trim();
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var profileDto = new UserProfileDto(
+            user.Id,
+            user.UserName ?? string.Empty,
+            user.Email ?? string.Empty,
+            user.FullName,
+            user.Bio,
+            user.AvatarUrl,
+            user.IsOnline,
+            user.LastSeenAt,
+            user.CreatedAt
+        );
+
+        return ApiResponse<UserProfileDto>.Ok(profileDto, "Profile updated successfully.");
+    }
+
     public async Task<ApiResponse<UserProfileDto>> GetUserByIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default)

@@ -131,6 +131,35 @@ public class AuthApiService : IAuthApiService
         }
     }
 
+    public async Task<ApiResult<UserProfileDto>> UpdateProfileAsync(UpdateProfileRequestDto request)
+    {
+        try
+        {
+            var token = await _storageService.GetAccessTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                return ApiResult<UserProfileDto>.Failure("لا يوجد رمز دخول محفوظ.", 401);
+            }
+
+            using var req = new HttpRequestMessage(HttpMethod.Put, "/api/v1/users/me")
+            {
+                Content = JsonContent.Create(request, options: _jsonOptions)
+            };
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.SendAsync(req);
+            return await HandleResponseAsync<UserProfileDto>(response);
+        }
+        catch (HttpRequestException)
+        {
+            return ApiResult<UserProfileDto>.Failure("تعذر الاتصال بالسيرفر.", 503);
+        }
+        catch (Exception ex)
+        {
+            return ApiResult<UserProfileDto>.Failure($"حدث خطأ أثناء حفظ الملف الشخصي: {ex.Message}", 500);
+        }
+    }
+
     private async Task<ApiResult<T>> HandleResponseAsync<T>(HttpResponseMessage response)
     {
         var content = await response.Content.ReadAsStringAsync();

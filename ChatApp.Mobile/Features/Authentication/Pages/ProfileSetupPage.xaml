@@ -7,6 +7,7 @@
              x:DataType="vm:ProfileSetupViewModel"
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
+             FlowDirection="RightToLeft"
              BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
 
     <ScrollView>
@@ -29,6 +30,22 @@
 
             <!-- 2. Profile Details Form -->
             <VerticalStackLayout Grid.Row="1" Spacing="24" VerticalOptions="Center">
+
+                <!-- Global Error Banner -->
+                <Border IsVisible="{Binding HasError}"
+                        BackgroundColor="{AppThemeBinding Light=#FEF2F2, Dark=#450A0A}"
+                        Stroke="#EF4444"
+                        StrokeThickness="1"
+                        Padding="14,10">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <Label Text="{Binding ErrorMessage}"
+                           FontFamily="CairoRegular"
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light=#B91C1C, Dark=#FECACA}"
+                           VerticalOptions="Center" />
+                </Border>
 
                 <!-- Interactive Avatar Section -->
                 <VerticalStackLayout Spacing="10" HorizontalOptions="Center">

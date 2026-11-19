@@ -35,6 +35,22 @@ public class UsersController : ApiControllerBase
     }
 
     /// <summary>
+    /// Updates the profile details (FullName, Bio, AvatarUrl) of the currently authenticated user.
+    /// </summary>
+    [HttpPut("me")]
+    [ProducesResponseType(typeof(ApiResponse<UserProfileDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ApiResponse<UserProfileDto>>> UpdateMe(
+        [FromBody] UpdateUserProfileRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        var currentUserId = GetCurrentUserId();
+        var result = await _userService.UpdateCurrentUserProfileAsync(currentUserId, request, cancellationToken);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Retrieves the public profile of a user by their unique identifier.
     /// </summary>
     [HttpGet("{id:guid}")]

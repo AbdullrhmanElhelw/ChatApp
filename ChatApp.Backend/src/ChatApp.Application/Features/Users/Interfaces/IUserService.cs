@@ -7,6 +7,11 @@ public interface IUserService
 {
     Task<ApiResponse<UserProfileDto>> GetCurrentUserProfileAsync(Guid userId, CancellationToken cancellationToken = default);
 
+    Task<ApiResponse<UserProfileDto>> UpdateCurrentUserProfileAsync(
+        Guid userId,
+        UpdateUserProfileRequestDto request,
+        CancellationToken cancellationToken = default);
+
     Task<ApiResponse<UserProfileDto>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     Task<PagedResponse<UserProfileDto>> SearchUsersAsync(

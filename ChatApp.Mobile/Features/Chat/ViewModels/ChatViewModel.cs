@@ -1315,10 +1315,21 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     private async Task UploadAndSendImageAsync(FileResult file)
     {
         IsBusy = true;
+        ClearError();
         try
         {
-            await using var stream = await file.OpenReadAsync();
-            var ext = Path.GetExtension(file.FullPath).ToLowerInvariant();
+            await using var rawStream = await file.OpenReadAsync();
+            await using var ms = new MemoryStream();
+            await rawStream.CopyToAsync(ms);
+            ms.Position = 0;
+
+            var fileName = string.IsNullOrWhiteSpace(file.FileName) ? "photo.jpg" : file.FileName;
+            var ext = Path.GetExtension(fileName);
+            if (string.IsNullOrWhiteSpace(ext))
+            {
+                ext = Path.GetExtension(file.FullPath);
+            }
+            ext = ext.ToLowerInvariant();
             var contentType = ext switch
             {
                 ".png" => "image/png",
@@ -1327,7 +1338,7 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
                 _ => "image/jpeg"
             };
 
-            var uploadResult = await _stickerApi.UploadMediaAsync(stream, file.FileName, contentType, MessageType.Image);
+            var uploadResult = await _stickerApi.UploadMediaAsync(ms, fileName, contentType, MessageType.Image);
             if (!uploadResult.IsSuccess || uploadResult.Value == null)
             {
                 ErrorMessage = uploadResult.ErrorMessage ?? "فشل رفع الصورة.";

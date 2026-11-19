@@ -137,16 +137,22 @@ public class StickerApiService : IStickerApiService
             using var req = new HttpRequestMessage(HttpMethod.Post, "/api/v1/media/upload");
             await AttachAuthHeaderAsync(req);
 
+            var safeFileName = string.IsNullOrWhiteSpace(fileName) ? "upload.jpg" : fileName;
             using var form = new MultipartFormDataContent();
             var streamContent = new StreamContent(stream);
             streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-            form.Add(streamContent, "file", fileName);
+            form.Add(streamContent, "file", safeFileName);
             form.Add(new StringContent(((int)mediaType).ToString()), "mediaType");
 
             req.Content = form;
 
             var response = await _httpClient.SendAsync(req);
-            return await HandleResponseAsync<UploadMediaResponseClientDto>(response);
+            var res = await HandleResponseAsync<UploadMediaResponseClientDto>(response);
+            if (!res.IsSuccess)
+            {
+                Features.Common.PerfLog.Write("upload.fail", 0, $"{(int)response.StatusCode}: {res.ErrorMessage}");
+            }
+            return res;
         }
         catch (HttpRequestException)
         {

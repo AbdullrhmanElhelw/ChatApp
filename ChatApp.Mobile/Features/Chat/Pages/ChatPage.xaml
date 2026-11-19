@@ -206,8 +206,21 @@
             </Grid>
         </Border>
 
-        <!-- 2. Search Bar + Pinned Banner + Message Feed -->
+        <!-- 2. Search Bar + Error Banner + Message Feed -->
         <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*">
+            <!-- Error Banner -->
+            <Border Grid.Row="1"
+                    IsVisible="{Binding HasError}"
+                    StrokeThickness="1"
+                    Stroke="#EF4444"
+                    BackgroundColor="#450A0A"
+                    Padding="12,8"
+                    Margin="12,4">
+                <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                <Label Text="{Binding ErrorMessage}"
+                       FontFamily="CairoBold" FontSize="12" TextColor="#FECACA"
+                       HorizontalTextAlignment="Center" LineBreakMode="WordWrap" />
+            </Border>
             <!-- Collapsible In-Chat Search Bar -->
             <Border Grid.Row="0"
                     IsVisible="{Binding IsSearchOpen}"

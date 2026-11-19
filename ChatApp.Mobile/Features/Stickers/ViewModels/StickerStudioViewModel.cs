@@ -7,6 +7,7 @@ using ChatApp.Mobile.Features.Chat.Services;
 using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Features.Conversations.DTOs;
 using ChatApp.Mobile.Navigation;
+using Microsoft.Maui.Controls;
 
 namespace ChatApp.Mobile.Features.Stickers.ViewModels;
 
@@ -15,6 +16,8 @@ public partial class StickerStudioViewModel : BaseViewModel
     private readonly IStickerApiService _stickerApi;
     private readonly INavigationService _navigationService;
     private readonly IAuthenticationStateService _authState;
+
+    public Func<Task<byte[]?>>? CaptureCanvasAsync { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasImage))]
@@ -28,7 +31,69 @@ public partial class StickerStudioViewModel : BaseViewModel
     public partial string SelectedColor { get; set; } = "#FFFFFF";
 
     [ObservableProperty]
-    public partial double CaptionFontSize { get; set; } = 18;
+    public partial double CaptionFontSize { get; set; } = 22;
+
+    // Shape: "rounded", "circle"
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanvasCornerRadius))]
+    [NotifyPropertyChangedFor(nameof(IsCircleShape))]
+    public partial string SelectedShape { get; set; } = "rounded";
+
+    public bool IsCircleShape => SelectedShape == "circle";
+    public CornerRadius CanvasCornerRadius => IsCircleShape ? new CornerRadius(150) : new CornerRadius(28);
+
+    // Border: "none", "white", "neon"
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanvasStrokeThickness))]
+    [NotifyPropertyChangedFor(nameof(CanvasStrokeColor))]
+    public partial string SelectedBorderStyle { get; set; } = "white";
+
+    public double CanvasStrokeThickness => SelectedBorderStyle switch
+    {
+        "white" => 6,
+        "neon" => 4,
+        _ => 0
+    };
+
+    public Color CanvasStrokeColor => SelectedBorderStyle switch
+    {
+        "white" => Colors.White,
+        "neon" => Color.FromArgb("#FF4FB8"),
+        _ => Colors.Transparent
+    };
+
+    // Text Position: "top", "center", "bottom"
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CaptionVerticalOptions))]
+    public partial string SelectedTextPosition { get; set; } = "bottom";
+
+    public LayoutOptions CaptionVerticalOptions => SelectedTextPosition switch
+    {
+        "top" => LayoutOptions.Start,
+        "center" => LayoutOptions.Center,
+        _ => LayoutOptions.End
+    };
+
+    // Text Style: "dark", "neon", "outline"
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CaptionBackgroundColor))]
+    public partial string SelectedTextStyle { get; set; } = "dark";
+
+    public Color CaptionBackgroundColor => SelectedTextStyle switch
+    {
+        "neon" => Color.FromArgb("#DDFF4FB8"),
+        "outline" => Colors.Transparent,
+        _ => Color.FromArgb("#B814042B")
+    };
+
+    // Image Fit: true = AspectFill, false = AspectFit
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ImageAspectMode))]
+    [NotifyPropertyChangedFor(nameof(ImageFitLabel))]
+    public partial bool IsFillAspect { get; set; } = true;
+
+    public Aspect ImageAspectMode => IsFillAspect ? Aspect.AspectFill : Aspect.AspectFit;
+    public string ImageFitLabel => IsFillAspect ? "ملء الإطار" : "الصورة كاملة";
 
     [ObservableProperty]
     public partial ObservableCollection<StickerPackClientDto> StickerPacks { get; set; } = new();
@@ -52,7 +117,7 @@ public partial class StickerStudioViewModel : BaseViewModel
         _stickerApi = stickerApi;
         _navigationService = navigationService;
         _authState = authState;
-        Title = "صانع الاستيكرات (Sticker Studio)";
+        Title = "صانع الاستيكرات الذكي";
     }
 
     public async Task InitializeAsync()
@@ -92,7 +157,7 @@ public partial class StickerStudioViewModel : BaseViewModel
             {
                 SelectedImagePath = result.FullPath;
                 ClearError();
-                StatusMessage = "تم اختيار الصورة. أضف نصًا وإيموجي للمعاينة قبل حفظ الصورة الأصلية كملصق.";
+                StatusMessage = "تم اختيار الصورة! أضف نصك واختر الشكل والإطار ثم احفظ الاستيكر.";
             }
         }
         catch (Exception ex)
@@ -102,28 +167,43 @@ public partial class StickerStudioViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public void SelectColor(string hexColor)
+    public void SelectColor(string hexColor) => SelectedColor = hexColor;
+
+    [RelayCommand]
+    public void SelectShape(string shape) => SelectedShape = shape;
+
+    [RelayCommand]
+    public void SelectBorderStyle(string border) => SelectedBorderStyle = border;
+
+    [RelayCommand]
+    public void SelectTextPosition(string position) => SelectedTextPosition = position;
+
+    [RelayCommand]
+    public void SelectTextStyle(string style) => SelectedTextStyle = style;
+
+    [RelayCommand]
+    public void ToggleImageAspect() => IsFillAspect = !IsFillAspect;
+
+    [RelayCommand]
+    public void ApplySmartCaption(string caption)
     {
-        SelectedColor = hexColor;
+        if (!string.IsNullOrWhiteSpace(caption))
+        {
+            CaptionText = caption;
+        }
     }
 
     [RelayCommand]
-    public void AddQuickEmoji(string emoji)
-    {
-        CaptionText += emoji;
-    }
+    public void ClearCaption() => CaptionText = string.Empty;
 
     [RelayCommand]
-    public void IncreaseCaptionSize()
-    {
-        CaptionFontSize = Math.Min(CaptionFontSize + 2, 34);
-    }
+    public void AddQuickEmoji(string emoji) => CaptionText += emoji;
 
     [RelayCommand]
-    public void DecreaseCaptionSize()
-    {
-        CaptionFontSize = Math.Max(CaptionFontSize - 2, 14);
-    }
+    public void IncreaseCaptionSize() => CaptionFontSize = Math.Min(CaptionFontSize + 2, 36);
+
+    [RelayCommand]
+    public void DecreaseCaptionSize() => CaptionFontSize = Math.Max(CaptionFontSize - 2, 14);
 
     [RelayCommand]
     public async Task SaveStickerAsync()
@@ -136,7 +216,7 @@ public partial class StickerStudioViewModel : BaseViewModel
 
         IsBusy = true;
         ClearError();
-        StatusMessage = "جارٍ رفع الصورة وإضافتها إلى حزمة الملصقات...";
+        StatusMessage = "جارٍ تجهيز الاستيكر بالنص والإطار ورفعه...";
 
         try
         {
@@ -157,19 +237,34 @@ public partial class StickerStudioViewModel : BaseViewModel
                 SelectedPack = targetPack;
             }
 
-            // 2. Upload file
-            await using var stream = File.OpenRead(SelectedImagePath);
-            var fileName = Path.GetFileName(SelectedImagePath);
-            var extension = Path.GetExtension(SelectedImagePath).ToLowerInvariant();
-            var contentType = extension switch
+            // 2. Capture rendered canvas (image + text + shape + border) as PNG
+            byte[]? renderedPng = null;
+            if (CaptureCanvasAsync != null)
             {
-                ".png" => "image/png",
-                ".webp" => "image/webp",
-                ".gif" => "image/gif",
-                _ => "image/jpeg"
-            };
+                renderedPng = await CaptureCanvasAsync();
+            }
 
-            var uploadResult = await _stickerApi.UploadMediaAsync(stream, fileName, contentType, MessageType.Sticker);
+            ApiResult<UploadMediaResponseClientDto> uploadResult;
+            if (renderedPng != null && renderedPng.Length > 0)
+            {
+                await using var ms = new MemoryStream(renderedPng);
+                uploadResult = await _stickerApi.UploadMediaAsync(ms, $"sticker_{Guid.NewGuid():N}.png", "image/png", MessageType.Sticker);
+            }
+            else
+            {
+                await using var stream = File.OpenRead(SelectedImagePath);
+                var fileName = Path.GetFileName(SelectedImagePath);
+                var extension = Path.GetExtension(SelectedImagePath).ToLowerInvariant();
+                var contentType = extension switch
+                {
+                    ".png" => "image/png",
+                    ".webp" => "image/webp",
+                    ".gif" => "image/gif",
+                    _ => "image/jpeg"
+                };
+                uploadResult = await _stickerApi.UploadMediaAsync(stream, fileName, contentType, MessageType.Sticker);
+            }
+
             if (!uploadResult.IsSuccess || uploadResult.Value == null)
             {
                 ErrorMessage = uploadResult.ErrorMessage ?? "فشل رفع صورة الاستيكر.";
@@ -180,10 +275,10 @@ public partial class StickerStudioViewModel : BaseViewModel
             var addResult = await _stickerApi.AddStickerToPackAsync(targetPack.Id, uploadResult.Value.FileUrl);
             if (addResult.IsSuccess)
             {
-                StatusMessage = "🎉 تم حفظ الاستيكر بنجاح وأصبح متاحاً في لوحة الملصقات بالشات!";
+                StatusMessage = "تم حفظ الاستيكر بالنص والتصميم وأصبح متاحاً في لوحة الملصقات!";
                 SelectedImagePath = null;
                 CaptionText = string.Empty;
-                await Task.Delay(1500);
+                await Task.Delay(1200);
                 await _navigationService.GoBackAsync();
             }
             else
@@ -202,8 +297,5 @@ public partial class StickerStudioViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public async Task NavigateBackAsync()
-    {
-        await _navigationService.GoBackAsync();
-    }
+    public async Task NavigateBackAsync() => await _navigationService.GoBackAsync();
 }

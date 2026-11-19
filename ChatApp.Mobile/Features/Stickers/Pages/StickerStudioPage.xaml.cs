@@ -14,7 +14,25 @@ public partial class StickerStudioPage : ContentPage
     {
         InitializeComponent();
         _viewModel = viewModel;
+        _viewModel.CaptureCanvasAsync = CaptureStickerCanvasPngAsync;
         BindingContext = _viewModel;
+    }
+
+    private async Task<byte[]?> CaptureStickerCanvasPngAsync()
+    {
+        try
+        {
+            if (StickerCanvas == null) return null;
+            var screenshot = await StickerCanvas.CaptureAsync();
+            if (screenshot == null) return null;
+            await using var ms = new MemoryStream();
+            await screenshot.CopyToAsync(ms, ScreenshotFormat.Png);
+            return ms.ToArray();
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     protected override async void OnAppearing()

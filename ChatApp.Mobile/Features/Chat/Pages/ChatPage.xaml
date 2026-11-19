@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:vm="clr-namespace:ChatApp.Mobile.Features.Chat.ViewModels"
              xmlns:dto="clr-namespace:ChatApp.Mobile.Features.Chat.DTOs"
              xmlns:converters="clr-namespace:ChatApp.Mobile.Converters"
@@ -193,6 +194,28 @@
                                 <Border.Shadow>
                                     <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,2" Radius="4" Opacity="0.3" />
                                 </Border.Shadow>
+                                <Border.Behaviors>
+                                    <toolkit:TouchBehavior LongPressCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                           LongPressCommandParameter="{Binding .}"
+                                                           LongPressDuration="360" />
+                                </Border.Behaviors>
+                                <Border.GestureRecognizers>
+                                    <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
+                                                              PointerReleased="OnMessageBubblePointerReleased"
+                                                              PointerExited="OnMessageBubblePointerExited" />
+                                    <PanGestureRecognizer PanUpdated="OnMessageBubblePanUpdated" />
+                                    <SwipeGestureRecognizer Direction="Left"
+                                                            Threshold="35"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                            CommandParameter="{Binding .}" />
+                                    <SwipeGestureRecognizer Direction="Right"
+                                                            Threshold="35"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                            CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer Buttons="Secondary"
+                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
                                 <VerticalStackLayout Spacing="5">
                                     <!-- Quoted Reply Inset Card -->
                                     <Border IsVisible="{Binding HasReplyTo}"
@@ -244,46 +267,8 @@
                                                Aspect="AspectFill" />
                                     </Border>
 
-                                    <!-- Actions Row: Quick Reaction, Reply, Timestamp & Read Status -->
-                                    <HorizontalStackLayout HorizontalOptions="End" Spacing="8" VerticalOptions="Center">
-                                        <!-- Quick Reaction Smiley Trigger -->
-                                        <Border WidthRequest="22"
-                                                HeightRequest="22"
-                                                StrokeThickness="0"
-                                                BackgroundColor="Transparent"
-                                                VerticalOptions="Center">
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
-                                                                      CommandParameter="{Binding .}" />
-                                            </Border.GestureRecognizers>
-                                            <Path Data="{StaticResource IconSmiley}"
-                                                  Fill="#BFDBFE"
-                                                  WidthRequest="13"
-                                                  HeightRequest="13"
-                                                  Aspect="Uniform"
-                                                  HorizontalOptions="Center"
-                                                  VerticalOptions="Center" />
-                                        </Border>
-
-                                        <!-- Quick Reply Button -->
-                                        <Border WidthRequest="22"
-                                                HeightRequest="22"
-                                                StrokeThickness="0"
-                                                BackgroundColor="Transparent"
-                                                VerticalOptions="Center">
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                                      CommandParameter="{Binding .}" />
-                                            </Border.GestureRecognizers>
-                                            <Path Data="{StaticResource IconReply}"
-                                                  Fill="#BFDBFE"
-                                                  WidthRequest="12"
-                                                  HeightRequest="12"
-                                                  Aspect="Uniform"
-                                                  HorizontalOptions="Center"
-                                                  VerticalOptions="Center" />
-                                        </Border>
-
+                                    <!-- Clean Timestamp & Read Status Row (WhatsApp Style) -->
+                                    <HorizontalStackLayout HorizontalOptions="End" Spacing="5" VerticalOptions="Center">
                                         <Label Text="{Binding FormattedTime}"
                                                FontFamily="CairoRegular"
                                                FontSize="10"
@@ -365,6 +350,28 @@
                                     </Border>
 
                                     <Grid>
+                                        <Grid.Behaviors>
+                                            <toolkit:TouchBehavior LongPressCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                   LongPressCommandParameter="{Binding .}"
+                                                                   LongPressDuration="360" />
+                                        </Grid.Behaviors>
+                                        <Grid.GestureRecognizers>
+                                            <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
+                                                                      PointerReleased="OnMessageBubblePointerReleased"
+                                                                      PointerExited="OnMessageBubblePointerExited" />
+                                            <PanGestureRecognizer PanUpdated="OnMessageBubblePanUpdated" />
+                                            <SwipeGestureRecognizer Direction="Left"
+                                                                    Threshold="35"
+                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                    CommandParameter="{Binding .}" />
+                                            <SwipeGestureRecognizer Direction="Right"
+                                                                    Threshold="35"
+                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                    CommandParameter="{Binding .}" />
+                                            <TapGestureRecognizer Buttons="Secondary"
+                                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Grid.GestureRecognizers>
                                         <Image Source="{Binding StickerUrl}"
                                                WidthRequest="150"
                                                HeightRequest="150"
@@ -374,46 +381,11 @@
                                                 Margin="0,0,4,4"
                                                 StrokeThickness="0"
                                                 BackgroundColor="#90000000"
-                                                Padding="6,2">
+                                                Padding="7,2">
                                             <Border.StrokeShape>
                                                 <RoundRectangle CornerRadius="8" />
                                             </Border.StrokeShape>
-                                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                                                <!-- Quick Reaction Trigger -->
-                                                <Border WidthRequest="18"
-                                                        HeightRequest="18"
-                                                        StrokeThickness="0"
-                                                        BackgroundColor="Transparent">
-                                                    <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
-                                                                              CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
-                                                    <Path Data="{StaticResource IconSmiley}"
-                                                          Fill="#F8FAFC"
-                                                          WidthRequest="11"
-                                                          HeightRequest="11"
-                                                          Aspect="Uniform"
-                                                          HorizontalOptions="Center"
-                                                          VerticalOptions="Center" />
-                                                </Border>
-
-                                                <!-- Quick Reply -->
-                                                <Border WidthRequest="18"
-                                                        HeightRequest="18"
-                                                        StrokeThickness="0"
-                                                        BackgroundColor="Transparent">
-                                                    <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                                              CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
-                                                    <Path Data="{StaticResource IconReply}"
-                                                          Fill="#F8FAFC"
-                                                          WidthRequest="10"
-                                                          HeightRequest="10"
-                                                          Aspect="Uniform"
-                                                          HorizontalOptions="Center"
-                                                          VerticalOptions="Center" />
-                                                </Border>
+                                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
                                                 <Label Text="{Binding FormattedTime}"
                                                        FontSize="10"
                                                        TextColor="#F8FAFC" />
@@ -481,6 +453,28 @@
                                 <Border.Shadow>
                                     <Shadow Brush="#08000000" Offset="0,1" Radius="3" Opacity="0.5" />
                                 </Border.Shadow>
+                                <Border.Behaviors>
+                                    <toolkit:TouchBehavior LongPressCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                           LongPressCommandParameter="{Binding .}"
+                                                           LongPressDuration="360" />
+                                </Border.Behaviors>
+                                <Border.GestureRecognizers>
+                                    <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
+                                                              PointerReleased="OnMessageBubblePointerReleased"
+                                                              PointerExited="OnMessageBubblePointerExited" />
+                                    <PanGestureRecognizer PanUpdated="OnMessageBubblePanUpdated" />
+                                    <SwipeGestureRecognizer Direction="Left"
+                                                            Threshold="35"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                            CommandParameter="{Binding .}" />
+                                    <SwipeGestureRecognizer Direction="Right"
+                                                            Threshold="35"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                            CommandParameter="{Binding .}" />
+                                    <TapGestureRecognizer Buttons="Secondary"
+                                                          Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
                                 <VerticalStackLayout Spacing="5">
                                     <!-- Quoted Reply Inset Card -->
                                     <Border IsVisible="{Binding HasReplyTo}"
@@ -532,46 +526,8 @@
                                                Aspect="AspectFill" />
                                     </Border>
 
-                                    <!-- Timestamp and Actions -->
-                                    <HorizontalStackLayout HorizontalOptions="End" Spacing="8" VerticalOptions="Center">
-                                        <!-- Quick Reaction Trigger -->
-                                        <Border WidthRequest="22"
-                                                HeightRequest="22"
-                                                StrokeThickness="0"
-                                                BackgroundColor="Transparent"
-                                                VerticalOptions="Center">
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
-                                                                      CommandParameter="{Binding .}" />
-                                            </Border.GestureRecognizers>
-                                            <Path Data="{StaticResource IconSmiley}"
-                                                  Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                                                  WidthRequest="13"
-                                                  HeightRequest="13"
-                                                  Aspect="Uniform"
-                                                  HorizontalOptions="Center"
-                                                  VerticalOptions="Center" />
-                                        </Border>
-
-                                        <!-- Quick Reply Button -->
-                                        <Border WidthRequest="22"
-                                                HeightRequest="22"
-                                                StrokeThickness="0"
-                                                BackgroundColor="Transparent"
-                                                VerticalOptions="Center">
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                                      CommandParameter="{Binding .}" />
-                                            </Border.GestureRecognizers>
-                                            <Path Data="{StaticResource IconReply}"
-                                                  Fill="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                                                  WidthRequest="12"
-                                                  HeightRequest="12"
-                                                  Aspect="Uniform"
-                                                  HorizontalOptions="Center"
-                                                  VerticalOptions="Center" />
-                                        </Border>
-
+                                    <!-- Clean Timestamp Row (WhatsApp Style) -->
+                                    <HorizontalStackLayout HorizontalOptions="End" Spacing="5" VerticalOptions="Center">
                                         <Label Text="{Binding FormattedTime}"
                                                FontFamily="CairoRegular"
                                                FontSize="10"
@@ -649,6 +605,28 @@
                                     </Border>
 
                                     <Grid>
+                                        <Grid.Behaviors>
+                                            <toolkit:TouchBehavior LongPressCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                   LongPressCommandParameter="{Binding .}"
+                                                                   LongPressDuration="360" />
+                                        </Grid.Behaviors>
+                                        <Grid.GestureRecognizers>
+                                            <PointerGestureRecognizer PointerPressed="OnMessageBubblePointerPressed"
+                                                                      PointerReleased="OnMessageBubblePointerReleased"
+                                                                      PointerExited="OnMessageBubblePointerExited" />
+                                            <PanGestureRecognizer PanUpdated="OnMessageBubblePanUpdated" />
+                                            <SwipeGestureRecognizer Direction="Left"
+                                                                    Threshold="35"
+                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                    CommandParameter="{Binding .}" />
+                                            <SwipeGestureRecognizer Direction="Right"
+                                                                    Threshold="35"
+                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
+                                                                    CommandParameter="{Binding .}" />
+                                            <TapGestureRecognizer Buttons="Secondary"
+                                                                  Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Grid.GestureRecognizers>
                                         <Image Source="{Binding StickerUrl}"
                                                WidthRequest="150"
                                                HeightRequest="150"
@@ -658,46 +636,11 @@
                                                 Margin="0,0,4,4"
                                                 StrokeThickness="0"
                                                 BackgroundColor="#90000000"
-                                                Padding="6,2">
+                                                Padding="7,2">
                                             <Border.StrokeShape>
                                                 <RoundRectangle CornerRadius="8" />
                                             </Border.StrokeShape>
-                                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                                                <!-- Quick Reaction Trigger -->
-                                                <Border WidthRequest="18"
-                                                        HeightRequest="18"
-                                                        StrokeThickness="0"
-                                                        BackgroundColor="Transparent">
-                                                    <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenReactionPickerCommand}"
-                                                                              CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
-                                                    <Path Data="{StaticResource IconSmiley}"
-                                                          Fill="#F8FAFC"
-                                                          WidthRequest="11"
-                                                          HeightRequest="11"
-                                                          Aspect="Uniform"
-                                                          HorizontalOptions="Center"
-                                                          VerticalOptions="Center" />
-                                                </Border>
-
-                                                <!-- Quick Reply -->
-                                                <Border WidthRequest="18"
-                                                        HeightRequest="18"
-                                                        StrokeThickness="0"
-                                                        BackgroundColor="Transparent">
-                                                    <Border.GestureRecognizers>
-                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=StartReplyCommand}"
-                                                                              CommandParameter="{Binding .}" />
-                                                    </Border.GestureRecognizers>
-                                                    <Path Data="{StaticResource IconReply}"
-                                                          Fill="#F8FAFC"
-                                                          WidthRequest="10"
-                                                          HeightRequest="10"
-                                                          Aspect="Uniform"
-                                                          HorizontalOptions="Center"
-                                                          VerticalOptions="Center" />
-                                                </Border>
+                                            <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
                                                 <Label Text="{Binding FormattedTime}"
                                                        FontSize="10"
                                                        TextColor="#F8FAFC" />
@@ -1488,6 +1431,56 @@
                                 <TapGestureRecognizer Command="{Binding ReactWithEmojiCommand}" CommandParameter="😢" />
                             </Border.GestureRecognizers>
                             <Label Text="😢" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </HorizontalStackLayout>
+
+                    <!-- Quick Message Actions Bar (Reply & Copy) -->
+                    <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,4,0,0">
+                        <Border Padding="14,7"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ReplyFromReactionPickerCommand}" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconReply}"
+                                      Fill="{StaticResource BrandPrimary}"
+                                      WidthRequest="13"
+                                      HeightRequest="13"
+                                      Aspect="Uniform"
+                                      VerticalOptions="Center" />
+                                <Label Text="رد على الرسالة"
+                                       FontFamily="CairoBold"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <Border Padding="14,7"
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CopyTargetMessageCommand}" />
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Label Text="📋"
+                                       FontSize="12"
+                                       VerticalOptions="Center" />
+                                <Label Text="نسخ النص"
+                                       FontFamily="CairoBold"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
                         </Border>
                     </HorizontalStackLayout>
                 </VerticalStackLayout>

@@ -215,6 +215,31 @@ public partial class ChatViewModel : BaseViewModel, IQueryAttributable, IDisposa
     }
 
     [RelayCommand]
+    public void ReplyFromReactionPicker()
+    {
+        if (ReactionTargetMessage != null)
+        {
+            ReplyingToMessage = ReactionTargetMessage;
+        }
+        CloseReactionPicker();
+    }
+
+    [RelayCommand]
+    public async Task CopyTargetMessageAsync()
+    {
+        var content = ReactionTargetMessage?.Content;
+        CloseReactionPicker();
+        if (!string.IsNullOrWhiteSpace(content))
+        {
+            try
+            {
+                await Clipboard.Default.SetTextAsync(content);
+            }
+            catch { }
+        }
+    }
+
+    [RelayCommand]
     public async Task ReactWithEmojiAsync(string? emoji)
     {
         if (ReactionTargetMessage == null || string.IsNullOrWhiteSpace(emoji))

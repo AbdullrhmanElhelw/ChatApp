@@ -58,6 +58,24 @@ public partial class ConversationsViewModel : BaseViewModel
     [ObservableProperty]
     public partial bool IsMoodSheetVisible { get; set; }
 
+    [ObservableProperty]
+    public partial bool IsNotificationBannerVisible { get; set; }
+
+    [ObservableProperty]
+    public partial string NotificationSenderName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string NotificationMessagePreview { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial ConversationSummaryDto? NotificationConversation { get; set; }
+
+    private CancellationTokenSource? _notificationCts;
+
+    public int TotalUnreadCount => Conversations.Sum(c => c.UnreadCount);
+    public bool HasTotalUnread => TotalUnreadCount > 0;
+    public string UnreadFilterLabel => TotalUnreadCount > 0 ? $"غير مقروءة ({TotalUnreadCount})" : "غير مقروءة";
+
     public bool IsEmpty => FilteredConversations.Count == 0 && !IsBusy;
 
     public ConversationsViewModel(
@@ -189,8 +207,9 @@ public partial class ConversationsViewModel : BaseViewModel
                 {
                     Conversations = new ObservableCollection<ConversationSummaryDto>(fresh);
                     FilterConversations();
+                    NotifyUnreadTotalsChanged();
                 }
-                _ = EnsureHubConnectedAsync();
+                _ = JoinAllConversationsOnHubAsync();
             }
             else if (Conversations.Count == 0)
             {
@@ -343,15 +362,93 @@ public partial class ConversationsViewModel : BaseViewModel
 
     private async Task EnsureHubConnectedAsync()
     {
-        if (_chatHubService == null || _chatHubService.IsConnected) return;
+        if (_chatHubService == null) return;
         try
         {
-            await _chatHubService.ConnectAsync();
+            if (!_chatHubService.IsConnected)
+            {
+                await _chatHubService.ConnectAsync();
+            }
+            await JoinAllConversationsOnHubAsync();
         }
         catch
         {
             // Non-fatal: list already loaded via REST
         }
+    }
+
+    private async Task JoinAllConversationsOnHubAsync()
+    {
+        if (_chatHubService == null || !_chatHubService.IsConnected) return;
+        try
+        {
+            var ids = Conversations.Select(c => c.Id).ToList();
+            foreach (var id in ids)
+            {
+                await _chatHubService.JoinConversationAsync(id);
+            }
+        }
+        catch { }
+    }
+
+    private void NotifyUnreadTotalsChanged()
+    {
+        OnPropertyChanged(nameof(TotalUnreadCount));
+        OnPropertyChanged(nameof(HasTotalUnread));
+        OnPropertyChanged(nameof(UnreadFilterLabel));
+    }
+
+    [RelayCommand]
+    private async Task OpenNotificationConversationAsync()
+    {
+        var target = NotificationConversation;
+        IsNotificationBannerVisible = false;
+        if (target != null)
+        {
+            await SelectConversationAsync(target);
+        }
+    }
+
+    [RelayCommand]
+    private void DismissNotificationBanner()
+    {
+        IsNotificationBannerVisible = false;
+    }
+
+    private void ShowInAppNotification(ConversationSummaryDto conversation, MessageClientDto message)
+    {
+        try
+        {
+            HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
+        }
+        catch { }
+
+        NotificationSenderName = string.IsNullOrWhiteSpace(message.SenderFullName) ? conversation.Title : message.SenderFullName;
+        NotificationMessagePreview = message.MessageType switch
+        {
+            MessageType.Image => "أرسل صورة",
+            MessageType.Sticker => "أرسل ملصقاً",
+            MessageType.Audio => "أرسل رسالة صوتية",
+            MessageType.Video => "أرسل مقطع فيديو",
+            _ => message.Content ?? "رسالة جديدة"
+        };
+        NotificationConversation = conversation;
+        IsNotificationBannerVisible = true;
+
+        _notificationCts?.Cancel();
+        _notificationCts?.Dispose();
+        _notificationCts = new CancellationTokenSource();
+        var token = _notificationCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(3500, token);
+                MainThread.BeginInvokeOnMainThread(() => IsNotificationBannerVisible = false);
+            }
+            catch { }
+        }, token);
     }
 
     private void OnRealtimeMessageReceived(MessageClientDto message)
@@ -392,6 +489,13 @@ public partial class ConversationsViewModel : BaseViewModel
             Conversations.RemoveAt(index);
             Conversations.Insert(0, updated);
             FilterConversations();
+            NotifyUnreadTotalsChanged();
+            SaveConversationsCache(CurrentUser?.Id ?? Guid.Empty, Conversations.ToList());
+
+            if (!isMine)
+            {
+                ShowInAppNotification(updated, message);
+            }
         });
     }
 

@@ -25,7 +25,7 @@
 
             <!-- 1. Centered Wordmark + Theme Toggle -->
             <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
-                <BoxView Grid.Column="0" WidthRequest="38" HeightRequest="38" Color="Transparent" />
+                <Grid Grid.Column="0" WidthRequest="38" HeightRequest="38" IsEnabled="False" />
 
                 <HorizontalStackLayout Grid.Column="1"
                                        FlowDirection="LeftToRight"

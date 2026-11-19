@@ -10,6 +10,7 @@ using ChatApp.Mobile.Features.Conversations.Pages;
 using ChatApp.Mobile.Features.Conversations.Services;
 using ChatApp.Mobile.Features.Conversations.ViewModels;
 using ChatApp.Mobile.Features.CoupleSpace.Pages;
+using ChatApp.Mobile.Features.CoupleSpace.Services;
 using ChatApp.Mobile.Features.CoupleSpace.ViewModels;
 using ChatApp.Mobile.Features.Settings.Pages;
 using ChatApp.Mobile.Features.Settings.ViewModels;
@@ -68,6 +69,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IMessageApiService, MessageApiService>();
         builder.Services.AddSingleton<IStickerApiService, StickerApiService>();
         builder.Services.AddSingleton<IVoiceAudioService, VoiceAudioService>();
+        builder.Services.AddSingleton<ICoupleApiService, CoupleApiService>();
 
         // 3. ViewModels
         builder.Services.AddTransient<SplashViewModel>();

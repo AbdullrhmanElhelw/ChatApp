@@ -194,6 +194,64 @@ namespace ChatApp.Infrastructure.Persistence.Migrations
                     b.ToTable("ConversationParticipants");
                 });
 
+            modelBuilder.Entity("ChatApp.Domain.Entities.CoupleSpace", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DailyAnswersJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InviteCode")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("LoveNotesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MemoriesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PairedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Partner1Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Partner1Mood")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid?>("Partner2Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Partner2Mood")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("SpecialDatesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InviteCode")
+                        .IsUnique();
+
+                    b.HasIndex("Partner1Id");
+
+                    b.HasIndex("Partner2Id");
+
+                    b.ToTable("CoupleSpaces");
+                });
+
             modelBuilder.Entity("ChatApp.Domain.Entities.MediaAttachment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -671,6 +729,24 @@ namespace ChatApp.Infrastructure.Persistence.Migrations
                     b.Navigation("LastReadMessage");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ChatApp.Domain.Entities.CoupleSpace", b =>
+                {
+                    b.HasOne("ChatApp.Domain.Entities.AppUser", "Partner1")
+                        .WithMany()
+                        .HasForeignKey("Partner1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ChatApp.Domain.Entities.AppUser", "Partner2")
+                        .WithMany()
+                        .HasForeignKey("Partner2Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Partner1");
+
+                    b.Navigation("Partner2");
                 });
 
             modelBuilder.Entity("ChatApp.Domain.Entities.MediaAttachment", b =>

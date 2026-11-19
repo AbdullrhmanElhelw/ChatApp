@@ -22,6 +22,7 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
     public DbSet<StickerPack> StickerPacks => Set<StickerPack>();
     public DbSet<Sticker> Stickers => Set<Sticker>();
     public DbSet<UserStickerPack> UserStickerPacks => Set<UserStickerPack>();
+    public DbSet<CoupleSpace> CoupleSpaces => Set<CoupleSpace>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -39,6 +40,24 @@ public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
         builder.Entity<StickerPack>().HasQueryFilter(sp => !sp.IsDeleted);
         builder.Entity<Sticker>().HasQueryFilter(s => !s.StickerPack!.IsDeleted);
         builder.Entity<UserStickerPack>().HasQueryFilter(usp => !usp.StickerPack!.IsDeleted);
+
+        builder.Entity<CoupleSpace>(entity =>
+        {
+            entity.HasIndex(cs => cs.InviteCode).IsUnique();
+            entity.Property(cs => cs.InviteCode).HasMaxLength(16).IsRequired();
+            entity.Property(cs => cs.Partner1Mood).HasMaxLength(64);
+            entity.Property(cs => cs.Partner2Mood).HasMaxLength(64);
+
+            entity.HasOne(cs => cs.Partner1)
+                  .WithMany()
+                  .HasForeignKey(cs => cs.Partner1Id)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(cs => cs.Partner2)
+                  .WithMany()
+                  .HasForeignKey(cs => cs.Partner2Id)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

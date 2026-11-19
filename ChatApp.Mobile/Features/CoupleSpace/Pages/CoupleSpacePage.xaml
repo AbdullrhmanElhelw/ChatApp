@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:ChatApp.Mobile.Features.CoupleSpace.ViewModels"
              xmlns:models="clr-namespace:ChatApp.Mobile.Features.CoupleSpace.Models"
+             xmlns:controls="clr-namespace:ChatApp.Mobile.Controls"
              x:Class="ChatApp.Mobile.Features.CoupleSpace.Pages.CoupleSpacePage"
              x:Name="CoupleRoot"
              x:DataType="vm:CoupleSpaceViewModel"
@@ -57,6 +58,123 @@
             <!-- 2. Scrollable Content -->
             <ScrollView Grid.Row="1">
                 <VerticalStackLayout Padding="18,6,18,32" Spacing="16">
+
+                    <!-- 2a. Couple Pairing Card (Not Paired Yet) -->
+                    <Border IsVisible="{Binding IsNotPaired}"
+                            StrokeThickness="1"
+                            Stroke="#FF4FB8"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
+                            Padding="18">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="22" /></Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="#FF4FB8" Offset="0,4" Radius="16" Opacity="0.25" />
+                        </Border.Shadow>
+
+                        <VerticalStackLayout Spacing="12">
+                            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                <Path Data="{StaticResource IconHeart}" Fill="{StaticResource BrandNeonPink}" WidthRequest="17" HeightRequest="17" Aspect="Uniform" VerticalOptions="Center" />
+                                <Label Text="ربط حسابك بشريكك"
+                                       FontFamily="CairoBold" FontSize="16"
+                                       TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
+                            <Label Text="أنشئ كود دعوة خاص بكما أو أدخل كود شريكك لربط عالمكم المشترك."
+                                   FontFamily="CairoRegular" FontSize="12"
+                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#C5AFE4}"
+                                   LineBreakMode="WordWrap" />
+
+                            <!-- Invite Code Display when generated -->
+                            <Border IsVisible="{Binding HasInviteCode}"
+                                    StrokeThickness="1" Stroke="#7B2DF3"
+                                    BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#180930}"
+                                    Padding="14,10">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                        <Label Text="كود الدعوة الخاص بك:" FontFamily="CairoRegular" FontSize="11" TextColor="#9B86B8" />
+                                        <Label Text="{Binding InviteCode}" FontFamily="CairoBold" FontSize="22" TextColor="{StaticResource BrandNeonPink}" />
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="1" StrokeThickness="0" Padding="14,8" BackgroundColor="#3A0B6B" VerticalOptions="Center">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding CopyInviteCodeCommand}" /></Border.GestureRecognizers>
+                                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                            <Path Data="{StaticResource IconCopy}" Fill="#FFD6F2" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
+                                            <Label Text="نسخ" FontFamily="CairoBold" FontSize="12" TextColor="#FFD6F2" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- Generate Code Button -->
+                            <Border HeightRequest="44" StrokeThickness="0">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding CreateInviteCodeCommand}" /></Border.GestureRecognizers>
+                                <Label Text="إنشاء كود دعوة" FontFamily="CairoBold" FontSize="13" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- Join by Partner Code -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Border Grid.Column="0" StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="{AppThemeBinding Light=#FFF5FF, Dark=#180930}" Padding="12,0" HeightRequest="44">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                    <Entry Text="{Binding JoinCodeInput, Mode=TwoWay}"
+                                           Placeholder="أدخل كود شريكك (مثال: 7K9P2M)"
+                                           FontFamily="CairoRegular" FontSize="13"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark=#FFFFFF}"
+                                           PlaceholderColor="#8C7FA6"
+                                           BackgroundColor="Transparent"
+                                           VerticalOptions="Center" />
+                                </Border>
+                                <Border Grid.Column="1" StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="#3A0B6B" Padding="16,0" HeightRequest="44">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding JoinByCodeCommand}" /></Border.GestureRecognizers>
+                                    <Label Text="ربط الآن" FontFamily="CairoBold" FontSize="13" TextColor="#FFD6F2" VerticalOptions="Center" />
+                                </Border>
+                            </Grid>
+
+                            <Label IsVisible="{Binding HasPairingFeedback}"
+                                   Text="{Binding PairingFeedback}"
+                                   FontFamily="CairoBold" FontSize="12"
+                                   TextColor="{StaticResource BrandNeonPink}"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- 2b. Connected Partner Banner (When Paired) -->
+                    <Border IsVisible="{Binding IsPaired}"
+                            StrokeThickness="1"
+                            Stroke="#FF4FB8"
+                            BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#220E3F}"
+                            Padding="16">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="22" /></Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="#FF4FB8" Offset="0,4" Radius="16" Opacity="0.28" />
+                        </Border.Shadow>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                            <controls:AvatarView Grid.Column="0"
+                                                 FullName="{Binding PartnerName}"
+                                                 AvatarUrl="{Binding PartnerAvatarUrl}"
+                                                 Size="54"
+                                                 IsOnline="{Binding IsPartnerOnline}" />
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                    <Path Data="{StaticResource IconHeart}" Fill="{StaticResource BrandNeonPink}" WidthRequest="14" HeightRequest="14" Aspect="Uniform" VerticalOptions="Center" />
+                                    <Label Text="{Binding PartnerName}" FontFamily="CairoBold" FontSize="16" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <Label Text="{Binding PartnerMood, StringFormat='مزاج شريكك: {0}'}" FontFamily="CairoRegular" FontSize="12" TextColor="{StaticResource BrandNeonPink}" />
+                            </VerticalStackLayout>
+                            <Border Grid.Column="2" StrokeThickness="1" Stroke="#6B1D4A" BackgroundColor="#3B0D22" Padding="12,6" VerticalOptions="Center">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding UnlinkCoupleCommand}" /></Border.GestureRecognizers>
+                                <Label Text="فك الربط" FontFamily="CairoBold" FontSize="11" TextColor="#FCA5A5" />
+                            </Border>
+                        </Grid>
+                    </Border>
 
                     <!-- Daily Question Hero Card -->
                     <Border StrokeThickness="1"

@@ -3,7 +3,9 @@ using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChatApp.Mobile.Features.Common;
+using ChatApp.Mobile.Features.CoupleSpace.DTOs;
 using ChatApp.Mobile.Features.CoupleSpace.Models;
+using ChatApp.Mobile.Features.CoupleSpace.Services;
 using ChatApp.Mobile.Navigation;
 
 namespace ChatApp.Mobile.Features.CoupleSpace.ViewModels;
@@ -18,6 +20,7 @@ public enum CoupleTab
 public partial class CoupleSpaceViewModel : BaseViewModel
 {
     private readonly INavigationService _navigationService;
+    private readonly ICoupleApiService? _coupleApi;
 
     private static readonly string[] DailyQuestions =
     [
@@ -40,6 +43,44 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     public bool IsMemoriesTab => ActiveTab == CoupleTab.Memories;
     public bool IsLoveNotesTab => ActiveTab == CoupleTab.LoveNotes;
 
+    // Couple Pairing State
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotPaired))]
+    public partial bool IsPaired { get; set; }
+
+    public bool IsNotPaired => !IsPaired;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasInviteCode))]
+    public partial string InviteCode { get; set; } = string.Empty;
+
+    public bool HasInviteCode => !string.IsNullOrWhiteSpace(InviteCode);
+
+    [ObservableProperty]
+    public partial string JoinCodeInput { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string PartnerName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string PartnerUserName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string? PartnerAvatarUrl { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsPartnerOnline { get; set; }
+
+    [ObservableProperty]
+    public partial string PartnerMood { get; set; } = "عالمكم الصغير";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPairingFeedback))]
+    public partial string? PairingFeedback { get; set; }
+
+    public bool HasPairingFeedback => !string.IsNullOrWhiteSpace(PairingFeedback);
+
+    // Daily Question & Lists
     [ObservableProperty]
     public partial string TodayQuestion { get; set; } = string.Empty;
 
@@ -58,7 +99,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     [ObservableProperty]
     public partial ObservableCollection<LoveNoteItem> LoveNotes { get; set; } = new();
 
-    // Add Special Date Sheet
+    // Modals
     [ObservableProperty]
     public partial bool IsAddDateSheetVisible { get; set; }
 
@@ -68,7 +109,6 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     [ObservableProperty]
     public partial DateTime NewDateValue { get; set; } = DateTime.Today;
 
-    // Add Memory Sheet
     [ObservableProperty]
     public partial bool IsAddMemorySheetVisible { get; set; }
 
@@ -84,7 +124,6 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     [ObservableProperty]
     public partial string? NewMemoryImagePath { get; set; }
 
-    // Add Love Note Sheet
     [ObservableProperty]
     public partial bool IsAddNoteSheetVisible { get; set; }
 
@@ -97,14 +136,96 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     [ObservableProperty]
     public partial DateTime NewNoteUnlockDate { get; set; } = DateTime.Today.AddDays(7);
 
-    public CoupleSpaceViewModel(INavigationService navigationService)
+    public CoupleSpaceViewModel(INavigationService navigationService, ICoupleApiService? coupleApi = null)
     {
         _navigationService = navigationService;
+        _coupleApi = coupleApi;
         Title = "عالمنا الخاص";
-        LoadAll();
+        LoadLocal();
     }
 
-    public void LoadAll()
+    public async Task LoadFromServerAsync()
+    {
+        if (_coupleApi == null) return;
+        try
+        {
+            var res = await _coupleApi.GetMySpaceAsync();
+            if (res.IsSuccess && res.Value != null)
+            {
+                ApplyServerSpace(res.Value);
+            }
+        }
+        catch { }
+    }
+
+    private void ApplyServerSpace(CoupleSpaceClientDto dto)
+    {
+        InviteCode = dto.InviteCode;
+        IsPaired = dto.IsPaired;
+
+        if (dto.Partner != null)
+        {
+            PartnerName = dto.Partner.FullName;
+            PartnerUserName = dto.Partner.UserName;
+            PartnerAvatarUrl = dto.Partner.AvatarUrl;
+            IsPartnerOnline = dto.Partner.IsOnline;
+            PartnerMood = !string.IsNullOrWhiteSpace(dto.Partner.Mood) ? dto.Partner.Mood : "عالمكم الصغير";
+        }
+        else
+        {
+            PartnerName = string.Empty;
+            PartnerUserName = string.Empty;
+            PartnerAvatarUrl = null;
+            IsPartnerOnline = false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.SpecialDatesJson))
+        {
+            try
+            {
+                var dates = JsonSerializer.Deserialize<List<SpecialDateItem>>(dto.SpecialDatesJson);
+                if (dates != null) SpecialDates = new ObservableCollection<SpecialDateItem>(dates);
+            }
+            catch { }
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.MemoriesJson))
+        {
+            try
+            {
+                var mems = JsonSerializer.Deserialize<List<MemoryItem>>(dto.MemoriesJson);
+                if (mems != null) Memories = new ObservableCollection<MemoryItem>(mems);
+            }
+            catch { }
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.LoveNotesJson))
+        {
+            try
+            {
+                var notes = JsonSerializer.Deserialize<List<LoveNoteItem>>(dto.LoveNotesJson);
+                if (notes != null) LoveNotes = new ObservableCollection<LoveNoteItem>(notes);
+            }
+            catch { }
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.DailyAnswersJson))
+        {
+            try
+            {
+                var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(dto.DailyAnswersJson);
+                var key = $"{DateTime.Today:yyyyMMdd}";
+                if (dict != null && dict.TryGetValue(key, out var ans))
+                {
+                    TodayAnswer = ans;
+                    IsAnswerSaved = !string.IsNullOrWhiteSpace(ans);
+                }
+            }
+            catch { }
+        }
+    }
+
+    private void LoadLocal()
     {
         var dayIndex = DateTime.Today.DayOfYear % DailyQuestions.Length;
         TodayQuestion = DailyQuestions[dayIndex];
@@ -153,9 +274,99 @@ public partial class CoupleSpaceViewModel : BaseViewModel
                 };
             }
         }
-        catch
+        catch { }
+    }
+
+    [RelayCommand]
+    private async Task CreateInviteCodeAsync()
+    {
+        if (_coupleApi == null || IsBusy) return;
+        IsBusy = true;
+        PairingFeedback = null;
+        try
         {
-            // Safe fallback
+            var res = await _coupleApi.CreateSpaceAsync();
+            if (res.IsSuccess && res.Value != null)
+            {
+                ApplyServerSpace(res.Value);
+                PairingFeedback = "تم إنشاء كود الدعوة! ابعته لشريكك ليرتبط بحسابك.";
+            }
+            else
+            {
+                PairingFeedback = res.ErrorMessage ?? "تعذر إنشاء كود الدعوة.";
+            }
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task CopyInviteCodeAsync()
+    {
+        if (string.IsNullOrWhiteSpace(InviteCode)) return;
+        try
+        {
+            await Clipboard.Default.SetTextAsync(InviteCode);
+            PairingFeedback = $"تم نسخ الكود ({InviteCode})! ابعته لشريكك.";
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    private async Task JoinByCodeAsync()
+    {
+        if (_coupleApi == null || IsBusy) return;
+        if (string.IsNullOrWhiteSpace(JoinCodeInput))
+        {
+            PairingFeedback = "من فضلك أدخل كود الدعوة أولاً.";
+            return;
+        }
+
+        IsBusy = true;
+        PairingFeedback = null;
+        try
+        {
+            var res = await _coupleApi.JoinByCodeAsync(JoinCodeInput.Trim());
+            if (res.IsSuccess && res.Value != null)
+            {
+                ApplyServerSpace(res.Value);
+                JoinCodeInput = string.Empty;
+                PairingFeedback = "تم ربط حسابكما بنجاح!";
+            }
+            else
+            {
+                PairingFeedback = res.ErrorMessage ?? "كود الدعوة غير صحيح.";
+            }
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task UnlinkCoupleAsync()
+    {
+        if (_coupleApi == null || IsBusy) return;
+        IsBusy = true;
+        try
+        {
+            var res = await _coupleApi.UnlinkAsync();
+            if (res.IsSuccess)
+            {
+                IsPaired = false;
+                InviteCode = string.Empty;
+                PartnerName = string.Empty;
+                PartnerUserName = string.Empty;
+                PartnerAvatarUrl = null;
+                PairingFeedback = "تم فك الربط.";
+            }
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
@@ -175,9 +386,9 @@ public partial class CoupleSpaceViewModel : BaseViewModel
             IsAnswerSaved = true;
         }
         catch { }
+        _ = SyncToServerAsync();
     }
 
-    // Special Dates
     [RelayCommand]
     private void OpenAddDateSheet()
     {
@@ -201,6 +412,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         SpecialDates.Insert(0, new SpecialDateItem(Guid.NewGuid(), NewDateTitle.Trim(), NewDateValue));
         SaveList("couple_special_dates", SpecialDates);
         IsAddDateSheetVisible = false;
+        _ = SyncToServerAsync();
     }
 
     [RelayCommand]
@@ -209,9 +421,9 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         if (item == null) return;
         SpecialDates.Remove(item);
         SaveList("couple_special_dates", SpecialDates);
+        _ = SyncToServerAsync();
     }
 
-    // Memories
     [RelayCommand]
     private void OpenAddMemorySheet()
     {
@@ -258,6 +470,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
             NewMemoryImagePath));
         SaveList("couple_memories", Memories);
         IsAddMemorySheetVisible = false;
+        _ = SyncToServerAsync();
     }
 
     [RelayCommand]
@@ -266,9 +479,9 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         if (item == null) return;
         Memories.Remove(item);
         SaveList("couple_memories", Memories);
+        _ = SyncToServerAsync();
     }
 
-    // Love Notes
     [RelayCommand]
     private void OpenAddNoteSheet()
     {
@@ -290,6 +503,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
             false));
         SaveList("couple_love_notes", LoveNotes);
         IsAddNoteSheetVisible = false;
+        _ = SyncToServerAsync();
     }
 
     [RelayCommand]
@@ -298,6 +512,27 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         if (item == null) return;
         LoveNotes.Remove(item);
         SaveList("couple_love_notes", LoveNotes);
+        _ = SyncToServerAsync();
+    }
+
+    private async Task SyncToServerAsync()
+    {
+        if (_coupleApi == null) return;
+        try
+        {
+            var answers = new Dictionary<string, string>();
+            if (!string.IsNullOrWhiteSpace(TodayAnswer))
+            {
+                answers[$"{DateTime.Today:yyyyMMdd}"] = TodayAnswer.Trim();
+            }
+
+            await _coupleApi.SyncSpaceAsync(new SyncCoupleSpaceRequestClientDto(
+                JsonSerializer.Serialize(SpecialDates),
+                JsonSerializer.Serialize(Memories),
+                JsonSerializer.Serialize(LoveNotes),
+                JsonSerializer.Serialize(answers)));
+        }
+        catch { }
     }
 
     private static void SaveList<T>(string key, ObservableCollection<T> list)

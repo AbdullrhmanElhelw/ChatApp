@@ -2,6 +2,7 @@ using System.Text;
 using ChatApp.Application.Common.Interfaces;
 using ChatApp.Application.Features.Auth.Interfaces;
 using ChatApp.Application.Features.Conversations.Interfaces;
+using ChatApp.Application.Features.Couples.Interfaces;
 using ChatApp.Application.Features.Media.Interfaces;
 using ChatApp.Application.Features.Messages.Interfaces;
 using ChatApp.Application.Features.Stickers.Interfaces;
@@ -113,6 +114,7 @@ public static class DependencyInjection
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IMediaService, MediaService>();
         services.AddScoped<IStickerService, StickerService>();
+        services.AddScoped<ICoupleService, CoupleService>();
 
         return services;
     }

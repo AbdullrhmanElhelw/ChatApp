@@ -8,6 +8,7 @@ using ChatApp.Mobile.Features.Chat.Services;
 using ChatApp.Mobile.Features.Common;
 using ChatApp.Mobile.Features.Conversations.DTOs;
 using ChatApp.Mobile.Features.Conversations.Services;
+using ChatApp.Mobile.Features.CoupleSpace.Services;
 using ChatApp.Mobile.Navigation;
 
 namespace ChatApp.Mobile.Features.Conversations.ViewModels;
@@ -26,6 +27,7 @@ public partial class ConversationsViewModel : BaseViewModel
     private readonly INavigationService _navigationService;
     private readonly IChatHubService? _chatHubService;
     private readonly IAuthApiService? _authService;
+    private readonly ICoupleApiService? _coupleApiService;
 
     [ObservableProperty]
     public partial ObservableCollection<ConversationSummaryDto> Conversations { get; set; } = new();
@@ -62,13 +64,15 @@ public partial class ConversationsViewModel : BaseViewModel
         IAuthenticationStateService authStateService,
         INavigationService navigationService,
         IChatHubService? chatHubService = null,
-        IAuthApiService? authService = null)
+        IAuthApiService? authService = null,
+        ICoupleApiService? coupleApiService = null)
     {
         _conversationService = conversationService;
         _authStateService = authStateService;
         _navigationService = navigationService;
         _chatHubService = chatHubService;
         _authService = authService;
+        _coupleApiService = coupleApiService;
 
         Title = "المحادثات";
         CurrentUser = _authStateService.CurrentUser;
@@ -199,6 +203,10 @@ public partial class ConversationsViewModel : BaseViewModel
         {
             CurrentMoodLabel = mood;
             Preferences.Default.Set("betweenus_mood", mood);
+            if (_coupleApiService != null)
+            {
+                _ = _coupleApiService.UpdateMoodAsync(mood);
+            }
         }
         IsMoodSheetVisible = false;
     }

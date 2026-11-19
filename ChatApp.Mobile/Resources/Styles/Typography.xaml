@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Spacing Scale -->
+    <!-- Compatibility Spacing & Radius Aliases -->
     <x:Double x:Key="SpacingMicro">2</x:Double>
     <x:Double x:Key="SpacingTiny">4</x:Double>
     <x:Double x:Key="SpacingSmall">8</x:Double>
@@ -12,62 +12,74 @@
     <x:Double x:Key="SpacingXLarge">32</x:Double>
     <x:Double x:Key="SpacingXXLarge">48</x:Double>
 
-    <!-- Corner Radius Scale -->
-    <x:Double x:Key="DoubleRadiusSmall">8</x:Double>
+    <x:Double x:Key="DoubleRadiusSmall">10</x:Double>
     <x:Double x:Key="DoubleRadiusMedium">14</x:Double>
-    <x:Double x:Key="DoubleRadiusLarge">22</x:Double>
+    <x:Double x:Key="DoubleRadiusLarge">20</x:Double>
     <x:Double x:Key="DoubleRadiusPill">999</x:Double>
 
-    <!-- Typography Text Styles -->
+    <!-- BetweenUs Design System v1.0 — Typography Scale -->
+    <Style x:Key="TypographyDisplay" TargetType="Label">
+        <Setter Property="FontFamily" Value="CairoBold" />
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="LineHeight" Value="1.35" />
+    </Style>
+
     <Style x:Key="TypographyH1" TargetType="Label">
         <Setter Property="FontFamily" Value="CairoBold" />
         <Setter Property="FontSize" Value="28" />
         <Setter Property="FontAttributes" Value="Bold" />
-        <Setter Property="LineHeight" Value="1.2" />
+        <Setter Property="LineHeight" Value="1.35" />
     </Style>
 
     <Style x:Key="TypographyH2" TargetType="Label">
         <Setter Property="FontFamily" Value="CairoBold" />
-        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontSize" Value="24" />
         <Setter Property="FontAttributes" Value="Bold" />
-        <Setter Property="LineHeight" Value="1.25" />
+        <Setter Property="LineHeight" Value="1.4" />
     </Style>
 
     <Style x:Key="TypographyH3" TargetType="Label">
         <Setter Property="FontFamily" Value="CairoBold" />
-        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontSize" Value="20" />
         <Setter Property="FontAttributes" Value="Bold" />
-        <Setter Property="LineHeight" Value="1.3" />
+        <Setter Property="LineHeight" Value="1.4" />
+    </Style>
+
+    <Style x:Key="TypographyBodyLarge" TargetType="Label">
+        <Setter Property="FontFamily" Value="CairoRegular" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="LineHeight" Value="1.5" />
     </Style>
 
     <Style x:Key="TypographySubtitle" TargetType="Label">
         <Setter Property="FontFamily" Value="CairoRegular" />
         <Setter Property="FontSize" Value="16" />
-        <Setter Property="LineHeight" Value="1.35" />
+        <Setter Property="LineHeight" Value="1.45" />
     </Style>
 
     <Style x:Key="TypographyBody" TargetType="Label">
         <Setter Property="FontFamily" Value="CairoRegular" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="LineHeight" Value="1.4" />
+        <Setter Property="LineHeight" Value="1.5" />
     </Style>
 
     <Style x:Key="TypographyBodyBold" TargetType="Label">
         <Setter Property="FontFamily" Value="CairoBold" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontAttributes" Value="Bold" />
-        <Setter Property="LineHeight" Value="1.4" />
+        <Setter Property="LineHeight" Value="1.5" />
     </Style>
 
     <Style x:Key="TypographyCaption" TargetType="Label">
         <Setter Property="FontFamily" Value="CairoRegular" />
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="LineHeight" Value="1.3" />
+        <Setter Property="LineHeight" Value="1.4" />
     </Style>
 
     <Style x:Key="TypographyTiny" TargetType="Label">
         <Setter Property="FontFamily" Value="CairoRegular" />
         <Setter Property="FontSize" Value="10" />
-        <Setter Property="LineHeight" Value="1.2" />
+        <Setter Property="LineHeight" Value="1.3" />
     </Style>
 </ResourceDictionary>

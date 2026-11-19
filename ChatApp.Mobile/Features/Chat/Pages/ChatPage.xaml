@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -230,14 +230,14 @@
                                                 <Label Text="{Binding DisplayReplySender}"
                                                        FontFamily="CairoBold"
                                                        FontSize="11"
-                                                       TextColor="#BFDBFE"
+                                                       TextColor="#FFB5DC"
                                                        FontAttributes="Bold"
                                                        LineBreakMode="TailTruncation"
                                                        MaxLines="1" />
                                                 <Label Text="{Binding ReplyToContent}"
                                                        FontFamily="CairoRegular"
                                                        FontSize="11"
-                                                       TextColor="#F1F5F9"
+                                                       TextColor="#F7ECFA"
                                                        LineBreakMode="TailTruncation"
                                                        MaxLines="1" />
                                             </VerticalStackLayout>
@@ -270,11 +270,11 @@
                                         <Label Text="{Binding FormattedTime}"
                                                FontFamily="CairoRegular"
                                                FontSize="10"
-                                               TextColor="#BFDBFE"
+                                               TextColor="#FFB5DC"
                                                VerticalOptions="Center" />
                                         <Label Text="{Binding StatusIcon}"
                                                FontSize="11"
-                                               TextColor="#93C5FD"
+                                               TextColor="#FFB5DC"
                                                VerticalOptions="Center" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
@@ -291,7 +291,7 @@
                                     <DataTemplate x:DataType="dto:ReactionCountClientDto">
                                         <Border StrokeThickness="1"
                                                 Stroke="{AppThemeBinding Light=#25000000, Dark=#35FFFFFF}"
-                                                BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#1E293B}"
+                                                BackgroundColor="{AppThemeBinding Light=#F7ECFA, Dark=#39274F}"
                                                 Padding="10,4"
                                                 Margin="0,0,6,4">
                                             <Border.StrokeShape>
@@ -299,7 +299,7 @@
                                             </Border.StrokeShape>
                                             <Border.Triggers>
                                                 <DataTrigger TargetType="Border" Binding="{Binding HasReacted}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#DBEAFE, Dark=#1E3A8A}" />
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FCE7F3, Dark=#4E1688}" />
                                                     <Setter Property="Stroke" Value="{StaticResource BrandPrimary}" />
                                                 </DataTrigger>
                                             </Border.Triggers>
@@ -405,7 +405,7 @@
                                     <DataTemplate x:DataType="dto:ReactionCountClientDto">
                                         <Border StrokeThickness="1"
                                                 Stroke="{AppThemeBinding Light=#25000000, Dark=#35FFFFFF}"
-                                                BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#1E293B}"
+                                                BackgroundColor="{AppThemeBinding Light=#F7ECFA, Dark=#39274F}"
                                                 Padding="10,4"
                                                 Margin="0,0,6,4">
                                             <Border.StrokeShape>
@@ -413,7 +413,7 @@
                                             </Border.StrokeShape>
                                             <Border.Triggers>
                                                 <DataTrigger TargetType="Border" Binding="{Binding HasReacted}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#DBEAFE, Dark=#1E3A8A}" />
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FCE7F3, Dark=#4E1688}" />
                                                     <Setter Property="Stroke" Value="{StaticResource BrandPrimary}" />
                                                 </DataTrigger>
                                             </Border.Triggers>
@@ -542,7 +542,7 @@
                                     <DataTemplate x:DataType="dto:ReactionCountClientDto">
                                         <Border StrokeThickness="1"
                                                 Stroke="{AppThemeBinding Light=#25000000, Dark=#35FFFFFF}"
-                                                BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#1E293B}"
+                                                BackgroundColor="{AppThemeBinding Light=#F7ECFA, Dark=#39274F}"
                                                 Padding="10,4"
                                                 Margin="0,0,6,4">
                                             <Border.StrokeShape>
@@ -550,7 +550,7 @@
                                             </Border.StrokeShape>
                                             <Border.Triggers>
                                                 <DataTrigger TargetType="Border" Binding="{Binding HasReacted}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#DBEAFE, Dark=#1E3A8A}" />
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FCE7F3, Dark=#4E1688}" />
                                                     <Setter Property="Stroke" Value="{StaticResource BrandPrimary}" />
                                                 </DataTrigger>
                                             </Border.Triggers>
@@ -653,7 +653,7 @@
                                     <DataTemplate x:DataType="dto:ReactionCountClientDto">
                                         <Border StrokeThickness="1"
                                                 Stroke="{AppThemeBinding Light=#25000000, Dark=#35FFFFFF}"
-                                                BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#1E293B}"
+                                                BackgroundColor="{AppThemeBinding Light=#F7ECFA, Dark=#39274F}"
                                                 Padding="10,4"
                                                 Margin="0,0,6,4">
                                             <Border.StrokeShape>
@@ -661,7 +661,7 @@
                                             </Border.StrokeShape>
                                             <Border.Triggers>
                                                 <DataTrigger TargetType="Border" Binding="{Binding HasReacted}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#DBEAFE, Dark=#1E3A8A}" />
+                                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FCE7F3, Dark=#4E1688}" />
                                                     <Setter Property="Stroke" Value="{StaticResource BrandPrimary}" />
                                                 </DataTrigger>
                                             </Border.Triggers>
@@ -1061,8 +1061,8 @@
         <Border Grid.Row="5"
                 ZIndex="30"
                 StrokeThickness="1"
-                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#1E293B}"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#0B1120}"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#39274F}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#10091F}"
                 Padding="16,12,16,14"
                 IsVisible="{Binding IsEmojiPickerVisible}">
             <Border.StrokeShape>
@@ -1085,7 +1085,7 @@
 
                         <Border StrokeThickness="1"
                                 Stroke="{StaticResource BrandPrimary}"
-                                BackgroundColor="{AppThemeBinding Light=#EFF6FF, Dark=#172554}"
+                                BackgroundColor="{AppThemeBinding Light=#EFF6FF, Dark=#281A3E}"
                                 Padding="10,2"
                                 VerticalOptions="Center">
                             <Border.StrokeShape>
@@ -1094,7 +1094,7 @@
                             <Label Text="{Binding SelectedEmojiCategory}"
                                    FontFamily="CairoBold"
                                    FontSize="11"
-                                   TextColor="{AppThemeBinding Light={StaticResource BrandPrimary}, Dark=#93C5FD}"
+                                   TextColor="{AppThemeBinding Light={StaticResource BrandPrimary}, Dark=#FFB5DC}"
                                    VerticalOptions="Center" />
                         </Border>
                     </HorizontalStackLayout>
@@ -1104,8 +1104,8 @@
                         <Border HeightRequest="32"
                                 Padding="12,0"
                                 StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#1E293B}"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#162032}">
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#39274F}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#281A3E}">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="16" />
                             </Border.StrokeShape>
@@ -1129,8 +1129,8 @@
                         <Border WidthRequest="32"
                                 HeightRequest="32"
                                 StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#1E293B}"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#162032}">
+                                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#39274F}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#281A3E}">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="16" />
                             </Border.StrokeShape>
@@ -1150,7 +1150,7 @@
 
                 <!-- Quick Favorites Bar (1-Tap Popular Emojis) -->
                 <Border StrokeThickness="1"
-                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#1E293B}"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#39274F}"
                         BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#111827}"
                         Padding="10,6">
                     <Border.StrokeShape>
@@ -1172,7 +1172,7 @@
                                                 HeightRequest="36"
                                                 StrokeThickness="1"
                                                 Stroke="{AppThemeBinding Light=#10000000, Dark=#18FFFFFF}"
-                                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#1E293B}">
+                                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#39274F}">
                                             <Border.StrokeShape>
                                                 <RoundRectangle CornerRadius="18" />
                                             </Border.StrokeShape>
@@ -1201,15 +1201,15 @@
                             <DataTemplate x:DataType="dto:EmojiCategoryTabItem">
                                 <Border Padding="14,5"
                                         StrokeThickness="1"
-                                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#1E293B}"
-                                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#162032}">
+                                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#39274F}"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark=#281A3E}">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="18" />
                                     </Border.StrokeShape>
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
                                             <Setter Property="BackgroundColor" Value="{StaticResource BrandPrimary}" />
-                                            <Setter Property="Stroke" Value="#60A5FA" />
+                                            <Setter Property="Stroke" Value="#F044A5" />
                                         </DataTrigger>
                                     </Border.Triggers>
                                     <Border.GestureRecognizers>
@@ -1245,8 +1245,8 @@
                                         HeightRequest="44"
                                         Margin="3"
                                         StrokeThickness="1"
-                                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#1E293B}"
-                                        BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#151F32}">
+                                        Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark=#39274F}"
+                                        BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#281A3E}">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="12" />
                                     </Border.StrokeShape>

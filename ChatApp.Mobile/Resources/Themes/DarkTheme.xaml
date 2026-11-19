@@ -3,30 +3,30 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Dark Theme Dynamic Tokens (Obsidian / Slate Luxury Palette) -->
-    <Color x:Key="ThemeBackground">#0B0F17</Color>
-    <Color x:Key="ThemeChatBackground">#0B0F17</Color>
-    <Color x:Key="ThemeHeaderBackground">#0F172A</Color>
-    <Color x:Key="ThemeSurfaceCard">#1E293B</Color>
-    <Color x:Key="ThemeSurfaceElevated">#1E293B</Color>
-    <Color x:Key="ThemeBorder">#334155</Color>
-    <Color x:Key="ThemeDivider">#1E293B</Color>
-    <Color x:Key="ThemeSearchBarBackground">#1E293B</Color>
+    <!-- Dark Theme Dynamic Tokens (BetweenUs Deep Purple & Violet Palette) -->
+    <Color x:Key="ThemeBackground">#10091F</Color>
+    <Color x:Key="ThemeChatBackground">#10091F</Color>
+    <Color x:Key="ThemeHeaderBackground">#1C1230</Color>
+    <Color x:Key="ThemeSurfaceCard">#1C1230</Color>
+    <Color x:Key="ThemeSurfaceElevated">#281A3E</Color>
+    <Color x:Key="ThemeBorder">#39274F</Color>
+    <Color x:Key="ThemeDivider">#281A3E</Color>
+    <Color x:Key="ThemeSearchBarBackground">#281A3E</Color>
 
     <!-- Text Colors -->
-    <Color x:Key="ThemeTextPrimary">#F8FAFC</Color>
-    <Color x:Key="ThemeTextSecondary">#94A3B8</Color>
-    <Color x:Key="ThemeTextMuted">#64748B</Color>
-    <Color x:Key="ThemeTextPlaceholder">#64748B</Color>
+    <Color x:Key="ThemeTextPrimary">#FFF5FF</Color>
+    <Color x:Key="ThemeTextSecondary">#FFB5DC</Color>
+    <Color x:Key="ThemeTextMuted">#9B86B8</Color>
+    <Color x:Key="ThemeTextPlaceholder">#755E96</Color>
 
     <!-- Message Bubbles -->
-    <Color x:Key="ThemeBubbleOutgoing">#2563EB</Color>
-    <Color x:Key="ThemeBubbleIncoming">#1E293B</Color>
-    <Color x:Key="ThemeTextOutgoing">#FFFFFF</Color>
-    <Color x:Key="ThemeTextIncoming">#F8FAFC</Color>
-    <Color x:Key="ThemeTimeOutgoing">#BFDBFE</Color>
-    <Color x:Key="ThemeTimeIncoming">#94A3B8</Color>
-    <Color x:Key="ThemeTicksRead">#60A5FA</Color>
+    <Color x:Key="ThemeBubbleOutgoing">#7025B8</Color>
+    <Color x:Key="ThemeBubbleIncoming">#1C1230</Color>
+    <Color x:Key="ThemeTextOutgoing">#FFF5FF</Color>
+    <Color x:Key="ThemeTextIncoming">#FFF5FF</Color>
+    <Color x:Key="ThemeTimeOutgoing">#FFB5DC</Color>
+    <Color x:Key="ThemeTimeIncoming">#9B86B8</Color>
+    <Color x:Key="ThemeTicksRead">#F044A5</Color>
 
     <!-- Brushes -->
     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{StaticResource ThemeBackground}" />

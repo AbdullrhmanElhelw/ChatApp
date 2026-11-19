@@ -138,6 +138,9 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     public partial string NewMemoryLocation { get; set; } = string.Empty;
 
     [ObservableProperty]
+    public partial DateTime NewMemoryDate { get; set; } = DateTime.Today;
+
+    [ObservableProperty]
     public partial string? NewMemoryImagePath { get; set; }
 
     [ObservableProperty]
@@ -147,6 +150,29 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     public string SelectedMemoryPhotosLabel => NewMemoryImagePaths.Count > 0
         ? $"تم اختيار {NewMemoryImagePaths.Count} صور للذكرى"
         : "اختيار صورة أو أكثر للذكرى";
+
+    [ObservableProperty]
+    public partial bool IsAddMomentSheetVisible { get; set; }
+
+    [ObservableProperty]
+    public partial string NewMomentTitle { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string NewMomentCaption { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial DateTime NewMomentDate { get; set; } = DateTime.Today;
+
+    [ObservableProperty]
+    public partial TimeSpan NewMomentTime { get; set; } = DateTime.Now.TimeOfDay;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSelectedMomentPhoto))]
+    [NotifyPropertyChangedFor(nameof(SelectedMomentPhotoLabel))]
+    public partial string? NewMomentImagePath { get; set; }
+
+    public bool HasSelectedMomentPhoto => !string.IsNullOrWhiteSpace(NewMomentImagePath);
+    public string SelectedMomentPhotoLabel => HasSelectedMomentPhoto ? "تم اختيار صورة اللحظة" : "اختيار صورة للحظة";
 
     [ObservableProperty]
     public partial bool IsAddNoteSheetVisible { get; set; }
@@ -457,6 +483,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     {
         IsAddDateSheetVisible = false;
         IsAddMemorySheetVisible = false;
+        IsAddMomentSheetVisible = false;
         IsAddNoteSheetVisible = false;
     }
 
@@ -485,6 +512,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         NewMemoryTitle = string.Empty;
         NewMemoryNote = string.Empty;
         NewMemoryLocation = string.Empty;
+        NewMemoryDate = DateTime.Today;
         NewMemoryImagePath = null;
         NewMemoryImagePaths = new List<string>();
         OnPropertyChanged(nameof(SelectedMemoryPhotosLabel));
@@ -533,7 +561,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
             .Select((path, index) => new MemoryMoment(
                 Guid.NewGuid(),
                 index == 0 && !string.IsNullOrWhiteSpace(note) ? note : null,
-                DateTime.Today,
+                NewMemoryDate,
                 path))
             .ToList();
 
@@ -542,12 +570,88 @@ public partial class CoupleSpaceViewModel : BaseViewModel
             NewMemoryTitle.Trim(),
             note,
             string.IsNullOrWhiteSpace(NewMemoryLocation) ? null : NewMemoryLocation.Trim(),
-            DateTime.Today,
+            NewMemoryDate,
             NewMemoryImagePath,
             paths,
             moments));
         SaveList("couple_memories", Memories);
         IsAddMemorySheetVisible = false;
+        _ = SyncToServerAsync();
+    }
+
+    [RelayCommand]
+    private void OpenAddMomentSheet()
+    {
+        if (SelectedMemory == null) return;
+        NewMomentTitle = string.Empty;
+        NewMomentCaption = string.Empty;
+        NewMomentDate = SelectedMemory.MemoryDate;
+        NewMomentTime = DateTime.Now.TimeOfDay;
+        NewMomentImagePath = null;
+        IsAddMomentSheetVisible = true;
+    }
+
+    [RelayCommand]
+    private async Task PickMomentPhotoAsync()
+    {
+        try
+        {
+            var file = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = "اختر صورة للحظة",
+                FileTypes = FilePickerFileType.Images
+            });
+            if (file == null) return;
+
+            var ext = Path.GetExtension(file.FileName);
+            if (string.IsNullOrWhiteSpace(ext)) ext = ".jpg";
+            var dest = Path.Combine(FileSystem.AppDataDirectory, $"moment_{Guid.NewGuid():N}{ext}");
+            await using var src = await file.OpenReadAsync();
+            await using var dst = File.Create(dest);
+            await src.CopyToAsync(dst);
+            NewMomentImagePath = dest;
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    private void SaveMoment()
+    {
+        if (SelectedMemory == null) return;
+        if (string.IsNullOrWhiteSpace(NewMomentTitle) && string.IsNullOrWhiteSpace(NewMomentImagePath)) return;
+
+        var moment = new MemoryMoment(
+            Guid.NewGuid(),
+            string.IsNullOrWhiteSpace(NewMomentCaption) ? null : NewMomentCaption.Trim(),
+            NewMomentDate,
+            NewMomentImagePath ?? string.Empty,
+            string.IsNullOrWhiteSpace(NewMomentTitle) ? null : NewMomentTitle.Trim(),
+            NewMomentTime);
+
+        var moments = new List<MemoryMoment>(SelectedMemory.DisplayMoments);
+        moments.Add(moment);
+
+        var paths = new List<string>(SelectedMemory.DisplayImages);
+        if (!string.IsNullOrWhiteSpace(NewMomentImagePath))
+        {
+            paths.Add(NewMomentImagePath);
+        }
+
+        var updated = SelectedMemory with
+        {
+            ImagePath = SelectedMemory.ImagePath ?? paths.FirstOrDefault(),
+            ImagePaths = paths,
+            Moments = moments
+        };
+
+        var idx = Memories.IndexOf(SelectedMemory);
+        if (idx >= 0)
+        {
+            Memories[idx] = updated;
+        }
+        SelectedMemory = updated;
+        SaveList("couple_memories", Memories);
+        IsAddMomentSheetVisible = false;
         _ = SyncToServerAsync();
     }
 

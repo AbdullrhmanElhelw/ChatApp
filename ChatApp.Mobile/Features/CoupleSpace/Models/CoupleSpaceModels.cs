@@ -37,11 +37,17 @@ public record MemoryMoment(
     Guid Id,
     string? Caption,
     DateTime MomentDate,
-    string ImagePath
+    string ImagePath,
+    string? Title = null,
+    TimeSpan? MomentTime = null
 )
 {
-    public string FormattedDate => MomentDate.ToString("MMM dd, yyyy");
+    public string FormattedDate => MomentTime.HasValue
+        ? $"{MomentDate:MMM dd, yyyy} • {DateTime.Today.Add(MomentTime.Value):hh:mm tt}"
+        : MomentDate.ToString("MMM dd, yyyy");
+    public bool HasTitle => !string.IsNullOrWhiteSpace(Title);
     public bool HasCaption => !string.IsNullOrWhiteSpace(Caption);
+    public bool HasImage => !string.IsNullOrWhiteSpace(ImagePath) && File.Exists(ImagePath);
 }
 
 public record MemoryItem(

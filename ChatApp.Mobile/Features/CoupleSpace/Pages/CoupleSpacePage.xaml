@@ -571,10 +571,10 @@
                             <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
                         </LinearGradientBrush>
                     </Border.Background>
-                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding AddPhotosToSelectedMemoryCommand}" /></Border.GestureRecognizers>
+                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenAddMomentSheetCommand}" /></Border.GestureRecognizers>
                     <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
                         <Path Data="{StaticResource IconPlus}" Fill="#FFFFFF" WidthRequest="13" HeightRequest="13" Aspect="Uniform" VerticalOptions="Center" />
-                        <Label Text="إضافة صور" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
+                        <Label Text="إضافة لحظة" FontFamily="CairoBold" FontSize="11" TextColor="#FFFFFF" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </Border>
             </Grid>
@@ -611,10 +611,11 @@
                                     </Grid>
 
                                     <!-- Moment Content + Large Photo -->
-                                    <VerticalStackLayout Grid.Column="1" Spacing="8" Padding="0,0,0,22">
+                                    <VerticalStackLayout Grid.Column="1" Spacing="6" Padding="0,0,0,22">
                                         <Label Text="{Binding FormattedDate}" FontFamily="CairoRegular" FontSize="12" TextColor="#B69AD8" />
+                                        <Label Text="{Binding Title}" FontFamily="CairoBold" FontSize="16" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" IsVisible="{Binding HasTitle}" LineBreakMode="WordWrap" />
                                         <Label Text="{Binding Caption}" FontFamily="CairoRegular" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark=#E8DCFA}" IsVisible="{Binding HasCaption}" LineBreakMode="WordWrap" />
-                                        <Border StrokeThickness="1" Stroke="#4E2682" HeightRequest="200">
+                                        <Border StrokeThickness="1" Stroke="#4E2682" HeightRequest="200" IsVisible="{Binding HasImage}">
                                             <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
                                             <Grid>
                                                 <Image Source="{Binding ImagePath}" Aspect="AspectFill" />
@@ -674,8 +675,12 @@
                     </Border>
                     <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="#220E3F" Padding="14,6" HeightRequest="80">
                         <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
-                        <Editor Text="{Binding NewMemoryNote, Mode=TwoWay}" Placeholder="اكتب تفاصيل اللحظة..." FontFamily="CairoRegular" FontSize="13" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
+                        <Editor Text="{Binding NewMemoryNote, Mode=TwoWay}" Placeholder="اكتب تفاصيل الذكرى..." FontFamily="CairoRegular" FontSize="13" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
                     </Border>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" VerticalOptions="Center">
+                        <Label Grid.Column="0" Text="تاريخ الذكرى:" FontFamily="CairoBold" FontSize="12" TextColor="#C5AFE4" VerticalOptions="Center" />
+                        <DatePicker Grid.Column="1" Date="{Binding NewMemoryDate, Mode=TwoWay}" TextColor="#FFFFFF" FontFamily="CairoRegular" />
+                    </Grid>
                     <Border HeightRequest="44" StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="#2A114E">
                         <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
                         <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding PickMemoryPhotoCommand}" /></Border.GestureRecognizers>
@@ -693,6 +698,54 @@
                         </Border.Background>
                         <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SaveMemoryCommand}" /></Border.GestureRecognizers>
                         <Label Text="حفظ الذكرى" FontFamily="CairoBold" FontSize="15" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- MODAL 4: Add Moment to Selected Memory -->
+        <Grid IsVisible="{Binding IsAddMomentSheetVisible}" BackgroundColor="#99090218">
+            <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding CloseAllSheetsCommand}" /></Grid.GestureRecognizers>
+            <Border VerticalOptions="End" StrokeThickness="1" Stroke="#4E2682" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1D0A38}" Padding="20,18,20,28">
+                <Border.StrokeShape><RoundRectangle CornerRadius="28,28,0,0" /></Border.StrokeShape>
+                <Border.GestureRecognizers><TapGestureRecognizer /></Border.GestureRecognizers>
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="إضافة لحظة جديدة" FontFamily="CairoBold" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" HorizontalOptions="Center" />
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="#220E3F" Padding="14,0" HeightRequest="46">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Entry Text="{Binding NewMomentTitle, Mode=TwoWay}" Placeholder="عنوان اللحظة (مثلاً: أول قهوة سوا)" FontFamily="CairoRegular" FontSize="14" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
+                    </Border>
+                    <Border StrokeThickness="1" Stroke="#3D1E6D" BackgroundColor="#220E3F" Padding="14,6" HeightRequest="72">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Editor Text="{Binding NewMomentCaption, Mode=TwoWay}" Placeholder="وصف قصير للحظة (اختياري)..." FontFamily="CairoRegular" FontSize="13" TextColor="#FFFFFF" PlaceholderColor="#9B86B8" BackgroundColor="Transparent" />
+                    </Border>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="التاريخ:" FontFamily="CairoBold" FontSize="11" TextColor="#C5AFE4" />
+                            <DatePicker Date="{Binding NewMomentDate, Mode=TwoWay}" TextColor="#FFFFFF" FontFamily="CairoRegular" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2">
+                            <Label Text="التوقيت:" FontFamily="CairoBold" FontSize="11" TextColor="#C5AFE4" />
+                            <TimePicker Time="{Binding NewMomentTime, Mode=TwoWay}" TextColor="#FFFFFF" FontFamily="CairoRegular" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Border HeightRequest="44" StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="#2A114E">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding PickMomentPhotoCommand}" /></Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Path Data="{StaticResource IconImage}" Fill="#FFD6F2" WidthRequest="16" HeightRequest="16" Aspect="Uniform" VerticalOptions="Center" />
+                            <Label Text="{Binding SelectedMomentPhotoLabel}" FontFamily="CairoBold" FontSize="13" TextColor="#FFD6F2" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                    <Border HeightRequest="48" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#7B2DF3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding SaveMomentCommand}" /></Border.GestureRecognizers>
+                        <Label Text="حفظ اللحظة" FontFamily="CairoBold" FontSize="15" TextColor="#FFFFFF" HorizontalOptions="Center" VerticalOptions="Center" />
                     </Border>
                 </VerticalStackLayout>
             </Border>

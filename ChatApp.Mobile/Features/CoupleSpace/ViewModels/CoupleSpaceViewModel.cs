@@ -2,7 +2,10 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ChatApp.Mobile.Features.Chat.DTOs;
+using ChatApp.Mobile.Features.Chat.Services;
 using ChatApp.Mobile.Features.Common;
+using ChatApp.Mobile.Features.Conversations.DTOs;
 using ChatApp.Mobile.Features.Conversations.Services;
 using ChatApp.Mobile.Features.CoupleSpace.DTOs;
 using ChatApp.Mobile.Features.CoupleSpace.Models;
@@ -24,6 +27,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     private readonly INavigationService _navigationService;
     private readonly ICoupleApiService? _coupleApi;
     private readonly IConversationApiService? _conversationApi;
+    private readonly IStickerApiService? _stickerApi;
 
     private static readonly string[] DailyQuestions =
     [
@@ -189,11 +193,13 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     public CoupleSpaceViewModel(
         INavigationService navigationService,
         ICoupleApiService? coupleApi = null,
-        IConversationApiService? conversationApi = null)
+        IConversationApiService? conversationApi = null,
+        IStickerApiService? stickerApi = null)
     {
         _navigationService = navigationService;
         _coupleApi = coupleApi;
         _conversationApi = conversationApi;
+        _stickerApi = stickerApi;
         Title = "عالمنا الخاص";
         LoadLocal();
     }
@@ -762,11 +768,118 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         _ = SyncToServerAsync();
     }
 
+    private async Task<string> UploadLocalImageIfNeededAsync(string path)
+    {
+        if (_stickerApi == null || string.IsNullOrWhiteSpace(path) || CoupleMediaHelper.IsRemoteUrl(path) || !File.Exists(path))
+            return path;
+
+        try
+        {
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            var contentType = ext switch
+            {
+                ".png" => "image/png",
+                ".webp" => "image/webp",
+                ".gif" => "image/gif",
+                _ => "image/jpeg"
+            };
+
+            await using var stream = File.OpenRead(path);
+            var uploadResult = await _stickerApi.UploadMediaAsync(stream, Path.GetFileName(path), contentType, MessageType.Image);
+            if (uploadResult.IsSuccess && uploadResult.Value != null && !string.IsNullOrWhiteSpace(uploadResult.Value.FileUrl))
+            {
+                return uploadResult.Value.FileUrl;
+            }
+        }
+        catch { }
+
+        return path;
+    }
+
+    private async Task EnsureMemoriesUploadedAsync()
+    {
+        if (_stickerApi == null || Memories.Count == 0) return;
+
+        var anyChanged = false;
+        for (var i = 0; i < Memories.Count; i++)
+        {
+            var mem = Memories[i];
+            var memChanged = false;
+
+            var coverPath = mem.ImagePath;
+            if (!string.IsNullOrWhiteSpace(coverPath))
+            {
+                var uploaded = await UploadLocalImageIfNeededAsync(coverPath);
+                if (uploaded != coverPath)
+                {
+                    coverPath = uploaded;
+                    memChanged = true;
+                }
+            }
+
+            List<string>? newPaths = mem.ImagePaths;
+            if (mem.ImagePaths != null && mem.ImagePaths.Count > 0)
+            {
+                var updatedList = new List<string>(mem.ImagePaths.Count);
+                foreach (var p in mem.ImagePaths)
+                {
+                    var uploaded = await UploadLocalImageIfNeededAsync(p);
+                    if (uploaded != p) memChanged = true;
+                    updatedList.Add(uploaded);
+                }
+                newPaths = updatedList;
+            }
+
+            List<MemoryMoment>? newMoments = mem.Moments;
+            if (mem.Moments != null && mem.Moments.Count > 0)
+            {
+                var updatedMoments = new List<MemoryMoment>(mem.Moments.Count);
+                foreach (var m in mem.Moments)
+                {
+                    var uploaded = await UploadLocalImageIfNeededAsync(m.ImagePath);
+                    if (uploaded != m.ImagePath)
+                    {
+                        memChanged = true;
+                        updatedMoments.Add(m with { ImagePath = uploaded });
+                    }
+                    else
+                    {
+                        updatedMoments.Add(m);
+                    }
+                }
+                newMoments = updatedMoments;
+            }
+
+            if (memChanged)
+            {
+                anyChanged = true;
+                var updatedMem = mem with
+                {
+                    ImagePath = coverPath,
+                    ImagePaths = newPaths,
+                    Moments = newMoments
+                };
+                Memories[i] = updatedMem;
+                if (SelectedMemory == mem)
+                {
+                    SelectedMemory = updatedMem;
+                }
+            }
+        }
+
+        if (anyChanged)
+        {
+            SaveList("couple_memories", Memories);
+        }
+    }
+
     private async Task SyncToServerAsync()
     {
         if (_coupleApi == null) return;
         try
         {
+            await EnsureMemoriesUploadedAsync();
+
             var answers = new Dictionary<string, string>();
             if (!string.IsNullOrWhiteSpace(TodayAnswer))
             {

@@ -1,4 +1,25 @@
+using ChatApp.Mobile.Features.Authentication.Services;
+
 namespace ChatApp.Mobile.Features.CoupleSpace.Models;
+
+internal static class CoupleMediaHelper
+{
+    public static bool IsRemoteUrl(string? path) =>
+        !string.IsNullOrWhiteSpace(path) &&
+        (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+         path.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
+         path.StartsWith("/"));
+
+    public static bool IsAvailableImage(string? path) =>
+        !string.IsNullOrWhiteSpace(path) && (IsRemoteUrl(path) || File.Exists(path));
+
+    public static string? ResolveImageUrl(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return null;
+        if (path.StartsWith("/")) return $"{ApiConfig.BaseUrl}{path}";
+        return path;
+    }
+}
 
 public record SpecialDateItem(
     Guid Id,
@@ -45,9 +66,10 @@ public record MemoryMoment(
     public string FormattedDate => MomentTime.HasValue
         ? $"{MomentDate:MMM dd, yyyy} • {DateTime.Today.Add(MomentTime.Value):hh:mm tt}"
         : MomentDate.ToString("MMM dd, yyyy");
+    public string? DisplayImageUrl => CoupleMediaHelper.ResolveImageUrl(ImagePath);
     public bool HasTitle => !string.IsNullOrWhiteSpace(Title);
     public bool HasCaption => !string.IsNullOrWhiteSpace(Caption);
-    public bool HasImage => !string.IsNullOrWhiteSpace(ImagePath) && File.Exists(ImagePath);
+    public bool HasImage => CoupleMediaHelper.IsAvailableImage(ImagePath);
 }
 
 public record MemoryItem(
@@ -70,15 +92,20 @@ public record MemoryItem(
             var list = new List<string>();
             if (Moments != null)
             {
-                list.AddRange(Moments.Select(m => m.ImagePath).Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p)));
+                list.AddRange(Moments
+                    .Select(m => m.ImagePath)
+                    .Where(CoupleMediaHelper.IsAvailableImage)
+                    .Select(p => CoupleMediaHelper.ResolveImageUrl(p)!));
             }
             if (list.Count == 0 && ImagePaths != null)
             {
-                list.AddRange(ImagePaths.Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p)));
+                list.AddRange(ImagePaths
+                    .Where(CoupleMediaHelper.IsAvailableImage)
+                    .Select(p => CoupleMediaHelper.ResolveImageUrl(p)!));
             }
-            if (list.Count == 0 && !string.IsNullOrWhiteSpace(ImagePath) && File.Exists(ImagePath))
+            if (list.Count == 0 && CoupleMediaHelper.IsAvailableImage(ImagePath))
             {
-                list.Add(ImagePath);
+                list.Add(CoupleMediaHelper.ResolveImageUrl(ImagePath)!);
             }
             return list;
         }
@@ -90,7 +117,7 @@ public record MemoryItem(
         {
             if (Moments != null && Moments.Count > 0)
             {
-                var valid = Moments.Where(m => !string.IsNullOrWhiteSpace(m.ImagePath) && File.Exists(m.ImagePath)).ToList();
+                var valid = Moments.Where(m => CoupleMediaHelper.IsAvailableImage(m.ImagePath) || m.HasTitle || m.HasCaption).ToList();
                 if (valid.Count > 0) return valid;
             }
 

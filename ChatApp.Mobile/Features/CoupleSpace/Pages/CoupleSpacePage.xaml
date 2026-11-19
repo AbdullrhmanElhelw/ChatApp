@@ -618,7 +618,7 @@
                                         <Border StrokeThickness="1" Stroke="#4E2682" HeightRequest="200" IsVisible="{Binding HasImage}">
                                             <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
                                             <Grid>
-                                                <Image Source="{Binding ImagePath}" Aspect="AspectFill" />
+                                                <Image Source="{Binding DisplayImageUrl}" Aspect="AspectFill" />
                                                 <Border WidthRequest="34" HeightRequest="34" StrokeThickness="0" BackgroundColor="#AA240D47" HorizontalOptions="End" VerticalOptions="End" Margin="12">
                                                     <Border.StrokeShape><RoundRectangle CornerRadius="17" /></Border.StrokeShape>
                                                     <Path Data="{StaticResource IconHeart}" Fill="#FF4FB8" WidthRequest="16" HeightRequest="16" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />

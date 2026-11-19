@@ -8,7 +8,7 @@
              x:Class="ChatApp.Mobile.Features.Chat.Pages.ChatPage"
              x:DataType="vm:ChatViewModel"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource ChatCanvasLight}, Dark={StaticResource ChatCanvasDark}}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -18,74 +18,96 @@
 
     <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
 
-        <!-- 1. Header / Top Bar -->
+        <!-- 1. Header / Top Bar (WhatsApp / Signal Premium Style) -->
         <Border Grid.Row="0"
                 StrokeThickness="0"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
-                Padding="16,10">
+                BackgroundColor="{AppThemeBinding Light={StaticResource ChatHeaderLight}, Dark={StaticResource ChatHeaderDark}}"
+                Padding="12,8">
             <Border.Shadow>
-                <Shadow Brush="{AppThemeBinding Light=#10000000, Dark=#30000000}"
+                <Shadow Brush="{AppThemeBinding Light=#10000000, Dark=#35000000}"
                         Offset="0,2"
-                        Radius="6"
+                        Radius="4"
                         Opacity="0.8" />
             </Border.Shadow>
 
-            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
                 <!-- Back Button -->
                 <Button Grid.Column="0"
                         Text="←"
-                        FontSize="20"
+                        FontSize="18"
                         FontAttributes="Bold"
-                        WidthRequest="40"
-                        HeightRequest="40"
-                        CornerRadius="20"
+                        WidthRequest="38"
+                        HeightRequest="38"
+                        CornerRadius="19"
                         Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                        TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray100}}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
                         Command="{Binding NavigateBackCommand}" />
 
                 <!-- Partner Avatar & Online Indicator -->
                 <controls:AvatarView Grid.Column="1"
                                      FullName="{Binding ChatTitle}"
                                      AvatarUrl="{Binding AvatarUrl}"
-                                     Size="42"
+                                     Size="44"
                                      IsOnline="{Binding IsPartnerOnline}" />
 
                 <!-- Partner Info & Status -->
-                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="2">
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="1">
                     <Label Text="{Binding ChatTitle}"
                            FontFamily="CairoBold"
                            FontSize="16"
                            FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
                            LineBreakMode="TailTruncation" />
 
-                    <!-- Typing or Presence Status -->
+                    <!-- Live Typing Indicator -->
                     <Label Text="{Binding PartnerTypingText}"
+                           FontFamily="CairoBold"
                            FontSize="12"
                            FontAttributes="Bold"
-                           TextColor="{StaticResource BrandPrimary}"
+                           TextColor="{StaticResource BrandPrimaryLight}"
                            IsVisible="{Binding IsPartnerTyping}" />
 
+                    <!-- Dynamic Presence (Online / Last Seen) -->
                     <Label Text="{Binding PartnerPresenceText}"
+                           FontFamily="CairoRegular"
                            FontSize="12"
                            TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
                            IsVisible="{Binding IsPartnerTyping, Converter={StaticResource InverseBoolConverter}}" />
                 </VerticalStackLayout>
 
-                <!-- Connection Indicator (Top Right) -->
-                <Border Grid.Column="3"
-                        StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                        Padding="8,4"
-                        VerticalOptions="Center">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12" />
-                    </Border.StrokeShape>
-                    <Label Text="{Binding ConnectionStatusText}"
-                           FontSize="11"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
-                </Border>
+                <!-- Actions: Call Placeholders & Connection Status -->
+                <HorizontalStackLayout Grid.Column="3" Spacing="4" VerticalOptions="Center">
+                    <Button Text="📹"
+                            FontSize="15"
+                            WidthRequest="36"
+                            HeightRequest="36"
+                            CornerRadius="18"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+
+                    <Button Text="📞"
+                            FontSize="15"
+                            WidthRequest="36"
+                            HeightRequest="36"
+                            CornerRadius="18"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+
+                    <Border StrokeThickness="0"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                            Padding="8,3"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Label Text="{Binding ConnectionStatusText}"
+                               FontSize="11"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                    </Border>
+                </HorizontalStackLayout>
             </Grid>
         </Border>
 
@@ -96,21 +118,29 @@
                         SelectionMode="None"
                         ItemSizingStrategy="MeasureAllItems">
             <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="6" />
             </CollectionView.ItemsLayout>
 
             <CollectionView.Header>
-                <VerticalStackLayout Padding="16,12" Spacing="4" HorizontalOptions="Center">
+                <VerticalStackLayout Padding="16,12" Spacing="6" HorizontalOptions="Center">
+                    <!-- E2EE Encryption Pill (WhatsApp signature design) -->
                     <Border StrokeThickness="0"
-                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
-                            Padding="12,6">
+                            BackgroundColor="{AppThemeBinding Light=#E1D9CE, Dark=#182229}"
+                            Padding="14,6">
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="12" />
+                            <RoundRectangle CornerRadius="10" />
                         </Border.StrokeShape>
-                        <Label Text="🔒 الرسائل مشفرة ومؤمنة في ChatApp"
-                               FontSize="11"
-                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
-                               HorizontalOptions="Center" />
+                        <Border.Shadow>
+                            <Shadow Brush="#08000000" Offset="0,1" Radius="2" Opacity="0.5" />
+                        </Border.Shadow>
+                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                            <Label Text="🔒" FontSize="11" VerticalOptions="Center" />
+                            <Label Text="الرسائل والمكالمات مشفرة تماماً بين الطرفين في ChatApp"
+                                   FontFamily="CairoRegular"
+                                   FontSize="11"
+                                   TextColor="{AppThemeBinding Light=#54656F, Dark=#8696A0}"
+                                   HorizontalOptions="Center" />
+                        </HorizontalStackLayout>
                     </Border>
                 </VerticalStackLayout>
             </CollectionView.Header>
@@ -118,32 +148,33 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="dto:ChatMessageItem">
                     <Grid Padding="12,2">
-                        <!-- Outgoing Bubble (Mine) - Text & Media -->
+                        <!-- Outgoing Bubble (Mine) - WhatsApp Emerald Style -->
                         <Border x:Name="OutgoingBubble"
                                 HorizontalOptions="End"
-                                MaximumWidthRequest="300"
+                                MaximumWidthRequest="320"
                                 StrokeThickness="0"
                                 BackgroundColor="{AppThemeBinding Light={StaticResource BubbleOutgoingLight}, Dark={StaticResource BubbleOutgoingDark}}"
                                 Padding="12,8"
                                 IsVisible="{Binding IsOutgoingNormal}">
                             <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="18,18,4,18" />
+                                <RoundRectangle CornerRadius="16,16,3,16" />
                             </Border.StrokeShape>
                             <Border.Shadow>
-                                <Shadow Brush="#15000000" Offset="0,1" Radius="3" Opacity="0.5" />
+                                <Shadow Brush="#18000000" Offset="0,1" Radius="3" Opacity="0.6" />
                             </Border.Shadow>
                             <VerticalStackLayout Spacing="4">
                                 <!-- Text Message Content -->
                                 <Label Text="{Binding Content}"
+                                       FontFamily="CairoRegular"
                                        FontSize="15"
-                                       TextColor="{StaticResource White}"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
                                        LineBreakMode="WordWrap"
                                        IsVisible="{Binding IsTextMessage}" />
 
                                 <!-- Image Attachment Preview -->
                                 <Border StrokeThickness="0"
-                                        MaximumWidthRequest="240"
-                                        MaximumHeightRequest="240"
+                                        MaximumWidthRequest="260"
+                                        MaximumHeightRequest="260"
                                         IsVisible="{Binding IsImage}">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="12" />
@@ -152,10 +183,12 @@
                                            Aspect="AspectFill" />
                                 </Border>
 
+                                <!-- Timestamp and Blue Read Status -->
                                 <HorizontalStackLayout HorizontalOptions="End" Spacing="4">
                                     <Label Text="{Binding FormattedTime}"
+                                           FontFamily="CairoRegular"
                                            FontSize="10"
-                                           TextColor="#E0F2FE" />
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark=#A7F3D0}" />
                                     <Label Text="{Binding StatusIcon}"
                                            FontSize="11"
                                            TextColor="{Binding StatusColor}" />
@@ -163,7 +196,7 @@
                             </VerticalStackLayout>
                         </Border>
 
-                        <!-- Outgoing Sticker (Mine) - Borderless WhatsApp style -->
+                        <!-- Outgoing Sticker (Mine) - Borderless Floating Sticker -->
                         <Grid HorizontalOptions="End"
                               IsVisible="{Binding IsOutgoingSticker}">
                             <Image Source="{Binding StickerUrl}"
@@ -174,7 +207,7 @@
                                     VerticalOptions="End"
                                     Margin="0,0,4,4"
                                     StrokeThickness="0"
-                                    BackgroundColor="#90000000"
+                                    BackgroundColor="#95000000"
                                     Padding="6,2">
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="8" />
@@ -190,16 +223,16 @@
                             </Border>
                         </Grid>
 
-                        <!-- Incoming Bubble (Partner) - Text & Media -->
+                        <!-- Incoming Bubble (Partner) - Slate Card Style -->
                         <Border x:Name="IncomingBubble"
                                 HorizontalOptions="Start"
-                                MaximumWidthRequest="300"
+                                MaximumWidthRequest="320"
                                 StrokeThickness="0"
                                 BackgroundColor="{AppThemeBinding Light={StaticResource BubbleIncomingLight}, Dark={StaticResource BubbleIncomingDark}}"
                                 Padding="12,8"
                                 IsVisible="{Binding IsIncomingNormal}">
                             <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="18,18,18,4" />
+                                <RoundRectangle CornerRadius="16,16,16,3" />
                             </Border.StrokeShape>
                             <Border.Shadow>
                                 <Shadow Brush="#10000000" Offset="0,1" Radius="3" Opacity="0.5" />
@@ -207,15 +240,16 @@
                             <VerticalStackLayout Spacing="4">
                                 <!-- Text Message Content -->
                                 <Label Text="{Binding Content}"
+                                       FontFamily="CairoRegular"
                                        FontSize="15"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
                                        LineBreakMode="WordWrap"
                                        IsVisible="{Binding IsTextMessage}" />
 
                                 <!-- Image Attachment Preview -->
                                 <Border StrokeThickness="0"
-                                        MaximumWidthRequest="240"
-                                        MaximumHeightRequest="240"
+                                        MaximumWidthRequest="260"
+                                        MaximumHeightRequest="260"
                                         IsVisible="{Binding IsImage}">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="12" />
@@ -225,13 +259,14 @@
                                 </Border>
 
                                 <Label Text="{Binding FormattedTime}"
+                                       FontFamily="CairoRegular"
                                        FontSize="10"
                                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
                                        HorizontalOptions="End" />
                             </VerticalStackLayout>
                         </Border>
 
-                        <!-- Incoming Sticker (Partner) - Borderless WhatsApp style -->
+                        <!-- Incoming Sticker (Partner) - Borderless Floating Sticker -->
                         <Grid HorizontalOptions="Start"
                               IsVisible="{Binding IsIncomingSticker}">
                             <Image Source="{Binding StickerUrl}"
@@ -242,7 +277,7 @@
                                     VerticalOptions="End"
                                     Margin="0,0,4,4"
                                     StrokeThickness="0"
-                                    BackgroundColor="#90000000"
+                                    BackgroundColor="#95000000"
                                     Padding="6,2">
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="8" />
@@ -266,6 +301,7 @@
             <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                 <Label Text="✍️" FontSize="14" VerticalOptions="Center" />
                 <Label Text="{Binding PartnerTypingText}"
+                       FontFamily="CairoBold"
                        FontSize="13"
                        TextColor="{StaticResource BrandPrimary}"
                        FontAttributes="Bold"
@@ -273,62 +309,63 @@
             </HorizontalStackLayout>
         </Border>
 
-        <!-- 4. Message Input Bar -->
+        <!-- 4. Floating Message Input Bar (WhatsApp / Signal Design) -->
         <Border Grid.Row="3"
                 StrokeThickness="0"
-                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
-                Padding="12,8">
+                BackgroundColor="{AppThemeBinding Light={StaticResource ChatHeaderLight}, Dark={StaticResource ChatHeaderDark}}"
+                Padding="10,8">
             <Border.Shadow>
-                <Shadow Brush="{AppThemeBinding Light=#10000000, Dark=#30000000}"
+                <Shadow Brush="{AppThemeBinding Light=#10000000, Dark=#35000000}"
                         Offset="0,-2"
                         Radius="6"
                         Opacity="0.8" />
             </Border.Shadow>
 
             <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8" VerticalOptions="Center">
-                <!-- Attachment Button (Stickers & Media) -->
+                <!-- Attachment Button (Paperclip) -->
                 <Button Grid.Column="0"
                         Text="📎"
                         FontSize="18"
-                        WidthRequest="42"
-                        HeightRequest="42"
-                        CornerRadius="21"
+                        WidthRequest="40"
+                        HeightRequest="40"
+                        CornerRadius="20"
                         Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                        TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}"
                         Command="{Binding ToggleAttachmentPanelCommand}" />
 
                 <!-- Sticker Studio Direct Button -->
                 <Button Grid.Column="1"
                         Text="🎨"
                         FontSize="18"
-                        WidthRequest="42"
-                        HeightRequest="42"
-                        CornerRadius="21"
+                        WidthRequest="40"
+                        HeightRequest="40"
+                        CornerRadius="20"
                         Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                        TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}"
                         Command="{Binding OpenStickerStudioCommand}" />
 
-                <!-- Text Input Box -->
+                <!-- Text Input Box (WhatsApp Floating Pill) -->
                 <Border Grid.Column="2"
                         StrokeThickness="1"
                         Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray800}}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray800}}"
                         Padding="14,2">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="22" />
                     </Border.StrokeShape>
                     <Entry Text="{Binding MessageText, Mode=TwoWay}"
                            Placeholder="اكتب رسالة..."
+                           FontFamily="CairoRegular"
                            PlaceholderColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray50}}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
                            FontSize="15"
                            VerticalOptions="Center"
                            ReturnCommand="{Binding SendMessageCommand}" />
                 </Border>
 
-                <!-- Send Button -->
+                <!-- Floating Circular Send FAB -->
                 <Button Grid.Column="3"
                         Text="➤"
                         FontSize="18"
@@ -339,40 +376,51 @@
                         Padding="0"
                         BackgroundColor="{StaticResource BrandPrimary}"
                         TextColor="{StaticResource White}"
-                        Command="{Binding SendMessageCommand}" />
+                        Command="{Binding SendMessageCommand}">
+                    <Button.Shadow>
+                        <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,2" Radius="6" Opacity="0.5" />
+                    </Button.Shadow>
+                </Button>
             </Grid>
         </Border>
 
         <!-- 5. Interactive Stickers & Media Bottom Sheet -->
         <Border Grid.Row="4"
                 StrokeThickness="1"
-                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
                 BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
-                Padding="16,12"
+                Padding="16,10,16,14"
                 IsVisible="{Binding IsAttachmentPanelVisible}">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="20,20,0,0" />
+                <RoundRectangle CornerRadius="24,24,0,0" />
             </Border.StrokeShape>
 
             <VerticalStackLayout Spacing="12">
-                <!-- Top Actions Bar: Photo, Sticker Studio -->
+                <!-- Top Drag Handle -->
+                <BoxView WidthRequest="40"
+                         HeightRequest="4"
+                         CornerRadius="2"
+                         Color="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                         HorizontalOptions="Center" />
+
+                <!-- Action Cards Bar: Photo, Sticker Studio -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                     <Button Grid.Column="0"
                             Text="📷 إرسال صورة"
                             Command="{Binding PickAndSendImageCommand}"
                             Style="{StaticResource ChatSecondaryButton}"
-                            HeightRequest="40"
-                            FontSize="12" />
+                            HeightRequest="42"
+                            FontSize="13" />
 
                     <Button Grid.Column="1"
                             Text="🎨 صانع الاستيكرات (Studio)"
                             Command="{Binding OpenStickerStudioCommand}"
                             Style="{StaticResource ChatPrimaryButton}"
-                            HeightRequest="40"
-                            FontSize="12" />
+                            HeightRequest="42"
+                            FontSize="13" />
                 </Grid>
 
-                <Label Text="اختر ملصقاً لإرساله فورياً:"
+                <Label Text="ملصقاتك والاستيكرات السريعة:"
                        FontFamily="CairoBold"
                        FontSize="13"
                        TextColor="{AppThemeBinding Light={StaticResource Gray700}, Dark={StaticResource Gray300}}" />
@@ -390,9 +438,10 @@
                                     HeightRequest="56"
                                     Padding="4"
                                     BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                                    StrokeThickness="0">
+                                    StrokeThickness="1"
+                                    Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}">
                                 <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="12" />
+                                    <RoundRectangle CornerRadius="14" />
                                 </Border.StrokeShape>
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=SendStickerCommand}"

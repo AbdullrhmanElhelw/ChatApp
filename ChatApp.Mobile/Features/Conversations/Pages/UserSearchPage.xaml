@@ -41,9 +41,14 @@
 
         <!-- 2. Search Input Box & Submit Button -->
         <Border Grid.Row="1"
-                Style="{StaticResource ChatCardBorder}"
-                Padding="12,4"
+                StrokeThickness="1"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                Padding="12,3"
                 Margin="0,0,0,10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20" />
+            </Border.StrokeShape>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                 <Entry Grid.Column="0"
                        Text="{Binding SearchQuery, Mode=TwoWay}"
@@ -60,7 +65,8 @@
                         Text="بحث"
                         Command="{Binding SearchCommand}"
                         Style="{StaticResource ChatPrimaryButton}"
-                        HeightRequest="38"
+                        HeightRequest="36"
+                        CornerRadius="18"
                         Padding="14,0"
                         FontSize="13" />
             </Grid>

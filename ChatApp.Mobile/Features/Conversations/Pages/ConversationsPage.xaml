@@ -8,27 +8,27 @@
              x:DataType="vm:ConversationsViewModel"
              Title="{Binding Title}"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray950}}">
+             BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="16,12,16,0">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12,16,0">
 
-        <!-- 1. Modern Top Header -->
+        <!-- 1. Modern Top Header (WhatsApp / Signal Style) -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,12" VerticalOptions="Center">
-            <!-- Current User Avatar / Status -->
+            <!-- Brand & Current User -->
             <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
                 <controls:AvatarView FullName="{Binding CurrentUser.FullName}"
                                      AvatarUrl="{Binding CurrentUser.AvatarUrl}"
                                      Size="42"
                                      IsOnline="True" />
-                <Label Text="المحادثات"
+                <Label Text="ChatApp"
                        FontFamily="CairoBold"
                        FontSize="24"
                        FontAttributes="Bold"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                       TextColor="{StaticResource BrandPrimary}"
                        VerticalOptions="Center" />
             </HorizontalStackLayout>
 
-            <!-- Actions: Theme Toggle & Logout -->
+            <!-- Actions: Search, Theme Toggle & Logout -->
             <HorizontalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
                 <Button Text="{Binding CurrentThemeIcon}"
                         Command="{Binding ToggleThemeCommand}"
@@ -56,14 +56,19 @@
             </HorizontalStackLayout>
         </Grid>
 
-        <!-- 2. Local Search Bar -->
+        <!-- 2. Search Bar -->
         <Border Grid.Row="1"
-                Style="{StaticResource ChatCardBorder}"
-                Padding="12,4"
-                Margin="0,0,0,12">
+                StrokeThickness="1"
+                Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                Padding="12,3"
+                Margin="0,0,0,10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20" />
+            </Border.StrokeShape>
             <Grid ColumnDefinitions="Auto,*">
                 <Label Text="🔍"
-                       FontSize="16"
+                       FontSize="15"
                        VerticalOptions="Center"
                        TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
                        Margin="0,0,8,0" />
@@ -79,8 +84,47 @@
             </Grid>
         </Border>
 
-        <!-- 3. Conversations List / RefreshView -->
-        <Grid Grid.Row="2">
+        <!-- 3. Category Filter Tabs (WhatsApp Style) -->
+        <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="0,0,0,12">
+            <Border BackgroundColor="{StaticResource BrandPrimary}"
+                    StrokeThickness="0"
+                    Padding="14,5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <Label Text="الكل"
+                       FontFamily="CairoBold"
+                       FontSize="12"
+                       TextColor="{StaticResource White}" />
+            </Border>
+
+            <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                    StrokeThickness="0"
+                    Padding="14,5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <Label Text="غير مقروءة"
+                       FontFamily="CairoBold"
+                       FontSize="12"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+            </Border>
+
+            <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                    StrokeThickness="0"
+                    Padding="14,5">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <Label Text="المجموعات"
+                       FontFamily="CairoBold"
+                       FontSize="12"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+            </Border>
+        </HorizontalStackLayout>
+
+        <!-- 4. Conversations List / RefreshView -->
+        <Grid Grid.Row="3">
             <RefreshView IsRefreshing="{Binding IsRefreshing}"
                          Command="{Binding RefreshCommand}"
                          RefreshColor="{StaticResource BrandPrimary}">
@@ -178,7 +222,8 @@
                                                          HorizontalOptions="End"
                                                          VerticalOptions="Center">
                                         <Label Text="{Binding FormattedTime}"
-                                               Style="{StaticResource TypographyTiny}"
+                                               FontFamily="CairoRegular"
+                                               FontSize="11"
                                                TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
                                                HorizontalOptions="End" />
 
@@ -192,7 +237,7 @@
                 </CollectionView>
             </RefreshView>
 
-            <!-- Floating Action Button (New Chat) -->
+            <!-- Floating Action Button (New Chat - WhatsApp Green FAB) -->
             <Border WidthRequest="56"
                     HeightRequest="56"
                     BackgroundColor="{StaticResource BrandPrimary}"
@@ -203,11 +248,14 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="28" />
                 </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource BrandPrimary}" Offset="0,4" Radius="8" Opacity="0.5" />
+                </Border.Shadow>
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenUserSearchCommand}" />
                 </Border.GestureRecognizers>
                 <Label Text="✍️"
-                       FontSize="24"
+                       FontSize="22"
                        HorizontalOptions="Center"
                        VerticalOptions="Center" />
             </Border>

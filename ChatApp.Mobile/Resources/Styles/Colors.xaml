@@ -3,41 +3,46 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Brand Identity Palette -->
-    <Color x:Key="BrandPrimary">#0D9488</Color>
-    <Color x:Key="BrandPrimaryLight">#14B8A6</Color>
-    <Color x:Key="BrandPrimaryDark">#0F766E</Color>
-    <Color x:Key="BrandSecondary">#0284C7</Color>
-    <Color x:Key="BrandAccent">#F59E0B</Color>
+    <!-- Brand Identity Palette (WhatsApp / Signal Premium) -->
+    <Color x:Key="BrandPrimary">#00A884</Color>
+    <Color x:Key="BrandPrimaryLight">#25D366</Color>
+    <Color x:Key="BrandPrimaryDark">#008069</Color>
+    <Color x:Key="BrandSecondary">#2C6BED</Color>
+    <Color x:Key="BrandAccent">#25D366</Color>
 
     <!-- Semantic Status Colors -->
-    <Color x:Key="StatusOnline">#10B981</Color>
-    <Color x:Key="StatusOffline">#94A3B8</Color>
-    <Color x:Key="StatusSuccess">#22C55E</Color>
+    <Color x:Key="StatusOnline">#25D366</Color>
+    <Color x:Key="StatusOffline">#8696A0</Color>
+    <Color x:Key="StatusSuccess">#25D366</Color>
     <Color x:Key="StatusWarning">#F59E0B</Color>
     <Color x:Key="StatusError">#EF4444</Color>
-    <Color x:Key="StatusInfo">#38BDF8</Color>
+    <Color x:Key="StatusInfo">#53BDEB</Color>
 
-    <!-- Neutral Scale -->
+    <!-- Neutral Scale (WhatsApp Slate Palette) -->
     <Color x:Key="White">#FFFFFF</Color>
     <Color x:Key="Black">#000000</Color>
     <Color x:Key="Gray50">#F8FAFC</Color>
-    <Color x:Key="Gray100">#F1F5F9</Color>
-    <Color x:Key="Gray200">#E2E8F0</Color>
-    <Color x:Key="Gray300">#CBD5E1</Color>
-    <Color x:Key="Gray400">#94A3B8</Color>
-    <Color x:Key="Gray500">#64748B</Color>
-    <Color x:Key="Gray600">#475569</Color>
-    <Color x:Key="Gray700">#334155</Color>
-    <Color x:Key="Gray800">#1E293B</Color>
-    <Color x:Key="Gray900">#0F172A</Color>
-    <Color x:Key="Gray950">#0B0F19</Color>
+    <Color x:Key="Gray100">#F0F2F5</Color>
+    <Color x:Key="Gray200">#E9EDEF</Color>
+    <Color x:Key="Gray300">#D1D7DB</Color>
+    <Color x:Key="Gray400">#8696A0</Color>
+    <Color x:Key="Gray500">#667781</Color>
+    <Color x:Key="Gray600">#3B4A54</Color>
+    <Color x:Key="Gray700">#222D34</Color>
+    <Color x:Key="Gray800">#202C33</Color>
+    <Color x:Key="Gray900">#111B21</Color>
+    <Color x:Key="Gray950">#0B141B</Color>
 
-    <!-- Message Bubble Specific -->
-    <Color x:Key="BubbleOutgoingLight">#0D9488</Color>
-    <Color x:Key="BubbleOutgoingDark">#0F766E</Color>
-    <Color x:Key="BubbleIncomingLight">#F1F5F9</Color>
-    <Color x:Key="BubbleIncomingDark">#1E293B</Color>
+    <!-- Message Bubble Specific (WhatsApp & Signal Signature) -->
+    <Color x:Key="BubbleOutgoingLight">#D9FDD3</Color>
+    <Color x:Key="BubbleOutgoingDark">#005C4B</Color>
+    <Color x:Key="BubbleIncomingLight">#FFFFFF</Color>
+    <Color x:Key="BubbleIncomingDark">#202C33</Color>
+    <Color x:Key="ChatCanvasLight">#EFEAE2</Color>
+    <Color x:Key="ChatCanvasDark">#0B141B</Color>
+    <Color x:Key="ChatHeaderLight">#F0F2F5</Color>
+    <Color x:Key="ChatHeaderDark">#1F2C34</Color>
+    <Color x:Key="BlueTicks">#53BDEB</Color>
 
     <!-- Common Brushes -->
     <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource BrandPrimary}" />

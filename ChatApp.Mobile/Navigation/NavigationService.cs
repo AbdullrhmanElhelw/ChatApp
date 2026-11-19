@@ -4,6 +4,8 @@ namespace ChatApp.Mobile.Navigation;
 
 public class NavigationService : INavigationService
 {
+    private bool _isNavigating;
+
     public Task NavigateToAsync(string route, IDictionary<string, object>? parameters = null)
     {
         if (MainThread.IsMainThread)
@@ -16,17 +18,18 @@ public class NavigationService : INavigationService
 
     private async Task ExecuteGoToAsync(string route, IDictionary<string, object>? parameters)
     {
-        if (Shell.Current == null) return;
+        if (Shell.Current == null || _isNavigating) return;
+        _isNavigating = true;
 
         try
         {
             if (parameters != null)
             {
-                await Shell.Current.GoToAsync(route, parameters);
+                await Shell.Current.GoToAsync(route, animate: false, parameters);
             }
             else
             {
-                await Shell.Current.GoToAsync(route);
+                await Shell.Current.GoToAsync(route, animate: false);
             }
         }
         catch
@@ -45,11 +48,15 @@ public class NavigationService : INavigationService
 
                 if (page != null && Shell.Current?.Navigation != null)
                 {
-                    await Shell.Current.Navigation.PushAsync(page);
+                    await Shell.Current.Navigation.PushAsync(page, animated: false);
                     return;
                 }
             }
             throw;
+        }
+        finally
+        {
+            _isNavigating = false;
         }
     }
 
@@ -73,28 +80,28 @@ public class NavigationService : INavigationService
             {
                 if (Shell.Current.Navigation.ModalStack.Count > 0)
                 {
-                    await Shell.Current.Navigation.PopModalAsync();
+                    await Shell.Current.Navigation.PopModalAsync(animated: false);
                     return;
                 }
 
                 if (Shell.Current.Navigation.NavigationStack.Count > 1)
                 {
-                    await Shell.Current.Navigation.PopAsync();
+                    await Shell.Current.Navigation.PopAsync(animated: false);
                     return;
                 }
             }
 
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync("..", animate: false);
         }
         catch
         {
             if (Shell.Current.Navigation?.NavigationStack.Count > 1)
             {
-                await Shell.Current.Navigation.PopAsync();
+                await Shell.Current.Navigation.PopAsync(animated: false);
             }
             else
             {
-                await Shell.Current.GoToAsync("..");
+                await Shell.Current.GoToAsync("..", animate: false);
             }
         }
     }

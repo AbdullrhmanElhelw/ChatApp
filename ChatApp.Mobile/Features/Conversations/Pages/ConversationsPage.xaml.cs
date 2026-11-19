@@ -16,9 +16,9 @@ public partial class ConversationsPage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadConversationsAsync();
+        _ = _viewModel.LoadConversationsAsync();
     }
 }

@@ -28,6 +28,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     private readonly ICoupleApiService? _coupleApi;
     private readonly IConversationApiService? _conversationApi;
     private readonly IStickerApiService? _stickerApi;
+    private static CoupleSpaceClientDto? _cachedSpaceDto;
 
     private static readonly string[] DailyQuestions =
     [
@@ -206,12 +207,18 @@ public partial class CoupleSpaceViewModel : BaseViewModel
 
     public async Task LoadFromServerAsync()
     {
+        if (_cachedSpaceDto != null)
+        {
+            ApplyServerSpace(_cachedSpaceDto);
+        }
+
         if (_coupleApi == null) return;
         try
         {
             var res = await _coupleApi.GetMySpaceAsync();
             if (res.IsSuccess && res.Value != null)
             {
+                _cachedSpaceDto = res.Value;
                 ApplyServerSpace(res.Value);
             }
         }

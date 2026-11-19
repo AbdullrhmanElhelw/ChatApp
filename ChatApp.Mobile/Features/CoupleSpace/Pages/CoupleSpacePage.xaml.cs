@@ -16,9 +16,9 @@ public partial class CoupleSpacePage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadFromServerAsync();
+        _ = _viewModel.LoadFromServerAsync();
     }
 }

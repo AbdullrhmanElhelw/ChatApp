@@ -30,6 +30,7 @@ public partial class ConversationsViewModel : BaseViewModel
     private readonly IAuthApiService? _authService;
     private readonly ICoupleApiService? _coupleApiService;
     private readonly ILocalChatDatabase? _localDb;
+    private readonly ILocalNotificationService? _notificationService;
 
     [ObservableProperty]
     public partial ObservableCollection<ConversationSummaryDto> Conversations { get; set; } = new();
@@ -86,7 +87,8 @@ public partial class ConversationsViewModel : BaseViewModel
         IChatHubService? chatHubService = null,
         IAuthApiService? authService = null,
         ICoupleApiService? coupleApiService = null,
-        ILocalChatDatabase? localDb = null)
+        ILocalChatDatabase? localDb = null,
+        ILocalNotificationService? notificationService = null)
     {
         _conversationService = conversationService;
         _authStateService = authStateService;
@@ -95,6 +97,7 @@ public partial class ConversationsViewModel : BaseViewModel
         _authService = authService;
         _coupleApiService = coupleApiService;
         _localDb = localDb;
+        _notificationService = notificationService;
 
         Title = "المحادثات";
         CurrentUser = _authStateService.CurrentUser;
@@ -388,6 +391,10 @@ public partial class ConversationsViewModel : BaseViewModel
 
     private async Task EnsureHubConnectedAsync()
     {
+        if (_notificationService != null)
+        {
+            _ = _notificationService.EnsureInitializedAndStartAsync();
+        }
         if (_chatHubService == null) return;
         try
         {
@@ -460,6 +467,8 @@ public partial class ConversationsViewModel : BaseViewModel
         };
         NotificationConversation = conversation;
         IsNotificationBannerVisible = true;
+
+        _notificationService?.ShowMessageNotification(NotificationSenderName, NotificationMessagePreview, conversation.Id);
 
         _notificationCts?.Cancel();
         _notificationCts?.Dispose();

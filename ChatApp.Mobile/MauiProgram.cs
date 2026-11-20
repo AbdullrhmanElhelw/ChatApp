@@ -57,6 +57,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<ISecureStorageService, SecureStorageService>();
         builder.Services.AddSingleton<IAuthenticationStateService, AuthenticationStateService>();
         builder.Services.AddSingleton<ILocalChatDatabase, LocalChatDatabase>();
+#if ANDROID
+        builder.Services.AddSingleton<ILocalNotificationService, Platforms.Android.AndroidLocalNotificationService>();
+#else
+        builder.Services.AddSingleton<ILocalNotificationService, DefaultLocalNotificationService>();
+#endif
 
         // 2. HTTP & API Services
         builder.Services.AddSingleton(new HttpClient

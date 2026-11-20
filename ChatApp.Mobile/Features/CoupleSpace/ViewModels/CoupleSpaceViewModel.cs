@@ -28,6 +28,7 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     private readonly ICoupleApiService? _coupleApi;
     private readonly IConversationApiService? _conversationApi;
     private readonly IStickerApiService? _stickerApi;
+    private readonly IChatHubService? _chatHub;
     private static CoupleSpaceClientDto? _cachedSpaceDto;
 
     private static readonly string[] DailyQuestions =
@@ -207,16 +208,24 @@ public partial class CoupleSpaceViewModel : BaseViewModel
     [ObservableProperty]
     public partial DateTime NewNoteUnlockDate { get; set; } = DateTime.Today.AddDays(7);
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasMissYouFeedback))]
+    public partial string? MissYouFeedback { get; set; }
+
+    public bool HasMissYouFeedback => !string.IsNullOrWhiteSpace(MissYouFeedback);
+
     public CoupleSpaceViewModel(
         INavigationService navigationService,
         ICoupleApiService? coupleApi = null,
         IConversationApiService? conversationApi = null,
-        IStickerApiService? stickerApi = null)
+        IStickerApiService? stickerApi = null,
+        IChatHubService? chatHub = null)
     {
         _navigationService = navigationService;
         _coupleApi = coupleApi;
         _conversationApi = conversationApi;
         _stickerApi = stickerApi;
+        _chatHub = chatHub;
         Title = "عالمنا الخاص";
         LoadLocal();
     }
@@ -477,6 +486,47 @@ public partial class CoupleSpaceViewModel : BaseViewModel
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SendMissYouPingAsync()
+    {
+        if (_conversationApi == null || _chatHub == null || PartnerId == null || PartnerId == Guid.Empty) return;
+
+        try { HapticFeedback.Default.Perform(HapticFeedbackType.LongPress); } catch { }
+
+        try
+        {
+            var convRes = await _conversationApi.GetOrCreateDirectConversationAsync(PartnerId.Value);
+            if (!convRes.IsSuccess || convRes.Value == null)
+            {
+                MissYouFeedback = "تعذر الوصول لمحادثة الشريك حالياً.";
+                return;
+            }
+
+            if (!_chatHub.IsConnected)
+            {
+                await _chatHub.ConnectAsync();
+            }
+            await _chatHub.JoinConversationAsync(convRes.Value.Id);
+
+            await _chatHub.SendMessageAsync(new SendMessageRequestClientDto(
+                convRes.Value.Id,
+                "💗 بفكر فيك دلوقتي!",
+                MessageType.Text,
+                Guid.NewGuid()));
+
+            MissYouFeedback = $"تم إرسال نبضة «بفكر فيك» إلى {PartnerName}!";
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                MainThread.BeginInvokeOnMainThread(() => MissYouFeedback = null);
+            });
+        }
+        catch
+        {
+            MissYouFeedback = "تعذر إرسال النبضة، تأكد من الاتصال.";
         }
     }
 

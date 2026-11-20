@@ -296,7 +296,34 @@
                                     </VerticalStackLayout>
                                     <Path Grid.Column="2" Data="{StaticResource IconChevronLeft}" Fill="#9B86B8" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
                                 </Grid>
+
+                                <BoxView HeightRequest="1" Margin="62,0,12,0" Color="#34185B" />
+
+                                <!-- Row 3: Miss You Ping -->
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="12,12">
+                                    <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding SendMissYouPingCommand}" /></Grid.GestureRecognizers>
+                                    <Border Grid.Column="0" WidthRequest="40" HeightRequest="40" StrokeThickness="0">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="20" /></Border.StrokeShape>
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="#FF4FB8" Offset="0.0" /><GradientStop Color="#EC4899" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <Path Data="{StaticResource IconHeart}" Fill="#FFFFFF" WidthRequest="18" HeightRequest="18" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                        <Label Text="بفكر فيك دلوقتي" FontFamily="CairoBold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource DeepPurple}, Dark=#FFFFFF}" />
+                                        <Label Text="ابعت نبضة واهتزاز فوري لشريكك" FontFamily="CairoRegular" FontSize="11" TextColor="#FFB5DC" />
+                                    </VerticalStackLayout>
+                                    <Path Grid.Column="2" Data="{StaticResource IconBolt}" Fill="#FF4FB8" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" />
+                                </Grid>
                             </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Miss You Sent Confirmation -->
+                        <Border IsVisible="{Binding HasMissYouFeedback}" StrokeThickness="1" Stroke="#FF4FB8" BackgroundColor="#3A0B6B" Padding="12,8">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>
+                            <Label Text="{Binding MissYouFeedback}" FontFamily="CairoBold" FontSize="12" TextColor="#FFD6F2" HorizontalTextAlignment="Center" />
                         </Border>
                     </VerticalStackLayout>
 

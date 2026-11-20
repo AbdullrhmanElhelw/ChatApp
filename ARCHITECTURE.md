@@ -68,8 +68,8 @@ flowchart TB
 
 ```
 ChatApp/
-├── ChatApp.Backend/
-│   ├── ChatApp.Backend.sln
+├── ChatApp.slnx
+├── Backend/
 │   ├── src/
 │   │   ├── ChatApp.Domain/              # Zero external dependencies
 │   │   │   ├── Common/                  # BaseEntity, AuditableEntity, ValueObjects
@@ -130,7 +130,7 @@ ChatApp/
 ### 3.2 Feature-Based Folder Structure
 
 ```
-ChatApp.Mobile/
+Mobile/
 ├── App.xaml / App.xaml.cs
 ├── AppShell.xaml / AppShell.xaml.cs
 ├── MauiProgram.cs

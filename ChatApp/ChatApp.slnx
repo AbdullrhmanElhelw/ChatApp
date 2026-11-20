@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Backend/src/">
+    <Project Path="Backend/src/ChatApp.API/ChatApp.API.csproj" />
+    <Project Path="Backend/src/ChatApp.Application/ChatApp.Application.csproj" />
+    <Project Path="Backend/src/ChatApp.Domain/ChatApp.Domain.csproj" />
+    <Project Path="Backend/src/ChatApp.Infrastructure/ChatApp.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Backend/tests/">
+    <Project Path="Backend/tests/ChatApp.IntegrationTests/ChatApp.IntegrationTests.csproj" />
+    <Project Path="Backend/tests/ChatApp.UnitTests/ChatApp.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/Mobile/">
+    <Project Path="Mobile/ChatApp.Mobile.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ChatApp.Mobile.UnitTests/ChatApp.Mobile.UnitTests.csproj" />
+  </Folder>
+</Solution>

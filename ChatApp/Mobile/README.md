@@ -18,7 +18,7 @@ This directory contains the cross-platform mobile client for **ChatApp**, built 
 ## 2. Directory Structure
 
 ```
-ChatApp.Mobile/
+Mobile/
 ├── App.xaml / App.xaml.cs
 ├── AppShell.xaml / AppShell.xaml.cs
 ├── MauiProgram.cs

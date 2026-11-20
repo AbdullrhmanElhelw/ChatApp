@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ChatApp.Mobile\ChatApp.Mobile.csproj" />
+    <ProjectReference Include="..\..\Mobile\ChatApp.Mobile.csproj" />
   </ItemGroup>
 
 </Project>

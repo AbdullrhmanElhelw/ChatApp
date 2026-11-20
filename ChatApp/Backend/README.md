@@ -21,16 +21,13 @@ This repository contains the backend core for **ChatApp**, an enterprise-grade c
 ## 2. Solution Structure
 
 ```
-ChatApp.Backend/
-├── ChatApp.Backend.slnx
-├── src/
-│   ├── ChatApp.Domain/
-│   ├── ChatApp.Application/
-│   ├── ChatApp.Infrastructure/
-│   └── ChatApp.API/
-└── tests/
-    ├── ChatApp.UnitTests/
-    └── ChatApp.IntegrationTests/
+ChatApp/
+├── ChatApp.slnx
+├── Backend/
+│   ├── src/
+│   └── tests/
+├── Mobile/
+└── tests/                       # Mobile unit tests
 ```
 
 ---
@@ -47,9 +44,9 @@ ChatApp.Backend/
 
 ### 4.1 Restore & Build
 ```powershell
-cd ChatApp.Backend
-dotnet restore ChatApp.Backend.slnx
-dotnet build ChatApp.Backend.slnx
+cd ChatApp\Backend
+dotnet restore ..\ChatApp.slnx
+dotnet build ..\ChatApp.slnx
 ```
 
 ### 4.2 Apply Database Migrations
@@ -74,5 +71,5 @@ The API will launch at:
 
 Run the complete test suite (Unit + Integration tests):
 ```powershell
-dotnet test ChatApp.Backend.slnx
+dotnet test ..\ChatApp.slnx
 ```

@@ -67,6 +67,16 @@ public static class DependencyInjection
         var jwtSettings = configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
             ?? throw new InvalidOperationException("JwtSettings section is missing in configuration.");
 
+        if (string.IsNullOrEmpty(jwtSettings.SecretKey) || Encoding.UTF8.GetByteCount(jwtSettings.SecretKey) < 32)
+        {
+            throw new InvalidOperationException("JwtSettings:SecretKey must be configured with at least 32 UTF-8 bytes.");
+        }
+
+        if (string.IsNullOrWhiteSpace(jwtSettings.Issuer) || string.IsNullOrWhiteSpace(jwtSettings.Audience))
+        {
+            throw new InvalidOperationException("JwtSettings:Issuer and JwtSettings:Audience must be configured.");
+        }
+
         // Configure JWT Authentication
         services.AddAuthentication(options =>
             {

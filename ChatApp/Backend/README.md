@@ -38,6 +38,15 @@ ChatApp/
 - Microsoft SQL Server 2022+ or SQL Server LocalDB (`(localdb)\mssqllocaldb`)
 - `dotnet-ef` global or local tool (`dotnet tool restore`)
 
+Configure the signing key in User Secrets before running the API (use a randomly generated value of at least 32 bytes):
+
+```powershell
+cd ChatApp\Backend\src\ChatApp.API
+dotnet user-secrets set "JwtSettings:SecretKey" "<random secret of at least 32 bytes>"
+```
+
+Production environments must supply `ConnectionStrings__DefaultConnection` and `JwtSettings__SecretKey` through a secret manager or environment variables. Configure any browser origins with `AllowedCorsOrigins__0`, `AllowedCorsOrigins__1`, etc. Mobile native clients do not require CORS origins.
+
 ---
 
 ## 4. Build & Run Instructions

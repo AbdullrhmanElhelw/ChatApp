@@ -34,8 +34,8 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                fonts.AddFont("OpenSans-Regular.ttf", "CairoRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "CairoBold");
+                fonts.AddFont("Cairo-Variable.ttf", "CairoRegular");
+                fonts.AddFont("Cairo-Variable.ttf", "CairoBold");
             });
 
 #if ANDROID

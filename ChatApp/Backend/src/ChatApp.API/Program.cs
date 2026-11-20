@@ -37,17 +37,21 @@ builder.Services.AddSignalR();
 
 // 6. Register CORS
 const string corsPolicy = "ChatAppCorsPolicy";
+var allowedCorsOrigins = builder.Configuration.GetSection("AllowedCorsOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsPolicy, policy =>
     {
-        policy.SetIsOriginAllowed(_ => true) // Mobile clients and local development
-              .AllowAnyHeader()
+        if (allowedCorsOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedCorsOrigins);
+        }
+
+        policy.AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
     });
 });
-
 // 7. Register Swagger with JWT Bearer Definition
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

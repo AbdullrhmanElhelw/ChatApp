@@ -194,6 +194,23 @@
                         </Border>
                     </HorizontalStackLayout>
 
+                    <!-- Import WhatsApp Stickers Batch Button -->
+                    <Border StrokeThickness="1" Stroke="#10B981" BackgroundColor="#063B2C" Padding="14,10">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="16" /></Border.StrokeShape>
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ImportWhatsAppStickersCommand}" /></Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                            <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeThickness="0" BackgroundColor="#10B981">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                                <Path Data="{StaticResource IconFolder}" Fill="#FFFFFF" WidthRequest="17" HeightRequest="17" Aspect="Uniform" HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                <Label Text="استيراد استيكرات واتساب دفعة واحدة" FontFamily="CairoBold" FontSize="13" TextColor="#ECFDF5" />
+                                <Label Text="اختر ملفات .webp أو حزمة .wastickers / .zip" FontFamily="CairoRegular" FontSize="11" TextColor="#A7F3D0" />
+                            </VerticalStackLayout>
+                            <Path Grid.Column="2" Data="{StaticResource IconPlus}" Fill="#A7F3D0" WidthRequest="16" HeightRequest="16" Aspect="Uniform" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+
                     <!-- Feedback & Error Banners -->
                     <Border StrokeThickness="1" Stroke="#10B981" BackgroundColor="{AppThemeBinding Light=#ECFDF5, Dark=#064E3B}" Padding="14,10" IsVisible="{Binding HasStatusMessage}">
                         <Border.StrokeShape><RoundRectangle CornerRadius="14" /></Border.StrokeShape>

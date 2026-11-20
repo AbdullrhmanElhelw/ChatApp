@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO.Compression;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChatApp.Mobile.Features.Authentication.Services;
@@ -295,6 +296,124 @@ public partial class StickerStudioViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    [RelayCommand]
+    public async Task ImportWhatsAppStickersAsync()
+    {
+        try
+        {
+            var files = await FilePicker.Default.PickMultipleAsync(new PickOptions
+            {
+                PickerTitle = "اختر استيكرات واتساب (.webp / .wastickers / .zip)"
+            });
+
+            if (files == null) return;
+            var fileList = files.Where(f => f != null).ToList();
+            if (fileList.Count == 0) return;
+
+            IsBusy = true;
+            ClearError();
+            StatusMessage = "جارٍ قراءة وتجهيز استيكرات واتساب...";
+
+            var itemsToUpload = new List<(string FileName, string ContentType, byte[] Data)>();
+
+            foreach (var file in fileList)
+            {
+                var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (ext is ".zip" or ".wastickers")
+                {
+                    await using var zipStream = await file.OpenReadAsync();
+                    using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+                    foreach (var entry in archive.Entries)
+                    {
+                        if (string.IsNullOrWhiteSpace(entry.Name) || entry.Length <= 0 || entry.Length > 5 * 1024 * 1024)
+                            continue;
+
+                        var entryExt = Path.GetExtension(entry.Name).ToLowerInvariant();
+                        var entryMime = GetStickerMimeType(entryExt);
+                        if (entryMime == null) continue;
+
+                        await using var es = entry.Open();
+                        await using var ms = new MemoryStream();
+                        await es.CopyToAsync(ms);
+                        itemsToUpload.Add((entry.Name, entryMime, ms.ToArray()));
+                    }
+                }
+                else
+                {
+                    var mime = GetStickerMimeType(ext);
+                    if (mime == null) continue;
+
+                    await using var fs = await file.OpenReadAsync();
+                    await using var ms = new MemoryStream();
+                    await fs.CopyToAsync(ms);
+                    if (ms.Length > 0)
+                    {
+                        itemsToUpload.Add((file.FileName, mime, ms.ToArray()));
+                    }
+                }
+            }
+
+            if (itemsToUpload.Count == 0)
+            {
+                ErrorMessage = "لم يتم العثور على صور استيكرات صالحة (.webp / .png / .gif / .wastickers).";
+                StatusMessage = string.Empty;
+                return;
+            }
+
+            var currentUserId = _authState.CurrentUser?.Id ?? Guid.Empty;
+            var targetPack = StickerPacks.FirstOrDefault(p => p.OwnerId == currentUserId);
+            if (targetPack == null)
+            {
+                var createResult = await _stickerApi.CreatePackAsync("استيكراتي المخصصة 🎨", "استيكرات صنعتها واستوردتها بنفسي", "/uploads/stickers/sparkles.png");
+                if (!createResult.IsSuccess || createResult.Value == null)
+                {
+                    ErrorMessage = createResult.ErrorMessage ?? "فشل إنشاء حزمة الاستيكرات.";
+                    return;
+                }
+                targetPack = createResult.Value;
+                StickerPacks.Add(targetPack);
+                SelectedPack = targetPack;
+            }
+
+            var uploadedCount = 0;
+            foreach (var item in itemsToUpload)
+            {
+                StatusMessage = $"جارٍ استيراد {uploadedCount + 1} من {itemsToUpload.Count} استيكر...";
+                await using var ms = new MemoryStream(item.Data);
+                var uploadResult = await _stickerApi.UploadMediaAsync(ms, item.FileName, item.ContentType, MessageType.Sticker);
+                if (uploadResult.IsSuccess && uploadResult.Value != null)
+                {
+                    var addResult = await _stickerApi.AddStickerToPackAsync(targetPack.Id, uploadResult.Value.FileUrl);
+                    if (addResult.IsSuccess)
+                    {
+                        uploadedCount++;
+                    }
+                }
+            }
+
+            StatusMessage = uploadedCount > 0
+                ? $"تم استيراد {uploadedCount} استيكر من واتساب بنجاح إلى حزمتك!"
+                : "تعذر رفع الاستيكرات المختارة، تأكد من الاتصال بالخادم.";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"تعذر استيراد الاستيكرات: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private static string? GetStickerMimeType(string ext) => ext switch
+    {
+        ".webp" => "image/webp",
+        ".png" => "image/png",
+        ".gif" => "image/gif",
+        ".jpg" or ".jpeg" => "image/jpeg",
+        _ => null
+    };
 
     [RelayCommand]
     public async Task NavigateBackAsync() => await _navigationService.GoBackAsync();
